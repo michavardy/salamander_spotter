@@ -1,0 +1,23 @@
+[workspace]
+channels = ["conda-forge"]
+name = "salamander_spotter"
+platforms = ["win-64"]
+version = "0.1.0"
+
+[tasks]
+normalize = "python scripts/normalize_names.py"
+# spot labels — one script; pick a stage via the subcommand (all | segment | contours):
+#   pixi run extract-spot-labels all --input <dir>      (full: Gemini purple + contours)
+#   pixi run extract-spot-labels segment  --input <dir> (stage 1: images  -> purple/)
+#   pixi run extract-spot-labels contours --input <dir> (stage 2: purple/ -> contours.db, per-spot contours + masks)
+extract-spot-labels = "python scripts/extract_spot_labels.py"
+# package a normalized image dir + its contours.db into datasets/<name>/ (raw/ + db/ + README) and zip it:
+#   pixi run package-dataset --input all_sasa_norm --name all_sasa_norm_2026_10_07
+package-dataset = "python scripts/package_dataset.py"
+
+[dependencies]
+python = ">=3.10"
+numpy = "*"
+opencv = "*"                  # cv2: image IO + magenta keying + contours
+duckdb = ">=1.5.4,<2"         # contour store (images/<input>/contours/contours.db)
+google-genai = ">=2.10.0,<3"  # Gemini image inpainting (stage 1)
