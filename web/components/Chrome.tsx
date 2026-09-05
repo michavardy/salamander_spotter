@@ -27,7 +27,17 @@ export function Chrome({ children }: { children: React.ReactNode }) {
   return (
     <div className="flex min-h-screen">
       <aside className="w-[220px] shrink-0 bg-sidebar text-white/90 flex flex-col">
-        <div className="px-5 py-5 font-head text-lg font-semibold tracking-tight">
+        <div className="px-5 pt-5 pb-1">
+          <div className="flex h-9 items-center justify-center overflow-hidden">
+            <img
+              src="/logo.png"
+              alt="Salamander Spotter logo"
+              className="rotate-90 object-contain"
+              style={{ height: 128, width: 36 }}
+            />
+          </div>
+        </div>
+        <div className="px-5 pb-5 font-head text-lg font-semibold tracking-tight">
           Salamander<span className="text-accent"> Spotter</span>
         </div>
         <nav className="flex-1 px-2 space-y-1">
