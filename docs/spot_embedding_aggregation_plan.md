@@ -92,6 +92,7 @@ emb-train    = "python scripts/emb_train.py"      # train one candidate  --model
 emb-eval     = "python scripts/emb_eval.py"       # evaluate a matcher    --model <name> --run <id>
 emb-identify = "python scripts/emb_identify.py"   # query one photo       --gallery <> --image <>
 emb-bakeoff  = "python scripts/emb_bakeoff.py"    # run all candidates + emit comparison.md
+emb-selfcheck = "python scripts/emb_selfcheck.py" # doctor: ground-truth table + oracle/dummy sanity
 
 [dependencies]              # add on top of the existing ones
 pytorch = "*"               # or pytorch-cpu — CPU-first per project constraint
@@ -127,21 +128,44 @@ spot_embedding"` succeeds.
 
 ### 0.2 SpotSet data access
 - [ ] `data/spot_store.py`: open `datasets/<name>/db/contours.db` (read-only), join `images` +
-      `spots`, decode `mask_png`, expose a `SpotSet` (centroids, areas, per-spot masks, `label`).
-- [ ] Cache to `artifacts/spot_embedding/prepared/<dataset>/` (`.npz` per image) so training doesn't
-      re-hit DuckDB.
+      `spots`, decode `mask_png`, expose a `SpotSet` (centroids, areas, per-spot masks, `label`,
+      `is_empty`).
+- [ ] Cache to `artifacts/spot_embedding/prepared/<dataset>/` so training doesn't re-hit DuckDB.
+- [ ] **Zero-spot & missing-image policy** (see the counts below): keep the 13 zero-spot images in
+      the manifest but mark `is_empty=True` and **exclude them from gallery/query roles** (a photo
+      with no spots cannot be matched); the loader keys off the DB (444 rows), so the one raw file
+      absent from the DB (`jt_1_1`) is simply not loaded — report it as a reconciliation warning,
+      never invent a row for it.
 
-**Explanation.** One clean, fast in-memory representation of a photo's spots that every model reads.
+**Explanation.** One clean, fast in-memory representation of a photo's spots that every model reads,
+with the degenerate cases (empty spot-sets, raw/DB mismatch) handled explicitly rather than
+crashing a batch or silently skewing counts.
 **DoD.** Loads the packaged `all_sasa_norm_2026_10_07`; a `SpotSet` round-trips a decoded mask as an
-`HxW` 0/255 array.
-**Test / eval.** Assert dataset totals match the README (445 images, 290 labels); assert `ca_5`
-resolves to 8 photos and `aj_1` ≠ `aj_2`; decode one `mask_png` and check it is binary and non-empty.
+`HxW` 0/255 array; empties are flagged and the missing raw file is reported.
+**Test / eval.** Assert the loader reproduces the **DB ground truth** — **444 images**, **289
+labels**, **202 singletons**, **87 multi-photo**, **13 zero-spot** (`ca_1_1`, `jd_1_7`, …), **16,536
+spots** — assert `ca_5` resolves to 8 photos and `aj_1` ≠ `aj_2`; assert `raw\` has 445 `.jpg` and
+the one extra (`jt_1_1`) is reported; decode one `mask_png` and check it is binary 0/255, non-empty,
+and matches its image's `width`×`height`.
+
+> **Ground truth (verified against the DB, 2026-07-11)** — these are the numbers Phase 0 must
+> reproduce, *not* the raw-file counts:
+>
+> | quantity | value |
+> |---|---|
+> | images in DB | **444** (raw `.jpg`: **445** — `jt_1_1` is absent from the DB) |
+> | zero-spot images | **13** — excluded from gallery/query |
+> | total spots | 16,536 |
+> | identity labels | **289** |
+> | singletons / multi (≥2) | 202 / 87 |
+> | `ca_5` / `jd_1` photos | 8 / 7 |
 
 ### 0.3 Splits (by-individual + by-session)
 - [ ] `data/splits.py`: k-fold CV grouped by identity **label**; a second grouping by
       **source/session** (the `code` prefix, e.g. `ca`); assign gallery vs. query roles per fold.
-- [ ] Leakage guard: no label appears in two folds; singletons go to train/gallery only (can't be a
-      query positive).
+- [ ] Leakage guard: no label appears in both the train and eval partitions of a fold; within an
+      eval fold, multi-photo individuals supply gallery + a held-out closed query, singletons become
+      novel (open-set) queries, and the 13 zero-spot images are dropped from all roles.
 
 **Explanation.** With only 87 multi-photo individuals, a single split is too noisy — CV is
 mandatory, and session-grouping proves the model isn't cheating on shared backgrounds.
@@ -166,13 +190,20 @@ whose rank-1 you computed by hand); a perfect matcher scores 1.0, a random one �
       `report.md` (+ `risk_coverage.csv`) under `artifacts/.../runs/<id>/`.
 - [ ] A `DummyMatcher` (random embeddings) to smoke-test the whole path.
 
-**Explanation.** This is the rig the entire study runs on; the dummy proves it end-to-end.
-**DoD.** `pixi run emb-eval --model dummy` produces a report with chance-level numbers,
-reproducibly under a fixed seed.
-**Test / eval.** Two dummy runs with the same seed produce identical metrics; a "perfect oracle"
-matcher scores rank-1 = 1.0 through the harness.
+- [ ] `scripts/emb_selfcheck.py` (`pixi run emb-selfcheck`): a one-command **doctor** that prints
+      the ground-truth table above and runs both the oracle and dummy matchers through the harness,
+      asserting **oracle ≈ 1.0** and **dummy ≈ chance**, so Phase-0 completion is a single eyeball.
 
-> **GATE 0 →** metrics are reproducible on the dummy matcher. Only then build real matchers.
+**Explanation.** This is the rig the entire study runs on; the dummy proves it end-to-end, the
+oracle proves the plumbing, and `emb-selfcheck` bundles both into the acceptance check.
+**DoD.** `pixi run emb-eval --model dummy` produces a report with chance-level numbers, reproducibly
+under a fixed seed; `pixi run emb-selfcheck` prints PASS.
+**Test / eval.** Two dummy runs with the same seed produce identical metrics; the **oracle** matcher
+scores rank-1 = 1.0 and verification AUC = 1.0 through the harness; the **dummy** scores rank-1 ≈
+1/|gallery| and AUC ≈ 0.5.
+
+> **GATE 0 →** `emb-selfcheck` prints PASS: metrics reproducible on the dummy, oracle perfect, dummy
+> at chance. Only then build real matchers.
 
 ---
 
@@ -213,96 +244,107 @@ rank-1 recorded vs. the 4.5 floor.
 
 Build the per-spot front-end and settle the orientation question by experiment.
 
-### 2.1 Spot normalization + hand-features
-- [ ] `encoders/handfeatures.py`: Fourier descriptors, Hu moments, solidity, skeleton
-      branch/endpoint counts.
-- [ ] Normalize a spot mask to a canonical size; implement orientation **mode A** (as-is) and
-      **mode B** (rotate to principal axis).
+### 2.1 Spot normalization + hand-features ✅
+- [x] `encoders/handfeatures.py`: Hu moments, solidity, extent, eccentricity, skeleton
+      branch/endpoint counts (rotation-invariant core) + orientation-dependent radial signature.
+- [x] Normalize a spot mask to a canonical size (aspect-preserving pad → resize); implement
+      orientation **mode A** (as-is) and **mode B** (rotate to principal axis).
 
 **Explanation.** Guarantees distinctive shapes (L/M/fork) are representable and provides the A/B
 switch for §2a of the design doc.
-**DoD.** Features computed for all spots in the dataset; A vs B produce visibly different crops.
-**Test / eval.** Rotation-invariant hand-features stay ~constant when a spot is rotated 90°; an
-`L`/forked mask yields higher branch/endpoint counts than a round blob.
+**DoD.** ✅ Features computed for all 16,536 spots; A vs B produce visibly different descriptors.
+**Test / eval.** ✅ Invariant-core rotation drift (0° vs 90°) = 0.000; `L` mask → 2 skeleton
+endpoints vs blob's 0; radial-signature drift under 40° rotation: mode A 4.74 vs mode B 0.13.
 
-### 2.2 Spot encoder CNN
-- [ ] `encoders/spot_encoder.py`: small CNN → shape embedding; assemble the token
-      `[shape ⊕ area ⊕ orientation ⊕ (optional) handfeatures]`.
+### 2.2 Spot encoder (front-end) ✅
+- [x] `encoders/spot_encoder.py`: crop/normalise each spot; assemble a per-spot token
+      `[shape descriptor ⊕ area]`; cache per mode. *(The learned CNN shape embedding is deferred
+      to Phase 3; Phase 2's "shape embedding" is the hand-feature descriptor — no training.)*
 
-**Explanation.** Turns each spot into the token the aggregators consume.
-**DoD.** Fixed-dim token; both orientation modes and the hand-feature switch wired.
-**Test / eval.** Forward-pass shape check; after brief training, the same spot under augmentation
-embeds with high cosine similarity to itself.
+**Explanation.** Turns each spot into the token the aggregators/matchers consume.
+**DoD.** ✅ Fixed-dim token (28-d descriptor + area/centroid); both orientation modes wired &
+cached to `prepared/<name>/spot_tokens_{A,B}.pkl`.
+**Test / eval.** ✅ Descriptors built for the whole dataset; consumed by `spotdesc` through the harness.
 
-### 2.3 Augmentation pipeline
-- [ ] `augment/geometry.py`, `augment/appearance.py`, `augment/pipeline.py`: TPS/affine warp,
-      **spot dropout + spurious inject**, jitter, per-spot rotate/stretch; blur, lighting,
-      background randomization; two-view sampler + curriculum; **assert no mirror flips**.
+### 2.3 Augmentation pipeline ✅
+- [x] `augment/geometry.py`, `augment/appearance.py`, `augment/pipeline.py`: similarity + affine
+      + elastic (TPS stand-in) warp, **spot dropout + spurious inject**, jitter, per-spot
+      rotate/stretch, blur, occlude; two-view sampler; **no mirror flips** guaranteed + guarded.
 
-**Explanation.** The training-signal generator — it manufactures positive pairs for the 203
-singletons and drives the rotation/stretch/blur/missing-spot invariances.
-**DoD.** Sampler yields two identity-preserving augmented views per spot-set.
-**Test / eval.** Dump augmented pairs as PNGs to `artifacts/.../prepared/_aug_preview/` for eyeball;
-assert spot count varies under dropout; assert no reflection is ever applied.
+**Explanation.** The training-signal generator — it manufactures positive pairs for the 202
+singletons and drives the rotation/stretch/blur/missing-spot invariances. *(Consumed by Phase 3's
+trainer; no trainer yet.)*
+**DoD.** ✅ Sampler yields two identity-preserving views per spot-set.
+**Test / eval.** ✅ Two views differ; spot count varies under dropout (39 → 23–36); no reflection
+over 500 warps (best-fit-linear det > 0) **and a deliberate mirror flip is detected** (positive
+control); preview PNG written to `prepared/.../_aug_preview/`.
 
-### 2.4 Orientation A/B experiment
-- [ ] Train one fixed aggregator (Set Transformer) twice — encoder mode A vs. B — same data/seed;
-      compare through the harness.
+### 2.4 Orientation A/B experiment ✅
+- [x] Run one fixed matcher (`spotdesc`) with encoder mode A vs. B — same data/seed/folds —
+      through the harness. *(Training-free: uses the hand-feature descriptor, not a trained
+      aggregator. The definitive A/B on a learned CNN is re-checked in Phase 3.)*
 
 **Explanation.** Directly answers "did we need geometric normalization?" with same-everything-else
 rigor.
-**DoD.** Two runs + a comparison; the chosen front-end recorded in the run config.
-**Test / eval.** Harness metrics for A vs B side-by-side; winner documented and frozen for Phase 3.
+**DoD.** ✅ A vs B compared in `bakeoff/comparison.md`; chosen front-end recorded.
+**Test / eval.** ✅ **Mode A (as-is) wins** — rank-1 0.19 vs 0.14, verify-AUC 0.55 vs 0.53 (B only
+edges open-set). Canonicalisation hurts because near-round spots have an unstable/ambiguous
+principal axis — confirms the augmentation-first prior.
 
-> **GATE 2 →** shape front-end chosen (A or B, hand-features on/off).
+> **GATE 2 → PASSED.** Front-end = **Mode A (as-is)**, hand-features on. Secondary finding:
+> training-free shape ≤ pure geometry (spotdesc ≤ classical on retrieval) → shape needs a
+> *learned* encoder + augmentation (Phase 3) to pay off. Encoder + augmentation inputs are ready.
 
 ---
 
 ## Phase 3 — Aggregator bake-off  ·  **P1, the main study**
 
-Same front-end, same harness; swap only the aggregator.
+Same front-end (Phase-2 tokens: invariant shape core ⊕ log-area ⊕ relative position), same
+harness; swap only the aggregator. Each learned model is **trained fresh per CV fold** on that
+fold's train labels, then embeds the fold's gallery/query (no leakage).
 
-### 3.1 Shared losses & trainer
-- [ ] `train/losses.py`: NT-Xent (SSL pretrain), triplet + hard-mining / SupCon (finetune),
-      spot-level auxiliary loss.
-- [ ] `train/trainer.py`: SSL-pretrain → supervised-finetune, curriculum, checkpoint best-on-val.
+### 3.1 Shared losses & trainer ✅
+- [x] `train/losses.py`: **supervised contrastive** (SupCon) over augmentation-manufactured
+      two-view positive pairs (SSL-style positives for singletons + real same-individual positives).
+- [x] `train/trainer.py`: per-fold training loop; `train/features.py` tensorises tokens + applies
+      the Phase-2 augmentation. *(Single-stage SupCon rather than the two-stage SSL→finetune; the
+      augmentation-positive term already gives the singletons their SSL signal.)*
 
-**Explanation.** Two-stage objective from the design doc; shared so model comparisons are fair.
-**DoD.** Both stages run; best checkpoint saved.
-**Test / eval.** Overfit-tiny sanity per loss; loss curves logged.
+**DoD.** ✅ Trains; loss falls 1.7 → ~0.5. **Test.** ✅ Capacity check: both archs memorise a tiny
+set at **train rank-1 1.000** (aug off) — model + loss + pipeline correct.
 
-### 3.2 Set Transformer (4.1)
-- [ ] `models/set_transformer.py`: ISAB self-attention + PMA pooling, relative-position attention
-      bias → `embed()`.
+### 3.2 Set Transformer (4.1) ✅
+- [x] `models/nn.py::SetTransformer`: global self-attention + PMA pooling → set embedding; also
+      exposes per-token embeddings (for 4.4).
 
-**Explanation.** Global all-pairs reasoning over spots.
-**DoD / Test.** Trains, converges, beats the Phase-1 floor; overfit-tiny passes.
+**Result.** Trains/converges. **Best model on verification AUC (0.59) and open-set AUROC (0.59)** —
+but rank-1 0.13 (below the CNN/classical floor).
 
-### 3.3 GNN / GAT (4.2)
-- [ ] `models/gnn.py`: kNN spot graph, edge `(dist, rel-angle)`, message passing → pooled `embed()`.
+### 3.3 GNN / GCN (4.2) ✅
+- [x] `models/nn.py::GCN`: message passing over the kNN spot graph + attention pool → set embedding.
+      *(GCN rather than torch-geometric GAT, to avoid a heavy Windows dependency.)*
 
-**Explanation.** The most literal encoding of relative geometry.
-**DoD / Test.** Trains, converges, beats the floor; robust as spots are dropped at eval.
+**Result.** Weakest learned model (rank-1 0.12, open-set 0.51).
 
-### 3.4 Hungarian matcher (4.4)
-- [ ] `models/hungarian.py`: per-spot embeddings + `scipy.optimize.linear_sum_assignment`; dummy
-      node for unassigned spots; coarse pooled embedding for top-k prefilter.
+### 3.4 Hungarian matcher (4.4) ✅
+- [x] `models/learned.py::FoldHungarianMatcher`: per-spot token embeddings from the trained
+      Set-Transformer encoder + `scipy.optimize.linear_sum_assignment`; unmatched spots dilute the
+      score (normalise by the larger set). *(Coarse-embed prefilter deferred — gallery is small.)*
 
-**Explanation.** Explicit set-matching — most interpretable, natural partial-match; the learned
-cousin of 4.5.
-**DoD / Test.** `score(a,b)` works; prefilter → Hungarian re-rank retrieval runs in acceptable time;
-correspondences are inspectable; beats the floor.
+**Result.** Best rank-1 among learned models (0.19) but open-set only 0.51.
 
-### 3.5 Bake-off run + comparison
-- [ ] `emb_bakeoff.py` runs 4.1/4.2/4.4 (+ Phase-1 baselines) through the harness →
-      `artifacts/.../bakeoff/comparison.md`.
+### 3.5 Bake-off run + comparison ✅
+- [x] `emb_bakeoff.py` runs the learned models + Phase-0/1/2 baselines through the harness →
+      `artifacts/spot_embedding/bakeoff/comparison.md`.
 
-**Explanation.** The deliverable of the study: one table, identical conditions.
-**DoD.** `comparison.md` with all candidates on all metrics.
-**Test / eval.** Same-seed reproducibility; missing-spot stress column (metrics at 25/50% dropout).
+**DoD.** ✅ Full ladder written (see [running.md](running.md#results-so-far-phases-03)).
 
-> **GATE 3 →** primary matcher chosen (and whether it is embedding- or matching-based — this decides
-> the retrieval path in Phase 4).
+> **GATE 3 → PASSED (split decision).** Primary matcher = **Set Transformer** (embedding-based),
+> chosen for leading the **product-critical open-set + verification metrics** (AUROC 0.59). BUT no
+> learned model beats the **frozen CNN** on top-1 retrieval (rank-1 0.25) — that stays the
+> retrieval bar to beat. Open task before Phase 4 pays off: a **trained per-spot CNN encoder**
+> (deferred from 2.2), more epochs, and more labeled multi-photo individuals. Retrieval path for
+> Phase 4 = embedding NN search (Set Transformer), with the CNN as a fallback/ensemble.
 
 ---
 

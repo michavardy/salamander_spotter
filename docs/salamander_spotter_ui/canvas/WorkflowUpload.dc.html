@@ -1,0 +1,129 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee; --green-line:#bfe0cd;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+    h1{font-family:"Hanken Grotesk";margin:0;font-weight:700;font-size:22px;letter-spacing:-.01em}
+    .mono{font-family:"IBM Plex Mono",monospace}
+    svg{display:block}
+    .page{width:1240px;padding:36px 20px 60px;background:var(--bg)}
+    .kicker{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--amber-ink);font-weight:700;margin-bottom:6px}
+    .desc{font-size:13px;color:var(--muted2);margin-top:6px;max-width:660px;line-height:1.6}
+    .diagram{position:relative;width:1200px;height:1420px;margin:34px auto 0}
+    .node{position:absolute;background:#fff;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;gap:10px;padding:0 15px;font-size:12px;font-weight:600;color:var(--ink-soft);box-shadow:0 1px 2px rgba(51,48,44,.05);line-height:1.28}
+    .node svg{width:18px;height:18px;stroke-width:1.8;flex:none;color:var(--accent)}
+    .node.decision{background:var(--accent-soft);border:1.4px dashed var(--amber-line);color:var(--amber-ink);justify-content:center;text-align:center;border-radius:27px}
+    .node.decision svg{color:var(--amber-ink)}
+    .node.terminal{border-style:dashed;color:var(--muted2);background:#fbf9f5}
+    .node.terminal svg{color:var(--muted2)}
+    .node.blue{border-color:var(--blue-line);background:var(--blue-soft);color:var(--blue)}
+    .node.blue svg{color:var(--blue)}
+    .node.green{border-color:var(--green-line);background:var(--green-soft);color:var(--green)}
+    .node.green svg{color:var(--green)}
+    .node.amber{border-color:var(--amber-line);background:var(--amber-soft);color:var(--amber-ink)}
+    .node.amber svg{color:var(--amber-ink)}
+    .elabel{position:absolute;font-size:10px;font-weight:700;color:var(--muted2);background:var(--bg);padding:1px 6px;border-radius:4px}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-chat" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5h16v11H8l-4 4Z"/></symbol>
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="ico-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><circle cx="19" cy="18" r="1.5"/><path d="M9.9 10.4 6.3 7.1M14.1 10.4l3.6-3.3M9.9 13.6l-3.6 3.3M14.1 13.6l3.6 3.3"/></symbol>
+  <symbol id="ico-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="ico-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="ico-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3" cy="6" r="1.2"/><circle cx="3" cy="12" r="1.2"/><circle cx="3" cy="18" r="1.2"/></symbol>
+  <symbol id="ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></symbol>
+  <symbol id="ico-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="ico-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.9.8c0 1.7-2.4 2-2.4 3.4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+</svg>
+
+<div class="page">
+  <div class="kicker">User workflow 1 of 4 &middot; updated</div>
+  <h1>Image upload, review &amp; approval</h1>
+  <div class="desc">From a WhatsApp photo to a confirmed census entry &mdash; now with the quality ladder guiding hand&#8209;correction, an auto&#8209;approve bypass above threshold, and upload &rarr; review staying one sitting.</div>
+
+  <div class="diagram">
+    <svg width="1200" height="1420" style="position:absolute;left:0;top:0" aria-hidden="true">
+      <defs>
+        <marker id="ahu" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7a736a"/></marker>
+        <marker id="ahug" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#2f7d4f"/></marker>
+      </defs>
+      <g stroke="#7a736a" stroke-width="1.6" fill="none">
+        <path d="M600 82 L600 148" marker-end="url(#ahu)"/>
+        <path d="M600 212 L600 278" marker-end="url(#ahu)"/>
+        <path d="M600 342 L600 401" marker-end="url(#ahu)"/>
+        <path d="M750 430 L865 430" marker-end="url(#ahu)"/>
+        <path d="M600 459 L600 528" marker-end="url(#ahu)"/>
+        <path d="M980 466 L980 560 L710 560" marker-end="url(#ahu)"/>
+        <path d="M600 592 L600 658" marker-end="url(#ahu)"/>
+        <path d="M600 722 L600 771" marker-end="url(#ahu)"/>
+        <path d="M750 800 L865 800" marker-end="url(#ahu)"/>
+        <path d="M600 829 L600 898" marker-end="url(#ahu)"/>
+        <path d="M600 962 L600 1033" marker-end="url(#ahu)"/>
+        <path d="M600 1087 L600 1130 L280 1130 L280 1178" marker-end="url(#ahu)"/>
+        <path d="M600 1130 L600 1178" marker-end="url(#ahu)"/>
+        <path d="M600 1130 L920 1130 L920 1178" marker-end="url(#ahu)"/>
+      </g>
+      <g stroke="#2f7d4f" stroke-width="1.6" fill="none">
+        <path d="M280 1242 L280 1280 L600 1280"/>
+        <path d="M600 1242 L600 1280"/>
+        <path d="M600 1280 L600 1308" marker-end="url(#ahug)"/>
+      </g>
+    </svg>
+
+    <div class="node" style="left:490px;top:18px;width:220px;height:64px"><svg><use href="#ico-chat"/></svg>Community member sends a photo over WhatsApp</div>
+    <div class="node" style="left:490px;top:148px;width:220px;height:64px"><svg><use href="#ico-upload"/></svg>Contributor drags it into Upload &mdash; same sitting starts</div>
+    <div class="node" style="left:490px;top:278px;width:220px;height:64px"><svg><use href="#ico-atom"/></svg>Pipeline extracts body/spots; judge model scores it</div>
+
+    <div class="node decision" style="left:450px;top:401px;width:300px;height:58px">Ladder tier: &ldquo;needs a look&rdquo; or better?</div>
+    <div class="elabel" style="left:790px;top:418px">no</div>
+    <div class="elabel" style="left:615px;top:485px">yes</div>
+    <div class="node blue" style="left:865px;top:394px;width:230px;height:72px"><svg><use href="#ico-pencil"/></svg>Guided to Frame Card hand&#8209;correction &mdash; fix, or &ldquo;Use anyway&rdquo; (not recommended)</div>
+
+    <div class="node" style="left:490px;top:528px;width:220px;height:64px"><svg><use href="#ico-search"/></svg>Auto&#8209;matched against enrolled individuals</div>
+    <div class="node" style="left:490px;top:658px;width:220px;height:64px"><svg><use href="#ico-list"/></svg>Candidates ranked; Top&#8209;N computed to cover the confidence target</div>
+
+    <div class="node decision" style="left:450px;top:771px;width:300px;height:58px">Confidence &ge; auto&#8209;approve threshold?</div>
+    <div class="elabel" style="left:775px;top:788px">yes</div>
+    <div class="elabel" style="left:615px;top:855px">no</div>
+    <div class="node green" style="left:865px;top:768px;width:220px;height:64px"><svg><use href="#ico-check"/></svg>Auto&#8209;confirmed &mdash; logged to Dashboard, no review needed</div>
+
+    <div class="node" style="left:490px;top:898px;width:220px;height:64px"><svg><use href="#ico-review"/></svg>Family Card opens: target vs. Top&#8209;N candidates</div>
+
+    <div class="node decision" style="left:470px;top:1033px;width:260px;height:54px">Reviewer decision</div>
+    <div class="elabel" style="left:250px;top:1153px">confirm</div>
+    <div class="elabel" style="left:572px;top:1153px">new</div>
+    <div class="elabel" style="left:865px;top:1153px">unsure</div>
+
+    <div class="node green" style="left:170px;top:1178px;width:220px;height:64px"><svg><use href="#ico-check"/></svg>Confirm re&#8209;ID</div>
+    <div class="node amber" style="left:490px;top:1178px;width:220px;height:64px"><svg><use href="#ico-plus"/></svg>New individual enrolled</div>
+    <div class="node blue terminal" style="left:810px;top:1178px;width:220px;height:64px"><svg><use href="#ico-help"/></svg>Uncertain &mdash; flagged, revisit later</div>
+    <div class="elabel" style="left:170px;top:1246px;background:none;color:var(--muted2);font-weight:500">hand&#8209;picking a different individual warns via toast first</div>
+
+    <div class="node" style="left:490px;top:1308px;width:220px;height:64px"><svg><use href="#ico-home"/></svg>Family Card updated &middot; Dashboard &amp; map refresh</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

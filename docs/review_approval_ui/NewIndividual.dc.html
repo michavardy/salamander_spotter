@@ -1,0 +1,253 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#33302c;background:#faf8f5;-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:#4a72b8;text-decoration:none}a:hover{color:#365a99}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    .screen{width:1440px;height:1000px;display:flex;overflow:hidden;background:#faf8f5}
+
+    .side{width:216px;flex:none;background:#2b2825;color:#cfc9c1;display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 18px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:#f4efe8}
+    .brand .dot{width:22px;height:22px;border-radius:6px;background:#b9782a;display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:6px 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:8.5px 12px;border-radius:8px;color:#a79e93;font-size:13px;font-weight:500}
+    .nav a.on{background:#3a3632;color:#f4efe8}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .side .foot{margin-top:auto;padding:14px 20px 2px;border-top:1px solid #3a3632;font-size:11.5px;color:#8a827a;line-height:1.5}
+    .side .foot b{color:#cfc9c1;font-weight:600;display:block;font-size:12.5px}
+
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .top{height:58px;flex:none;border-bottom:1px solid #e6e1d9;display:flex;align-items:center;gap:18px;padding:0 24px;background:#fff}
+    .top h1{font-size:15.5px}
+    .top .batch{font-size:12px;color:#8a827a;border-left:1px solid #e6e1d9;padding-left:16px}
+    .top .batch b{color:#5b544c;font-weight:600}
+    .top .prog{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12px;color:#8a827a}
+    .bar{width:120px;height:5px;border-radius:3px;background:#ece7df;overflow:hidden}
+    .bar i{display:block;height:100%;background:#7c9a86}
+    .nvg{display:flex;gap:4px}
+    .nvg button{width:28px;height:28px;border:1px solid #e0dacf;background:#fff;border-radius:7px;color:#7a736a;font-size:13px;cursor:pointer}
+
+    .rec{height:38px;flex:none;background:#f6ecdc;border-bottom:1px solid #e8d6b8;display:flex;align-items:center;gap:9px;padding:0 24px;font-size:12.5px;color:#8a5a1e}
+    .rec svg{width:15px;height:15px}
+    .rec b{font-weight:600}
+
+    .body{flex:1;display:flex;gap:20px;padding:20px 24px 0;min-height:0}
+    .rail{width:198px;flex:none;display:flex;flex-direction:column;gap:14px}
+    .panel{background:#fff;border:1px solid #e9e3d9;border-radius:12px;padding:13px}
+    .panel h3{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:#9a9186;font-weight:600;margin-bottom:9px}
+    .kv{font-size:11.5px;color:#7a736a;line-height:1.9}
+    .kv b{color:#4b453d;font-weight:600}
+    .kv .r{display:flex;justify-content:space-between}
+    .rchips{display:flex;flex-wrap:wrap;gap:6px}
+    .rchip{font-size:11px;padding:5px 9px;border-radius:20px;border:1px solid #e0dacf;color:#8a827a;background:#fbf8f3}
+    .rchip.on{background:#f0e4d0;border-color:#dcc496;color:#7a4f16;font-weight:600}
+
+    .stage{flex:1;display:flex;flex-direction:column;min-width:0}
+    .enroll{background:linear-gradient(#fbf3e6,#f8efe0);border:1px solid #e8d6b8;border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:20px;margin-bottom:16px}
+    .enroll .big{width:52px;height:52px;border-radius:13px;background:#b9782a;display:flex;align-items:center;justify-content:center;flex:none}
+    .enroll .big svg{width:26px;height:26px;stroke:#fff}
+    .enroll h2{font-size:16px;color:#5b3c12}
+    .enroll p{margin:3px 0 0;font-size:12px;color:#8a6636;line-height:1.5}
+    .enroll .idcard{margin-left:auto;text-align:right;flex:none}
+    .enroll .idcard .k{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#a5824c;font-weight:600}
+    .enroll .idcard .v{font-size:22px;font-weight:700;font-family:"IBM Plex Mono",monospace;color:#5b3c12}
+
+    .cols{flex:1;display:flex;gap:18px;min-height:0}
+    .target{width:322px;flex:none}
+    .cands{flex:1;display:flex;flex-direction:column;min-width:0}
+    .cands .lbl{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+    .cands .lbl h2{font-size:13.5px}
+    .cands .lbl span{font-size:11.5px;color:#9a9186}
+    .cardrow{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;min-height:0}
+
+    .card{background:#fff;border:1px solid #e9e3d9;border-radius:13px;display:flex;flex-direction:column;overflow:hidden;position:relative}
+    .card.tgt{border-color:#cda86f;box-shadow:0 6px 18px #b9782a1f}
+    .card.rejected{opacity:.58}
+    .chead{padding:11px 13px 10px;border-bottom:1px solid #f0ebe2}
+    .chead .row1{display:flex;align-items:center;justify-content:space-between;gap:6px}
+    .chead .id{font-size:14px;font-weight:600}
+    .rank{font-size:10px;font-weight:700;color:#8a827a;background:#f1ece3;border-radius:5px;padding:2px 6px}
+    .chead .sub{font-size:11px;color:#9a9186;margin-top:2px}
+    .nomatch{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#9a9186;background:#f1ece3;border-radius:5px;padding:3px 7px}
+    .newtag{font-size:10px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#8a5a1e;background:#f4e7d2;border-radius:5px;padding:3px 7px}
+
+    .figwrap{position:relative;flex:1;background:#211d19;min-height:0;display:flex}
+    .fig{width:100%;height:100%;display:block}
+    .figwrap.dim .fig{filter:grayscale(1);opacity:.4}
+    .figwrap .vtag{position:absolute;left:8px;top:7px;font-size:9.5px;color:#e9e2d3;opacity:.6}
+    .figwrap .cf{position:absolute;left:8px;right:8px;bottom:8px;background:#20242bdd;border-radius:8px;padding:6px 9px;font-size:10.5px;color:#cbc4b7;display:flex;justify-content:space-between}
+    .figwrap .cf b{color:#fff}
+
+    .qstrip{display:flex;border-top:1px solid #f0ebe2}
+    .qstrip div{flex:1;text-align:center;padding:7px 2px;border-right:1px solid #f4efe6}
+    .qstrip div:last-child{border-right:0}
+    .qstrip .k{font-size:8.5px;text-transform:uppercase;letter-spacing:.04em;color:#a99f92;font-weight:600}
+    .qstrip .v{font-size:11.5px;font-weight:600;margin-top:1px}
+    .q-pass{color:#2f7d4f}.q-fail{color:#a5443b}
+    .cmeta{display:flex;flex-direction:column;gap:6px;padding:11px 13px;font-size:11px;color:#7a736a;border-top:1px solid #f0ebe2}
+    .cmeta .m{display:flex;justify-content:space-between}
+    .cmeta .m b{color:#4b453d;font-weight:600}
+
+    .decide{height:74px;flex:none;display:flex;align-items:center;gap:12px;padding:0 24px;border-top:1px solid #e6e1d9;background:#fff;margin-top:12px}
+    .btn{border:1px solid #d9d0c1;background:#fff;border-radius:9px;padding:10px 15px;font-size:13px;font-weight:600;color:#4b453d;cursor:pointer;display:flex;align-items:center;gap:8px}
+    .btn .kbd{font-size:10px;font-weight:700;background:#f1ece3;border-radius:4px;padding:1px 5px;color:#9a9186}
+    .btn.primary{background:#b9782a;border-color:#b9782a;color:#fff}
+    .btn.primary .kbd{background:#ffffff2e;color:#f7ecdd}
+    .btn.undo{color:#8a5a1e;border-color:#cda86f}
+    .decide .end{margin-left:auto;font-size:11px;color:#a99f92}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <defs>
+    <symbol id="fig-A" viewBox="0 0 180 300">
+      <rect width="180" height="300" fill="#211d19"/>
+      <g opacity="0.5" stroke="#2d2820" stroke-width="1"><path d="M0 46 C 60 40 120 52 180 44"/><path d="M0 150 C 70 158 120 140 180 150"/><path d="M0 244 C 60 236 130 250 180 240"/></g>
+      <path id="bodA" d="M90 14 C 71 40 67 88 75 128 C 81 166 60 208 68 248 C 72 270 85 286 96 288 C 110 285 120 266 116 244 C 110 208 127 168 121 128 C 115 90 114 42 96 16 Z" fill="#17140f"/>
+      <use href="#bodA" fill="#b6a996" opacity="0.15"/><use href="#bodA" fill="none" stroke="#ded7c9" stroke-width="1" opacity="0.75"/>
+      <path d="M92 20 C 81 68 85 128 82 178 C 80 218 87 258 93 282" fill="none" stroke="#a99e8d" stroke-width="1" stroke-dasharray="3 3" opacity="0.65"/>
+      <g fill="#d99a3f" fill-opacity="0.62" stroke="#e8b866" stroke-width="0.8"><ellipse cx="86" cy="38" rx="7" ry="5"/><ellipse cx="104" cy="53" rx="5" ry="4"/><ellipse cx="82" cy="67" rx="6" ry="6"/><ellipse cx="101" cy="83" rx="8" ry="5"/><ellipse cx="86" cy="101" rx="5" ry="5"/><ellipse cx="104" cy="117" rx="6" ry="4"/><ellipse cx="84" cy="133" rx="7" ry="6"/><ellipse cx="98" cy="151" rx="5" ry="5"/><ellipse cx="80" cy="169" rx="6" ry="4"/><ellipse cx="93" cy="187" rx="7" ry="5"/><ellipse cx="84" cy="207" rx="5" ry="5"/><ellipse cx="96" cy="225" rx="5" ry="4"/><ellipse cx="88" cy="245" rx="4" ry="4"/><ellipse cx="92" cy="263" rx="4" ry="3"/></g>
+      <g font-family="'IBM Plex Mono',monospace" font-size="7" fill="#5cc678"><text x="96" y="40">1</text><text x="70" y="70">4</text><text x="111" y="86">6</text><text x="112" y="120">9</text><text x="104" y="154">12</text><text x="100" y="190">15</text><text x="102" y="228">18</text><text x="98" y="266">21</text></g>
+      <circle cx="92" cy="18" r="4.5" fill="#46b45f" stroke="#0c1a10"/><circle cx="93" cy="284" r="4.5" fill="#cf4b3d" stroke="#1a0c0a"/>
+    </symbol>
+    <symbol id="fig-B" viewBox="0 0 180 300">
+      <rect width="180" height="300" fill="#211d19"/>
+      <g opacity="0.5" stroke="#2d2820" stroke-width="1"><path d="M0 60 C 60 52 120 66 180 56"/><path d="M0 168 C 70 176 120 158 180 170"/></g>
+      <path id="bodB" d="M88 16 C 73 42 78 92 80 132 C 82 172 74 214 82 250 C 86 272 92 286 98 288 C 108 285 116 266 114 244 C 110 206 120 166 116 128 C 112 88 106 42 96 18 Z" fill="#17140f"/>
+      <use href="#bodB" fill="#b6a996" opacity="0.15"/><use href="#bodB" fill="none" stroke="#ded7c9" stroke-width="1" opacity="0.75"/>
+      <path d="M90 22 C 84 70 88 130 88 180 C 88 220 92 258 96 282" fill="none" stroke="#a99e8d" stroke-width="1" stroke-dasharray="3 3" opacity="0.65"/>
+      <g fill="#d99a3f" fill-opacity="0.62" stroke="#e8b866" stroke-width="0.8"><ellipse cx="90" cy="44" rx="6" ry="5"/><ellipse cx="82" cy="66" rx="5" ry="7"/><ellipse cx="101" cy="80" rx="7" ry="4"/><ellipse cx="88" cy="104" rx="9" ry="5"/><ellipse cx="97" cy="132" rx="4" ry="4"/><ellipse cx="84" cy="153" rx="6" ry="5"/><ellipse cx="101" cy="178" rx="5" ry="6"/><ellipse cx="90" cy="212" rx="7" ry="4"/><ellipse cx="88" cy="248" rx="4" ry="4"/></g>
+      <circle cx="90" cy="20" r="4.5" fill="#46b45f" stroke="#0c1a10"/><circle cx="97" cy="284" r="4.5" fill="#cf4b3d" stroke="#1a0c0a"/>
+    </symbol>
+    <symbol id="fig-C" viewBox="0 0 180 300">
+      <rect width="180" height="300" fill="#211d19"/>
+      <path id="bodC" d="M92 16 C 80 40 84 90 86 130 C 88 172 92 214 92 250 C 92 272 94 286 96 288 C 104 285 108 266 106 244 C 104 206 106 166 104 128 C 102 88 104 42 98 18 Z" fill="#17140f"/>
+      <use href="#bodC" fill="none" stroke="#ded7c9" stroke-width="1" opacity="0.7"/>
+      <g fill="#d99a3f" fill-opacity="0.55" stroke="#e8b866" stroke-width="0.8"><ellipse cx="94" cy="52" rx="5" ry="4"/><ellipse cx="90" cy="96" rx="7" ry="9"/><ellipse cx="98" cy="150" rx="4" ry="4"/><ellipse cx="90" cy="196" rx="5" ry="4"/><ellipse cx="95" cy="240" rx="3" ry="3"/></g>
+      <circle cx="94" cy="20" r="4.5" fill="#46b45f" stroke="#0c1a10"/><circle cx="96" cy="284" r="4.5" fill="#cf4b3d" stroke="#1a0c0a"/>
+    </symbol>
+  </defs>
+</svg>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Overview</a>
+      <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></svg>Upload</a>
+      <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></svg>Review &amp; Approval</a>
+      <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg>Individuals</a>
+      <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m9 4 6 2 6-2v14l-6 2-6-2-6 2V6z"/><path d="M9 4v14M15 6v14"/></svg>Sightings map</a>
+    </nav>
+    <div class="foot"><b>M. Vardy</b>reviewer · lead</div>
+  </aside>
+
+  <div class="work">
+    <header class="top">
+      <h1>Review &amp; Approval</h1>
+      <span class="batch">batch <b>Autumn 2026 survey</b></span>
+      <div class="prog"><span>21 / 74 reviewed</span><span class="bar"><i style="width:28%"></i></span><span class="nvg"><button>&#8249;</button><button>&#8250;</button></span></div>
+    </header>
+    <div class="rec">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 5v14M5 12h14"/></svg>
+      <span>Enrolled — sighting <b class="mono">sd_1_2</b> registered as a <b>new individual</b>. Population count for this batch: <b>+1</b> &rarr; 47 individuals.</span>
+    </div>
+
+    <div class="body">
+      <div class="rail">
+        <div class="panel">
+          <h3>Decision</h3>
+          <div class="kv">
+            <div class="r"><span>Verdict</span><b style="color:#8a5a1e">new individual</b></div>
+            <div class="r"><span>Top similarity</span><b class="mono">0.31</b></div>
+            <div class="r"><span>Match threshold</span><b class="mono">0.55</b></div>
+            <div class="r"><span>Models agreeing</span><b>5 / 5</b></div>
+            <div class="r"><span>Reviewer</span><b>M. Vardy</b></div>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Reason</h3>
+          <div class="rchips">
+            <span class="rchip on">distinct spot layout</span>
+            <span class="rchip on">no candidate above threshold</span>
+            <span class="rchip on">good photo quality</span>
+            <span class="rchip">few corresponding spots</span>
+            <span class="rchip">different site</span>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Next steps</h3>
+          <div class="kv" style="line-height:1.6">
+            Added to gallery for future sightings. Flagged for a <b>naming pass</b> and a <b>second reviewer</b> before it counts toward the published census.
+          </div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="enroll">
+          <div class="big"><svg viewBox="0 0 24 24" fill="none" stroke-width="2"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg></div>
+          <div>
+            <h2>Enrolled as a new individual</h2>
+            <p>No enrolled salamander is a confident match. The spot constellation, head&#8209;triplet spacing and the tail&#8209;quarter pattern are all unaccounted for in the top candidates.</p>
+          </div>
+          <div class="idcard">
+            <div class="k">assigned id</div>
+            <div class="v">sd_9</div>
+          </div>
+        </div>
+
+        <div class="cols">
+          <section class="target">
+            <div class="card tgt" style="height:100%">
+              <div class="chead"><div class="row1"><span class="id mono">sd_1_2</span><span class="newtag">now sd_9_1</span></div><div class="sub">incoming sighting &middot; contributor&#8209;tagged</div></div>
+              <div class="figwrap"><span class="vtag mono">sd_1_2</span><svg class="fig"><use href="#fig-A"/></svg></div>
+              <div class="qstrip"><div><div class="k">Qual</div><div class="v mono">0.61</div></div><div><div class="k">Sharp</div><div class="v mono">0.48</div></div><div><div class="k">Spots</div><div class="v mono">0.72</div></div><div><div class="k">Body</div><div class="v mono">0.55</div></div><div><div class="k">q0.4</div><div class="v q-pass">&#10003;</div></div></div>
+              <div class="cmeta"><div class="m"><span>Contributor</span><b>G. Esh&#8209;Am</b></div><div class="m"><span>Photographed</span><b>26 Aug 2026</b></div><div class="m"><span>Site</span><b>Sasa &middot; north slope</b></div></div>
+            </div>
+          </section>
+
+          <section class="cands">
+            <div class="lbl"><h2>Top matches in database</h2><span>none clears the match threshold &middot; kept for audit</span></div>
+            <div class="cardrow">
+              <div class="card rejected">
+                <div class="chead"><div class="row1"><span class="id mono">mk_1</span><span class="nomatch">below threshold</span></div><div class="sub">#1 &middot; rejected</div></div>
+                <div class="figwrap dim"><svg class="fig"><use href="#fig-B"/></svg><div class="cf"><span>confidence</span><b>0.31</b></div></div>
+                <div class="qstrip"><div><div class="k">Qual</div><div class="v mono">0.64</div></div><div><div class="k">Sharp</div><div class="v mono">0.59</div></div><div><div class="k">Spots</div><div class="v mono">0.55</div></div><div><div class="k">Body</div><div class="v mono">0.66</div></div><div><div class="k">q0.4</div><div class="v q-pass">&#10003;</div></div></div>
+              </div>
+              <div class="card rejected">
+                <div class="chead"><div class="row1"><span class="id mono">nb_1</span><span class="nomatch">below threshold</span></div><div class="sub">#2 &middot; rejected</div></div>
+                <div class="figwrap dim"><svg class="fig"><use href="#fig-C"/></svg><div class="cf"><span>confidence</span><b>0.18</b></div></div>
+                <div class="qstrip"><div><div class="k">Qual</div><div class="v mono">0.47</div></div><div><div class="k">Sharp</div><div class="v mono">0.41</div></div><div><div class="k">Spots</div><div class="v mono">0.44</div></div><div><div class="k">Body</div><div class="v mono">0.52</div></div><div><div class="k">q0.4</div><div class="v q-pass">&#10003;</div></div></div>
+              </div>
+              <div class="card rejected">
+                <div class="chead"><div class="row1"><span class="id mono">ca_6</span><span class="nomatch">below threshold</span></div><div class="sub">#3 &middot; rejected</div></div>
+                <div class="figwrap dim"><svg class="fig"><use href="#fig-C"/></svg><div class="cf"><span>confidence</span><b>0.11</b></div></div>
+                <div class="qstrip"><div><div class="k">Qual</div><div class="v mono">0.52</div></div><div><div class="k">Sharp</div><div class="v mono">0.49</div></div><div><div class="k">Spots</div><div class="v mono">0.38</div></div><div><div class="k">Body</div><div class="v mono">0.58</div></div><div><div class="k">q0.4</div><div class="v q-pass">&#10003;</div></div></div>
+              </div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <footer class="decide">
+      <button class="btn undo">Undo &mdash; back to review <span class="kbd">&#9003;</span></button>
+      <button class="btn">Re-open candidate search</button>
+      <button class="btn primary">Next sighting <span class="kbd">&#8594;</span></button>
+      <div class="end">enrollment auto-saved &middot; reversible until batch is published</div>
+    </footer>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

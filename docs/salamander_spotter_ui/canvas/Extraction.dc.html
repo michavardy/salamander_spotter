@@ -1,0 +1,260 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9; --line-soft:#e6e1d9; --line-faint:#f0ebe2;
+      --panel:#fff;
+      --side:#2b2825; --side-active:#3a3632; --side-text:#a79e93; --side-text-on:#f4efe8;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-link:#4a72b8; --blue-link-h:#365a99; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+      --magenta:#c93fae;
+      --chip:#f1ece3;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:var(--blue-link);text-decoration:none}a:hover{color:var(--blue-link-h)}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    svg{display:block}
+
+    .screen{width:1440px;height:1032px;display:flex;overflow:hidden;background:var(--bg)}
+    .side{width:220px;flex:none;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 20px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:var(--side-text-on)}
+    .brand .dot{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:var(--side-text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s ease,color .12s ease}
+    .nav a:hover{background:#332f2b;color:#e4ded4}
+    .nav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .nav a.on svg{color:var(--accent)}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .subnav{display:flex;flex-direction:column;gap:1px;margin:1px 0 2px 30px;padding-left:10px;border-left:1px solid var(--side-active)}
+    .subnav a{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:7px;color:var(--side-text);font-size:12px;font-weight:500;cursor:pointer}
+    .subnav a:hover{background:#332f2b;color:#e4ded4}
+    .subnav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .subnav2{display:flex;flex-direction:column;gap:1px;margin:1px 0 1px 14px;padding-left:9px;border-left:1px solid #4a453f}
+    .subnav2 a{display:flex;align-items:center;gap:7px;padding:5px 9px;border-radius:6px;color:#8f877c;font-size:11px;font-weight:500;cursor:pointer}
+    .subnav2 a:hover{background:#332f2b;color:#e4ded4}
+    .subnav2 a.on{background:var(--side-active);color:var(--side-text-on)}
+    .side-bottom{margin-top:auto;padding:0 12px}
+    .side .foot{padding:14px 20px 2px;border-top:1px solid var(--side-active);font-size:11.5px;color:var(--muted2);line-height:1.5;margin-top:10px}
+    .side .foot b{color:var(--side-text);font-weight:600;display:block;font-size:12.5px}
+
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .urlbar{height:32px;flex:none;background:#efeae0;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:9px;padding:0 14px}
+    .urlbar .dots{display:flex;gap:5px}
+    .urlbar .dots i{width:7px;height:7px;border-radius:50%;background:#d8d1c2}
+    .urlbar .pill{flex:none;background:#fff;border:1px solid var(--line);border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--muted2);font-family:"IBM Plex Mono"}
+    .urlbar .pill svg{width:10px;height:10px;stroke-width:2.2;color:var(--green);flex:none}
+    .urlbar .pill .cur{color:var(--ink);font-weight:600}
+
+    .top{height:58px;flex:none;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:12px;padding:0 24px;background:#fff}
+    .crumb{font-size:12.5px;color:var(--muted2);display:flex;align-items:center;gap:6px}
+    .crumb a{color:var(--muted2);font-weight:600}
+    .crumb a:hover{color:var(--blue-link)}
+    .kicker{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2);font-weight:700}
+    .top h1{font-size:16px}
+    .top .close{margin-left:auto;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--muted3);cursor:pointer;transition:border-color .12s ease}
+    .top .close:hover{border-color:var(--red-line);color:var(--red)}
+    .top .close svg{width:15px;height:15px;stroke-width:2}
+
+    .bodywrap{flex:1;display:flex;gap:16px;padding:20px 22px 0;min-height:0}
+    .rail{width:196px;flex:none;display:flex;flex-direction:column;gap:12px}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 13px 14px}
+    .panel h3{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-bottom:9px}
+    .seg{display:flex;background:#f1ece3;border-radius:8px;padding:3px;gap:3px;margin-bottom:9px}
+    .seg span{flex:1;text-align:center;font-size:11px;padding:5px 0;border-radius:6px;color:var(--muted3);cursor:pointer}
+    .seg span.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 3px #0000000f}
+    .fld{font-size:10.5px;color:var(--muted);font-weight:600;margin:2px 0 5px}
+    .chips{display:flex;flex-wrap:wrap;gap:5px}
+    .chip{font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid var(--line);color:var(--muted2);background:#fbf8f3}
+    .chip.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--amber-ink);font-weight:600}
+
+    .tools{display:flex;flex-direction:column;gap:5px}
+    .tool{display:flex;align-items:center;gap:9px;padding:8px 10px;border-radius:8px;font-size:12px;font-weight:600;color:var(--ink-soft);border:1px solid transparent;cursor:pointer;transition:all .12s ease}
+    .tool:hover{background:#fbf7ee;border-color:var(--line)}
+    .tool.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--amber-ink)}
+    .tool svg{width:16px;height:16px;stroke-width:1.7;flex:none}
+
+    .stage{flex:1;display:flex;gap:16px;min-height:0}
+    .canvas{flex:1;display:flex;flex-direction:column;min-width:0}
+    .figcard{flex:1;background:#211d19;border-radius:14px;position:relative;overflow:hidden;display:flex;align-items:center;justify-content:center}
+    .figcard svg{height:100%;width:auto;display:block}
+    .callout{position:absolute;left:24px;top:20px;display:flex;gap:8px}
+    .cbox{background:#1f1d1aee;border:1px solid #3a3632;border-radius:9px;padding:9px 12px;font-size:10.5px;color:#cbc4b7;line-height:1.7;backdrop-filter:blur(2px)}
+    .cbox b{color:#f4efe8;font-weight:600}
+    .cbox .yid{color:#f4d35e}
+    .swatch{width:52px;height:52px;background:#000;border-radius:8px;display:flex;align-items:center;justify-content:center;border:1px solid #3a3632}
+    .legend{position:absolute;right:16px;bottom:14px;display:flex;gap:10px;background:#1f1d1aee;border:1px solid #3a3632;border-radius:20px;padding:6px 12px;font-size:10px;color:#cbc4b7}
+    .legend span{display:flex;align-items:center;gap:5px}
+    .legend i{width:8px;height:8px;border-radius:50%;display:block}
+
+    .side2{width:230px;flex:none;display:flex;flex-direction:column;gap:14px}
+    .qcard{background:#fff;border:1px solid var(--line);border-radius:12px;padding:14px 15px}
+    .qcard .top1{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px}
+    .qcard .top1 h3{font-size:12.5px}
+    .qcard .top1 .tag{font-size:10px;font-weight:700;padding:2px 8px;border-radius:20px;background:var(--green-soft);color:var(--green)}
+    .qgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+    .qgrid div{font-size:10px;color:var(--muted2)}
+    .qgrid div b{display:block;font-size:13px;color:var(--ink);font-weight:600;font-family:"IBM Plex Mono"}
+    .hintcard{background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:12px;padding:13px 15px;font-size:12px;color:#6b5a3e;line-height:1.5}
+
+    .footbar{height:70px;flex:none;display:flex;align-items:center;gap:10px;padding:0 24px;border-top:1px solid var(--line-soft);background:#fff;margin-top:14px}
+    .btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:10px 18px;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;transition:all .13s ease}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px -8px rgba(51,48,44,.3)}
+    .btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+    .btn.cancel{border-color:var(--red-line);color:var(--red)}
+    .footbar .end{margin-left:auto;font-size:11.5px;color:var(--muted2)}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></symbol>
+  <symbol id="ico-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M3 10h18M9 4v16"/></symbol>
+  <symbol id="ico-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><circle cx="19" cy="18" r="1.5"/><path d="M9.9 10.4 6.3 7.1M14.1 10.4l3.6-3.3M9.9 13.6l-3.6 3.3M14.1 13.6l3.6 3.3"/></symbol>
+  <symbol id="ico-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="ico-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l6.5 17 2-6.7L20 11.5Z"/></symbol>
+  <symbol id="ico-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M11 6l1-1a4 4 0 1 1 6 6l-1 1"/><path d="M13 18l-1 1a4 4 0 1 1-6-6l1-1"/></symbol>
+  <symbol id="ico-spine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="1.8"/><path d="M12 6v12"/><circle cx="12" cy="20" r="1.8"/></symbol>
+  <symbol id="ico-headpin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 3v3M12 18v3M3 12h3M18 12h3"/></symbol>
+  <symbol id="ico-outline" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3c-3 4-3 7 0 11s3 7 0 7" stroke-dasharray="2 2.4"/></symbol>
+  <symbol id="ico-save" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4h11l3 3v13H5Z"/><path d="M8 4v6h8V4M8 20v-6h8v6"/></symbol>
+  <symbol id="ico-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10V7a6 6 0 0 1 12 0v3"/><rect x="4" y="10" width="16" height="10" rx="2"/></symbol>
+
+  <symbol id="fig-detail" viewBox="0 0 240 400">
+    <rect width="240" height="400" fill="#211d19"/>
+    <g opacity="0.45" stroke="#2d2820" stroke-width="1">
+      <path d="M0 60 C 80 52 160 68 240 58"/><path d="M0 200 C 90 210 160 188 240 200"/><path d="M0 326 C 80 316 170 336 240 322"/>
+    </g>
+    <path id="bodD" d="M120 18 C 95 54 90 118 100 172 C 108 222 80 278 90 332 C 96 362 113 384 128 386 C 146 382 160 356 154 326 C 146 278 170 222 162 172 C 154 118 152 54 128 20 Z" fill="#17140f"/>
+    <use href="#bodD" fill="#b6a996" opacity="0.15"/>
+    <use href="#bodD" fill="none" stroke="#ded7c9" stroke-width="1.3" opacity="0.8"/>
+    <path d="M122 26 C 108 90 114 170 110 236 C 106 292 116 344 124 378" fill="none" stroke="#a99e8d" stroke-width="1.3" stroke-dasharray="4 4" opacity="0.7"/>
+    <g fill="#d99a3f" fill-opacity="0.62" stroke="#e8b866" stroke-width="1">
+      <ellipse cx="114" cy="50" rx="9" ry="6.5"/><ellipse cx="138" cy="70" rx="6.5" ry="5.5"/>
+      <ellipse cx="108" cy="88" rx="8" ry="8"/><ellipse cx="134" cy="110" rx="10" ry="6.5"/>
+      <ellipse cx="112" cy="134" rx="7" ry="7"/><ellipse cx="138" cy="156" rx="8" ry="5.5"/>
+      <ellipse cx="110" cy="178" rx="9" ry="8"/><ellipse cx="130" cy="202" rx="6.5" ry="6.5"/>
+      <ellipse cx="106" cy="224" rx="8" ry="5.5"/><ellipse cx="124" cy="248" rx="9" ry="7"/>
+      <ellipse cx="110" cy="274" rx="6.5" ry="6.5"/><ellipse cx="128" cy="298" rx="6.5" ry="5.5"/>
+      <ellipse cx="116" cy="322" rx="5.5" ry="5.5"/><ellipse cx="122" cy="346" rx="5" ry="4.5"/>
+    </g>
+    <g font-family="'IBM Plex Mono',monospace" font-size="9" fill="#5cc678">
+      <text x="126" y="53">1</text><text x="94" y="93">4</text><text x="148" y="115">6</text>
+      <text x="149" y="160">9</text><text x="140" y="207">12</text><text x="134" y="250">15</text>
+      <text x="132" y="303">18</text><text x="126" y="350">21</text>
+    </g>
+    <ellipse cx="112" cy="134" rx="7" ry="7" fill="none" stroke="#f4efe8" stroke-width="2.4"/>
+    <ellipse cx="112" cy="134" rx="7" ry="7" fill="none" stroke="var(--accent)" stroke-width="1.4" stroke-dasharray="1.6 2"/>
+    <circle cx="122" cy="24" r="6" fill="#46b45f" stroke="#0c1a10" stroke-width="1.4"/>
+    <circle cx="124" cy="382" r="6" fill="#cf4b3d" stroke="#1a0c0a" stroke-width="1.4"/>
+  </symbol>
+</svg>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a><svg><use href="#ico-home"/></svg>Overview</a>
+      <a><svg><use href="#ico-upload"/></svg>Upload</a>
+      <a class="on"><svg><use href="#ico-review"/></svg>Review</a>
+      <div class="subnav">
+        <a>Top match comparison</a>
+        <div class="subnav2"><a class="on">Extraction</a></div>
+      </div>
+      <a><svg><use href="#ico-table"/></svg>Names</a>
+      <a><svg><use href="#ico-atom"/></svg>Models</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="foot"><b>M. Vardy</b>reviewer &middot; lead</div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <div class="urlbar"><span class="dots"><i></i><i></i><i></i></span><span class="pill"><svg><use href="#ico-lock"/></svg>spottersapp.com/review/sd_1_2/extraction/<span class="cur">en_1_3</span></span></div>
+    <header class="top">
+      <div>
+        <div class="crumb"><a>Review</a><span>&rsaquo;</span><a>Top match comparison</a></div>
+        <span class="kicker">Extraction</span>
+      </div>
+      <h1 class="mono">en_1_3</h1>
+      <span class="close"><svg><use href="#ico-x"/></svg></span>
+    </header>
+
+    <div class="bodywrap">
+      <div class="rail">
+        <div class="panel">
+          <h3>View</h3>
+          <div class="seg"><span class="on">Image</span><span>Normalized</span></div>
+          <div class="fld">Overlays</div>
+          <div class="chips">
+            <span class="chip on">spots</span><span class="chip on">body</span>
+            <span class="chip on">spine</span><span class="chip">anchors</span>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Edit tools</h3>
+          <div class="tools">
+            <div class="tool"><svg><use href="#ico-pointer"/></svg>Select</div>
+            <div class="tool on"><svg><use href="#ico-link"/></svg>Join spots</div>
+            <div class="tool"><svg><use href="#ico-spine"/></svg>Draw spine</div>
+            <div class="tool"><svg><use href="#ico-headpin"/></svg>Select head / tail</div>
+            <div class="tool"><svg><use href="#ico-outline"/></svg>Draw outline</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="canvas">
+          <div class="figcard">
+            <svg viewBox="0 0 240 400"><use href="#fig-detail"/></svg>
+            <div class="callout">
+              <div class="cbox"><b class="yid">SSID: EN&#8209;1&#8209;3&#8209;06</b><br>Interest: 0.44<br>Head: 0.47 (312px) &middot; Side: right</div>
+              <div class="swatch"><svg width="30" height="30" viewBox="0 0 24 24"><path d="M8 12c-1-3 1-6 4-6s5 3 4 6-3 4-4 4-3-1-4-4Z" fill="var(--magenta)"/></svg></div>
+            </div>
+            <div class="legend">
+              <span><i style="background:#d99a3f"></i>spot</span>
+              <span><i style="background:#a99e8d"></i>spine</span>
+              <span><i style="background:#46b45f"></i>head</span>
+              <span><i style="background:#cf4b3d"></i>tail</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="side2">
+          <div class="qcard">
+            <div class="top1"><h3>Quality assessment</h3><span class="tag">Passed</span></div>
+            <div class="qgrid">
+              <div>Qual<b>0.60</b></div><div>Sharp<b>0.27</b></div>
+              <div>Spots<b>1.00</b></div><div>Body<b>1.00</b></div>
+            </div>
+          </div>
+          <div class="hintcard">Spot <b class="mono" style="color:#4b3d24">06</b> is selected &mdash; click a spot on another photo in this family to join them, or press <b class="mono" style="color:#4b3d24">Esc</b> to deselect.</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="footbar">
+      <button class="btn primary"><svg width="15" height="15" style="display:inline;vertical-align:-3px;margin-right:6px"><use href="#ico-save"/></svg>Save extraction</button>
+      <button class="btn cancel">Cancel</button>
+      <div class="end">Editing does not change the re&#8209;ID decision on <b class="mono">en_1</b></div>
+    </footer>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

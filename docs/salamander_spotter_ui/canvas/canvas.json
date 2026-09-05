@@ -1,0 +1,40 @@
+{
+  "pages": [
+    { "id": "page-1", "name": "Screens" },
+    { "id": "page-2", "name": "Drill-down flows" },
+    { "id": "page-3", "name": "Workflows" }
+  ],
+  "artboards": [
+    { "file": "Main.dc.html",     "x": 0,    "y": 0, "w": 1440, "h": 960, "page": "page-1", "title": "Dashboard" },
+    { "file": "Upload.dc.html",   "x": 1520, "y": 0, "w": 1440, "h": 960, "page": "page-1" },
+    { "file": "Names.dc.html",    "x": 3040, "y": 0, "w": 1440, "h": 960, "page": "page-1" },
+    { "file": "Models.dc.html",   "x": 4560, "y": 0, "w": 1440, "h": 960, "page": "page-1", "title": "Models — Models tab" },
+    { "file": "Settings.dc.html","x": 6080, "y": 0, "w": 1440, "h": 960, "page": "page-1", "title": "Models — Settings tab" },
+
+    { "file": "IndividualImageSet.dc.html", "x": 0,    "y": 0,    "w": 1440, "h": 1032, "page": "page-2", "title": "/names/ac-3 — individual-image-set" },
+    { "file": "Image.dc.html",              "x": 1520, "y": 0,    "w": 1440, "h": 1032, "page": "page-2", "title": "/names/ac-3/ac_3_1 — image" },
+    { "file": "Review.dc.html",             "x": 0,    "y": 1160, "w": 1440, "h": 960,  "page": "page-2", "title": "/review — queue" },
+    { "file": "TopMatchComparison.dc.html", "x": 1520, "y": 1160, "w": 1440, "h": 1034, "page": "page-2", "title": "/review/sd_1_2 — top match comparison" },
+    { "file": "MatchLines.dc.html",         "x": 3040, "y": 1160, "w": 1440, "h": 1032, "page": "page-2", "title": "/review/sd_1_2/match-lines" },
+    { "file": "Extraction.dc.html",         "x": 4560, "y": 1160, "w": 1440, "h": 1032, "page": "page-2", "title": "/review/sd_1_2/extraction/en_1_3" },
+
+    { "file": "WorkflowUpload.dc.html", "x": 0,    "y": 0,    "w": 1260, "h": 1400, "page": "page-3" },
+    { "file": "WorkflowSearch.dc.html", "x": 1340, "y": 0,    "w": 1260, "h": 1400, "page": "page-3" },
+    { "file": "WorkflowStats.dc.html",  "x": 0,    "y": 1520, "w": 1260, "h": 960,  "page": "page-3" },
+    { "file": "WorkflowModel.dc.html",  "x": 1340, "y": 1520, "w": 1260, "h": 1560, "page": "page-3" }
+  ],
+  "annotations": [
+    { "id": "screens-note", "x": 0, "y": -140, "w": 700, "page": "page-1",
+      "text": "Updated renders — the warm cream / dark-sidebar system from the earlier Review & Approval canvas, icons throughout, hover lift on every card. Nav is now 5 items (Overview, Upload, Review, Names, Models) — Settings moved under Models as its second tab rather than sitting in the sidebar on its own, so every screen's Settings link is gone in favour of that tab bar." },
+
+    { "id": "components-note", "x": 0, "y": -220, "w": 1000, "page": "page-2",
+      "text": "Two granularities, now with real product names and URLs instead of internal component labels (Family Card / Frame Card are still the underlying design pattern, just not user-facing anymore). Row 1, under Names: INDIVIDUAL-IMAGE-SET (/names/{individual_id}) — every photo of one confirmed animal — click a photo to reach IMAGE (/names/{individual_id}/{image_id}), one photo fully annotated. Row 2, under Review: the queue at /review lists incoming sightings; selecting one opens TOP MATCH COMPARISON (/review/{image_id}) — target vs Top-N; its rail's Layout toggle and each candidate's pencil route to MATCH LINES (/review/{image_id}/match-lines) and EXTRACTION (/review/{image_id}/extraction/{candidate_id}) respectively. The hierarchy is reflected three ways on every page below: the address pill at top, the nested dark-sidebar links under Review/Names, and the breadcrumb + page-type kicker in the title bar." },
+
+    { "id": "review-note", "x": 1520, "y": -190, "w": 1000, "page": "page-2",
+      "text": "Top match comparison: Top 3 is Top N (the rail's coverage note + \"show all / search all individuals\" bar), a green auto-approve band shows what the ≥0.95 threshold already handled without you, and every candidate's pencil goes straight to Extraction. Match lines and Extraction both carry the same three-level breadcrumb (Review › Top match comparison › ...) and the matching nested sidebar entry, so the URL, the sidebar and the title card always agree on where you are." },
+
+    { "id": "workflows-note", "x": 0, "y": -140, "w": 620, "page": "page-3",
+      "text": "The four journeys this app has to support end-to-end, drawn as flowcharts (this canvas runtime has no Mermaid renderer, so these are hand-built diagrams in the same visual language). Colour follows the Review & Approval decision bar: green = confirms/promotes, amber = new/needs-a-look, blue/red = flagged or reverted, dashed grey = a terminal or deferred state." }
+  ],
+  "launch": { "view": "canvas", "page": "page-1" }
+}

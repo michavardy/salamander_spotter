@@ -1,0 +1,23 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light;
+}
+
+body {
+  background: #faf8f5;
+  color: #33302c;
+  font-family: "Hanken Grotesk", system-ui, sans-serif;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .lift {
+    transition: transform 140ms ease, box-shadow 140ms ease;
+  }
+  .lift:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 1px 3px rgba(51, 48, 44, 0.08), 0 10px 28px rgba(51, 48, 44, 0.08);
+  }
+}

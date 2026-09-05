@@ -1,0 +1,2 @@
+# The web bundle is baked in at build time (pixi run ui:bake / Docker stage 1).
+web/

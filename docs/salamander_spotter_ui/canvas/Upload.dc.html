@@ -1,0 +1,281 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9; --line-soft:#e6e1d9; --line-faint:#f0ebe2;
+      --panel:#fff;
+      --side:#2b2825; --side-active:#3a3632; --side-text:#a79e93; --side-text-on:#f4efe8;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-link:#4a72b8; --blue-link-h:#365a99; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+      --chip:#f1ece3;
+      --stage-upload:#6f9a91; --stage-body:#c2954f; --stage-spots:#c17b6a;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:var(--blue-link);text-decoration:none}a:hover{color:var(--blue-link-h)}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    svg{display:block}
+
+    .screen{width:1440px;height:960px;display:flex;overflow:hidden;background:var(--bg);position:relative}
+    .side{width:220px;flex:none;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 20px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:var(--side-text-on)}
+    .brand .dot{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:var(--side-text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s ease,color .12s ease}
+    .nav a:hover{background:#332f2b;color:#e4ded4}
+    .nav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .nav a.on svg{color:var(--accent)}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .side-bottom{margin-top:auto;padding:0 12px}
+    .side .foot{padding:14px 20px 2px;border-top:1px solid var(--side-active);font-size:11.5px;color:var(--muted2);line-height:1.5;margin-top:10px}
+    .side .foot b{color:var(--side-text);font-weight:600;display:block;font-size:12.5px}
+
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .top{height:60px;flex:none;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:16px;padding:0 28px;background:#fff}
+    .top h1{font-size:17px}
+    .top .sub{font-size:12.5px;color:var(--muted2)}
+    .body{flex:1;overflow:auto;padding:24px 28px 26px}
+
+    .drop{border:1.6px dashed #d3c7a8;border-radius:16px;background:linear-gradient(180deg,#fffefb,#fbf6ec);padding:30px 20px;display:flex;flex-direction:column;align-items:center;gap:9px;text-align:center;cursor:pointer;transition:border-color .15s ease,background .15s ease,transform .15s ease}
+    .drop:hover{border-color:var(--accent);background:linear-gradient(180deg,#fffdf9,#faf1e0);transform:translateY(-1px)}
+    .drop .icowrap{width:46px;height:46px;border-radius:13px;background:var(--accent-soft);display:flex;align-items:center;justify-content:center;color:var(--amber-ink);transition:transform .15s ease}
+    .drop:hover .icowrap{transform:translateY(-3px)}
+    .drop .icowrap svg{width:22px;height:22px;stroke-width:1.8}
+    .drop .t1{font-size:14px;font-weight:600;color:var(--ink)}
+    .drop .t2{font-size:11.5px;color:var(--muted2)}
+    .drop .t2 b{color:var(--blue-link);font-weight:600}
+
+    .filters{display:flex;align-items:center;gap:8px;margin:16px 0 14px;flex-wrap:wrap}
+    .fchip{display:flex;align-items:center;gap:6px;font-size:12px;padding:6px 13px;border-radius:20px;border:1px solid var(--line);color:var(--muted3);background:#fff;cursor:pointer;transition:all .12s ease;font-weight:500}
+    .fchip i{width:7px;height:7px;border-radius:50%;display:block}
+    .fchip:hover{border-color:var(--accent-line);color:var(--ink-soft)}
+    .fchip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+    .grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}
+    .card{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;transition:box-shadow .16s ease,transform .16s ease,border-color .16s ease}
+    .card:hover{box-shadow:0 10px 28px -16px rgba(51,48,44,.32);transform:translateY(-3px);border-color:var(--accent-line)}
+    .card .cbody{display:flex;gap:11px;padding:12px}
+    .thumb{width:72px;height:104px;border-radius:9px;background:#211d19;flex:none;overflow:hidden;position:relative}
+    .thumb svg{width:100%;height:100%}
+    .cinfo{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+    .cinfo .idrow{display:flex;align-items:center;justify-content:space-between}
+    .cinfo .idrow .name{font-size:12px;font-weight:600;color:var(--muted)}
+    .tier{display:inline-flex;align-items:center;gap:5px;font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+    .tier::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--tc);flex:none}
+    .stage{display:flex;align-items:center;gap:7px}
+    .stage .lbl{font-size:9.5px;color:var(--muted2);width:56px;flex:none}
+    .stage .track{flex:1;height:5px;border-radius:3px;background:#f0ebe2;overflow:hidden}
+    .stage .track i{display:block;height:100%;border-radius:3px}
+    .qrow{display:flex;gap:8px;margin-top:1px}
+    .qrow div{font-size:9px;color:var(--muted2);text-align:center}
+    .qrow div b{display:block;font-size:11px;font-weight:600;color:var(--ink-soft);font-family:"IBM Plex Mono"}
+    .qbad{margin-left:auto;font-weight:700;font-size:11px}
+    .qbad.pass{color:var(--green)}.qbad.fail{color:var(--red)}
+
+    .actions{display:flex;align-items:center;gap:11px;margin-top:2px;padding-top:7px;border-top:1px solid var(--line-faint)}
+    .actions a{font-size:10.5px;font-weight:600;display:flex;align-items:center;gap:4px}
+    .actions a svg{width:12px;height:12px;stroke-width:2}
+    .actions a.fix{color:var(--amber-ink)}
+    .actions a.use{color:var(--muted2);font-weight:500}
+    .actions a.use:hover{color:var(--red)}
+    .autonote{display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--green);font-weight:600;margin-top:2px;padding-top:7px;border-top:1px solid var(--line-faint)}
+    .autonote svg{width:13px;height:13px;stroke-width:2}
+
+    .ctabar{margin-top:18px;display:flex;align-items:center;gap:16px;background:#fff;border:1px solid var(--accent-line);border-radius:14px;padding:15px 20px}
+    .ctabar .ctatext{font-size:12.5px;color:var(--ink-soft);line-height:1.5}
+    .ctabar .ctatext b{color:var(--ink)}
+    .ctabtn{margin-left:auto;flex:none;display:flex;align-items:center;gap:8px;background:var(--green);color:#fff;border:1px solid var(--green);border-radius:10px;padding:11px 18px;font-size:13px;font-weight:600;cursor:pointer;transition:filter .13s ease,transform .13s ease}
+    .ctabtn:hover{filter:brightness(1.07);transform:translateY(-1px)}
+    .ctabtn svg{width:15px;height:15px;stroke-width:2}
+
+    .toast{position:absolute;right:26px;bottom:26px;width:328px;background:#211d19;color:#f4efe8;border-radius:13px;padding:14px 16px;box-shadow:0 20px 44px -16px rgba(0,0,0,.5);display:flex;gap:11px;z-index:5}
+    .toast .ic{width:32px;height:32px;border-radius:9px;background:#3a3227;display:flex;align-items:center;justify-content:center;color:#f4c15c;flex:none}
+    .toast .ic svg{width:16px;height:16px;stroke-width:1.8}
+    .toast .tbody{flex:1;min-width:0}
+    .toast .t1{font-size:12px;font-weight:700;margin-bottom:3px;padding-right:14px}
+    .toast .t2{font-size:11px;color:#cbc4b7;line-height:1.5}
+    .toast .copyblock{font-size:10px;color:#cbc4b7;font-family:"IBM Plex Mono";background:#17140f;border-radius:7px;padding:8px 9px;margin-top:8px;line-height:1.6;border:1px solid #3a3227}
+    .toast .actrow{display:flex;gap:8px;margin-top:9px}
+    .toast button{font-size:10.5px;font-weight:600;border-radius:7px;padding:6px 11px;cursor:pointer;border:1px solid #4a4137;transition:filter .12s ease}
+    .toast .copy{background:#f4c15c;color:#211d19;border-color:#f4c15c;display:flex;align-items:center;gap:5px}
+    .toast .copy:hover{filter:brightness(1.06)}
+    .toast .dismiss{background:transparent;color:#cbc4b7}
+    .toast .close{position:absolute;top:11px;right:11px;color:#8a827a;cursor:pointer;width:16px;height:16px}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></symbol>
+  <symbol id="ico-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M3 10h18M9 4v16"/></symbol>
+  <symbol id="ico-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><circle cx="19" cy="18" r="1.5"/><path d="M9.9 10.4 6.3 7.1M14.1 10.4l3.6-3.3M9.9 13.6l-3.6 3.3M14.1 13.6l3.6 3.3"/></symbol>
+  <symbol id="ico-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="18" r="2"/></symbol>
+  <symbol id="ico-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="ico-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20Z"/><path d="M12 9v5M12 17h.01"/></symbol>
+  <symbol id="ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="ico-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+  <symbol id="ico-copy" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="9" width="12" height="12" rx="2"/><path d="M5 15V5a2 2 0 0 1 2-2h10"/></symbol>
+  <symbol id="ico-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="fig-sal" viewBox="0 0 90 140">
+    <rect width="90" height="140" fill="#211d19"/>
+    <path d="M45 8 C 36 22 34 46 38 64 C 41 84 30 106 34 124 C 36 133 42 139 46 140 C 53 138 58 128 56 118 C 53 100 61 84 58 64 C 55 46 55 22 46 9 Z" fill="#17140f"/>
+    <path d="M45 8 C 36 22 34 46 38 64 C 41 84 30 106 34 124 C 36 133 42 139 46 140 C 53 138 58 128 56 118 C 53 100 61 84 58 64 C 55 46 55 22 46 9 Z" fill="#b6a996" opacity=".15"/>
+    <path d="M46 10 C 40 34 42 64 41 90 C 40 110 43 128 46 140" fill="none" stroke="#a99e8d" stroke-width=".8" stroke-dasharray="2 2" opacity=".6"/>
+    <g fill="#d99a3f" fill-opacity=".62" stroke="#e8b866" stroke-width=".6">
+      <ellipse cx="42" cy="20" rx="3.6" ry="2.6"/><ellipse cx="51" cy="27" rx="2.6" ry="2"/>
+      <ellipse cx="40" cy="34" rx="3" ry="3"/><ellipse cx="50" cy="42" rx="4" ry="2.6"/>
+      <ellipse cx="42" cy="51" rx="2.6" ry="2.6"/><ellipse cx="51" cy="59" rx="3" ry="2"/>
+      <ellipse cx="41" cy="67" rx="3.6" ry="3"/><ellipse cx="48" cy="76" rx="2.6" ry="2.6"/>
+      <ellipse cx="39" cy="85" rx="3" ry="2"/><ellipse cx="46" cy="94" rx="3.6" ry="2.6"/>
+      <ellipse cx="41" cy="104" rx="2.6" ry="2.6"/><ellipse cx="47" cy="113" rx="2.6" ry="2"/>
+    </g>
+    <circle cx="45" cy="9" r="2.2" fill="#46b45f"/>
+    <circle cx="46" cy="138" r="2.2" fill="#cf4b3d"/>
+  </symbol>
+</svg>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a><svg><use href="#ico-home"/></svg>Overview</a>
+      <a class="on"><svg><use href="#ico-upload"/></svg>Upload</a>
+      <a><svg><use href="#ico-review"/></svg>Review</a>
+      <a><svg><use href="#ico-table"/></svg>Names</a>
+      <a><svg><use href="#ico-atom"/></svg>Models</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="foot"><b>M. Vardy</b>reviewer &middot; lead</div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="top">
+      <h1>Upload images</h1>
+      <span class="sub">5 photos &middot; auto&#8209;judged against the quality ladder</span>
+    </header>
+
+    <div class="body">
+      <div class="drop">
+        <span class="icowrap"><svg><use href="#ico-upload"/></svg></span>
+        <div class="t1">Drag and drop photos here</div>
+        <div class="t2">or <b>click to browse</b> &middot; JPG, PNG &middot; WhatsApp exports welcome</div>
+      </div>
+
+      <div class="filters">
+        <span class="fchip on">All (5)</span>
+        <span class="fchip"><i style="background:var(--green)"></i>Auto&#8209;accept (1)</span>
+        <span class="fchip"><i style="background:var(--amber-ink)"></i>Needs a look (1)</span>
+        <span class="fchip"><i style="background:var(--blue)"></i>Hand&#8209;correction (1)</span>
+        <span class="fchip"><i style="background:var(--red)"></i>Failed (1)</span>
+      </div>
+
+      <div class="grid">
+        <div class="card">
+          <div class="cbody">
+            <div class="thumb"><svg><use href="#fig-sal"/></svg></div>
+            <div class="cinfo">
+              <div class="idrow"><span class="name mono">#2200</span></div>
+              <span class="tier" style="--tc:var(--muted2)">Judging&hellip;</span>
+              <div class="stage"><span class="lbl">Upload</span><span class="track"><i style="width:100%;background:var(--stage-upload)"></i></span></div>
+              <div class="stage"><span class="lbl">Body</span><span class="track"><i style="width:47%;background:var(--stage-body)"></i></span></div>
+              <div class="stage"><span class="lbl">Spots</span><span class="track"><i style="width:0%;background:var(--stage-spots)"></i></span></div>
+              <div class="qrow"><div>Qual<b>&ndash;</b></div><div>Sharp<b>&ndash;</b></div><div>Spots<b>&ndash;</b></div><div>Body<b>&ndash;</b></div></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cbody">
+            <div class="thumb"><svg><use href="#fig-sal"/></svg></div>
+            <div class="cinfo">
+              <div class="idrow"><span class="name mono">#2201</span></div>
+              <span class="tier" style="--tc:var(--green)">Auto&#8209;accept</span>
+              <div class="qrow"><div>Qual<b>0.86</b></div><div>Sharp<b>0.81</b></div><div>Spots<b>0.90</b></div><div>Body<b>0.88</b></div><span class="qbad pass">&#10003;</span></div>
+              <div class="autonote"><svg><use href="#ico-check"/></svg>Will auto&#8209;approve in Review &mdash; no action needed</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cbody">
+            <div class="thumb"><svg><use href="#fig-sal"/></svg></div>
+            <div class="cinfo">
+              <div class="idrow"><span class="name mono">#2202</span></div>
+              <span class="tier" style="--tc:var(--amber-ink)">Needs a look</span>
+              <div class="qrow"><div>Qual<b>0.58</b></div><div>Sharp<b>0.63</b></div><div>Spots<b>0.66</b></div><div>Body<b>0.71</b></div><span class="qbad pass">&#10003;</span></div>
+              <div class="actions"><a class="fix"><svg><use href="#ico-pencil"/></svg>Fix extraction</a></div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cbody">
+            <div class="thumb"><svg><use href="#fig-sal"/></svg></div>
+            <div class="cinfo">
+              <div class="idrow"><span class="name mono">#2203</span></div>
+              <span class="tier" style="--tc:var(--blue)">Hand&#8209;correction</span>
+              <div class="qrow"><div>Qual<b>0.29</b></div><div>Sharp<b>0.34</b></div><div>Spots<b>0.51</b></div><div>Body<b>0.40</b></div><span class="qbad fail">&#10007;</span></div>
+              <div class="actions">
+                <a class="fix"><svg><use href="#ico-pencil"/></svg>Fix extraction</a>
+                <a class="use" title="Not recommended below the quality cut&#8209;off"><svg><use href="#ico-warn"/></svg>Use anyway</a>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="cbody">
+            <div class="thumb"><svg><use href="#fig-sal"/></svg></div>
+            <div class="cinfo">
+              <div class="idrow"><span class="name mono">#2204</span></div>
+              <span class="tier" style="--tc:var(--red)">Failed extraction</span>
+              <div class="qrow"><div>Qual<b>0.07</b></div><div>Sharp<b>0.27</b></div><div>Spots<b>1.00</b></div><div>Body<b>0.84</b></div><span class="qbad fail">&#10007;</span></div>
+              <div class="actions">
+                <a class="fix"><svg><use href="#ico-pencil"/></svg>Fix extraction</a>
+                <a class="use" title="Not recommended &mdash; extraction may be unusable"><svg><use href="#ico-warn"/></svg>Use anyway</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="ctabar">
+        <div class="ctatext"><b>2 photos need a decision.</b> Review flows straight from here into Frame Card for any hand corrections &mdash; upload and approve in one sitting.</div>
+        <button class="ctabtn">Review this batch now<svg><use href="#ico-arrow"/></svg></button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toast">
+    <span class="close"><svg><use href="#ico-x"/></svg></span>
+    <span class="ic"><svg><use href="#ico-warn"/></svg></span>
+    <div class="tbody">
+      <div class="t1">Extraction model is low on tokens</div>
+      <div class="t2"><span class="mono">gemini-body-spot-v3</span> has ~40 calls left today.</div>
+      <div class="copyblock">Salamander Spotter: extraction LLM (gemini-body-spot-v3) low on tokens &mdash; ~40 calls left, resets 00:00 UTC. Reported by M. Vardy, 2026-09-04 14:12.</div>
+      <div class="actrow">
+        <button class="copy"><svg width="12" height="12"><use href="#ico-copy"/></svg>Copy for research team</button>
+        <button class="dismiss">Dismiss</button>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

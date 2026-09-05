@@ -1,0 +1,463 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9; --line-soft:#e6e1d9; --line-faint:#f0ebe2;
+      --panel:#fff;
+      --side:#2b2825; --side-active:#3a3632; --side-text:#a79e93; --side-text-on:#f4efe8;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-link:#4a72b8; --blue-link-h:#365a99; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+      --chip:#f1ece3;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:var(--blue-link);text-decoration:none}a:hover{color:var(--blue-link-h)}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    svg{display:block}
+
+    .screen{width:1440px;height:1034px;display:flex;overflow:hidden;background:var(--bg);position:relative}
+    .side{width:220px;flex:none;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 20px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:var(--side-text-on)}
+    .brand .dot{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:var(--side-text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s ease,color .12s ease}
+    .nav a:hover{background:#332f2b;color:#e4ded4}
+    .nav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .nav a.on svg{color:var(--accent)}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .subnav{display:flex;flex-direction:column;gap:1px;margin:1px 0 2px 30px;padding-left:10px;border-left:1px solid var(--side-active)}
+    .subnav a{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:7px;color:var(--side-text);font-size:12px;font-weight:500;cursor:pointer}
+    .subnav a:hover{background:#332f2b;color:#e4ded4}
+    .subnav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .side-bottom{margin-top:auto;padding:0 12px}
+    .side .foot{padding:14px 20px 2px;border-top:1px solid var(--side-active);font-size:11.5px;color:var(--muted2);line-height:1.5;margin-top:10px}
+    .side .foot b{color:var(--side-text);font-weight:600;display:block;font-size:12.5px}
+
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .urlbar{height:32px;flex:none;background:#efeae0;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:9px;padding:0 14px}
+    .urlbar .dots{display:flex;gap:5px}
+    .urlbar .dots i{width:7px;height:7px;border-radius:50%;background:#d8d1c2}
+    .urlbar .pill{flex:none;background:#fff;border:1px solid var(--line);border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--muted2);font-family:"IBM Plex Mono"}
+    .urlbar .pill svg{width:10px;height:10px;stroke-width:2.2;color:var(--green);flex:none}
+    .urlbar .pill .cur{color:var(--ink);font-weight:600}
+
+    .top{height:58px;flex:none;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:12px;padding:0 24px;background:#fff}
+    .crumb{font-size:12.5px;color:var(--muted2);display:flex;align-items:center;gap:6px}
+    .crumb a{color:var(--muted2);font-weight:600}
+    .crumb a:hover{color:var(--blue-link)}
+    .kicker{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2);font-weight:700}
+    .top h1{font-size:16px}
+    .top .prog{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted2)}
+    .bar{width:130px;height:5px;border-radius:3px;background:#ece7df;overflow:hidden}
+    .bar i{display:block;height:100%;background:var(--green)}
+    .nvg{display:flex;gap:4px}
+    .nvg button{width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:7px;color:var(--muted3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .12s ease}
+    .nvg button:hover{border-color:var(--accent-line);color:var(--ink)}
+    .nvg svg{width:15px;height:15px;stroke-width:2}
+
+    .bodywrap{flex:1;display:flex;gap:18px;padding:20px 22px 0;min-height:0}
+    .rail{width:196px;flex:none;display:flex;flex-direction:column;gap:12px}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 13px 14px}
+    .panel h3{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-bottom:9px}
+    .seg{display:flex;background:#f1ece3;border-radius:8px;padding:3px;gap:3px;margin-bottom:9px}
+    .seg span{flex:1;text-align:center;font-size:11px;padding:5px 0;border-radius:6px;color:var(--muted3);cursor:pointer;transition:all .12s ease}
+    .seg span.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 3px #0000000f}
+    .fld{font-size:10.5px;color:var(--muted);font-weight:600;margin:2px 0 5px}
+    .chips{display:flex;flex-wrap:wrap;gap:5px}
+    .chip{font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid var(--line);color:var(--muted2);background:#fbf8f3;cursor:pointer;transition:all .12s ease}
+    .chip.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--amber-ink);font-weight:600}
+    .mdl .pick{display:flex;align-items:center;justify-content:space-between;border:1px solid var(--line);border-radius:8px;padding:8px 10px;font-size:12px;font-weight:600;cursor:pointer;transition:border-color .12s ease}
+    .mdl .pick:hover{border-color:var(--accent-line)}
+    .mdl .meta{font-size:10.5px;color:var(--muted);line-height:1.5;margin-top:6px}
+
+    .stage{flex:1;display:flex;flex-direction:column;min-width:0}
+    .cols{flex:1;display:flex;gap:16px;min-height:0}
+    .target{width:296px;flex:none}
+    .cands{flex:1;display:flex;flex-direction:column;min-width:0}
+    .cands .lbl{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+    .cands .lbl h2{font-size:13px}
+    .cands .lbl span{font-size:11px;color:var(--muted)}
+    .cardrow{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;min-height:0}
+
+    .card{background:#fff;border:1px solid var(--line);border-radius:13px;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .16s ease,transform .16s ease,border-color .16s ease}
+    .card:hover{box-shadow:0 12px 28px -16px rgba(51,48,44,.32);transform:translateY(-2px)}
+    .card.tgt{border-color:#d9c9a3}
+    .card.suggested{border-color:var(--green);box-shadow:0 0 0 2px var(--green-soft)}
+    .chead{padding:11px 13px 9px;border-bottom:1px solid var(--line-faint)}
+    .chead .row1{display:flex;align-items:center;justify-content:space-between;gap:6px}
+    .chead .id{font-size:13.5px;font-weight:700}
+    .rank{font-size:10px;font-weight:700;color:var(--muted3);background:var(--chip);border-radius:5px;padding:2px 7px}
+    .chead .sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .tag{font-size:9.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:3px 7px;border-radius:5px}
+    .tag.sug{background:var(--green-soft);color:var(--green)}
+
+    .figwrap{position:relative;flex:1;background:#211d19;min-height:0;display:flex;cursor:pointer}
+    .fig{width:100%;height:100%;display:block}
+    .figwrap .vtag{position:absolute;left:8px;top:7px;font-size:9px;color:#e9e2d3;opacity:.55;letter-spacing:.04em;font-family:"IBM Plex Mono"}
+    .figwrap .edit{position:absolute;right:8px;top:7px;font-size:9.5px;font-weight:600;color:#f4efe8;background:#00000055;border:1px solid #ffffff33;border-radius:6px;padding:3px 8px;opacity:0;transition:opacity .15s ease}
+    .figwrap:hover .edit{opacity:1}
+    .figwrap .conf{position:absolute;left:8px;right:8px;bottom:8px;background:#20242bdd;border-radius:8px;padding:7px 9px;backdrop-filter:blur(2px)}
+    .simrow{display:flex;align-items:center;justify-content:space-between;font-size:10px;color:#cbc4b7;margin-bottom:4px}
+    .simrow b{color:#fff;font-weight:600;font-family:"IBM Plex Mono"}
+    .track{height:5px;border-radius:3px;background:#3a3d44;overflow:hidden}
+    .track i{display:block;height:100%}
+    .fill-hi{background:#6bab7b}.fill-mid{background:#c79a54}.fill-lo{background:#9a6b6b}
+
+    .qstrip{display:flex;border-top:1px solid var(--line-faint)}
+    .qstrip div{flex:1;text-align:center;padding:7px 2px;border-right:1px solid var(--line-faint)}
+    .qstrip div:last-child{border-right:0}
+    .qstrip .k{font-size:8.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+    .qstrip .v{font-size:11.5px;font-weight:600;margin-top:1px;font-family:"IBM Plex Mono"}
+    .q-pass{color:var(--green)}.q-fail{color:var(--red)}
+
+    .cmeta{display:flex;flex-direction:column;gap:6px;padding:11px 13px;font-size:11px;color:var(--muted3);border-top:1px solid var(--line-faint)}
+    .cmeta .m{display:flex;justify-content:space-between}
+    .cmeta .m b{color:var(--ink-soft);font-weight:600}
+    .agree{display:flex;align-items:center;gap:6px;padding:8px 13px;border-top:1px solid var(--line-faint);font-size:10px;color:var(--muted3)}
+    .dots{display:flex;gap:3px}
+    .dots i{width:7px;height:7px;border-radius:50%;background:#dcd5c8}
+    .dots i.y{background:var(--green)}
+    .editbtn{margin-left:auto;width:20px;height:20px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--muted2);cursor:pointer;transition:all .12s ease}
+    .editbtn:hover{background:var(--accent-soft);color:var(--amber-ink)}
+    .editbtn svg{width:12px;height:12px;stroke-width:2}
+
+    .autoband{display:flex;align-items:center;gap:9px;background:var(--green-soft);border:1px solid var(--green-line,#bfe0cd);color:var(--green);border-radius:11px;padding:9px 14px;font-size:11.5px;font-weight:500;margin-bottom:14px}
+    .autoband svg{width:15px;height:15px;stroke-width:2;flex:none}
+    .autoband a{margin-left:auto;font-weight:600;flex:none}
+
+    .morebar{display:flex;align-items:center;gap:10px;margin-top:10px;font-size:11.5px;color:var(--muted2)}
+    .morebar a{font-weight:600;margin-left:auto}
+
+    .toast{position:absolute;right:26px;bottom:96px;width:320px;background:#211d19;color:#f4efe8;border-radius:13px;padding:14px 16px;box-shadow:0 20px 44px -16px rgba(0,0,0,.5);display:flex;gap:11px;z-index:5}
+    .toast .ic{width:32px;height:32px;border-radius:9px;background:#3a3227;display:flex;align-items:center;justify-content:center;color:#f4c15c;flex:none}
+    .toast .ic svg{width:16px;height:16px;stroke-width:1.8}
+    .toast .tbody{flex:1;min-width:0}
+    .toast .t1{font-size:12px;font-weight:700;margin-bottom:3px;padding-right:14px}
+    .toast .t2{font-size:11px;color:#cbc4b7;line-height:1.5}
+    .toast .actrow{display:flex;gap:8px;margin-top:9px}
+    .toast button{font-size:10.5px;font-weight:600;border-radius:7px;padding:6px 11px;cursor:pointer;border:1px solid #4a4137;transition:filter .12s ease}
+    .toast .confirm{background:#f4c15c;color:#211d19;border-color:#f4c15c}
+    .toast .confirm:hover{filter:brightness(1.06)}
+    .toast .cancel{background:transparent;color:#cbc4b7}
+    .toast .close{position:absolute;top:11px;right:11px;color:#8a827a;cursor:pointer;width:16px;height:16px}
+
+    .sugg{display:flex;align-items:flex-start;gap:10px;margin:14px 0 0;padding:11px 15px;background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:11px;font-size:12px;color:#6b5a3e;line-height:1.5}
+    .sugg svg{width:16px;height:16px;flex:none;margin-top:1px;color:var(--amber-ink)}
+    .sugg b{color:#4b3d24;font-weight:600}
+    .decide{height:76px;flex:none;display:flex;align-items:center;gap:10px;padding:0 24px;border-top:1px solid var(--line-soft);background:#fff;margin-top:14px}
+    .btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .13s ease}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px -8px rgba(51,48,44,.3)}
+    .btn .kbd{font-size:10px;font-weight:700;background:var(--chip);border-radius:4px;padding:1px 5px;color:var(--muted2)}
+    .btn.primary{background:var(--green);border-color:var(--green);color:#fff}
+    .btn.primary .kbd{background:#ffffff2e;color:#eaf3ee}
+    .btn.new{border-color:var(--amber-line);color:var(--amber-ink)}
+    .btn.new:hover{background:var(--amber-soft)}
+    .btn.unsure{border-color:var(--blue-line);color:var(--blue)}
+    .btn.unsure:hover{background:var(--blue-soft)}
+    .btn.reject{border-color:var(--red-line);color:var(--red)}
+    .btn.reject:hover{background:var(--red-soft)}
+    .btn.ghost{border-color:transparent;color:var(--muted)}
+    .decide .end{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:11px;color:var(--muted)}
+    .decide .end .save{display:flex;align-items:center;gap:5px}
+    .decide .end .save i{width:6px;height:6px;border-radius:50%;background:var(--green);display:block}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></symbol>
+  <symbol id="ico-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M3 10h18M9 4v16"/></symbol>
+  <symbol id="ico-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><circle cx="19" cy="18" r="1.5"/><path d="M9.9 10.4 6.3 7.1M14.1 10.4l3.6-3.3M9.9 13.6l-3.6 3.3M14.1 13.6l3.6 3.3"/></symbol>
+  <symbol id="ico-chev-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></symbol>
+  <symbol id="ico-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="ico-info" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 8h.01M11 11h1v5h1"/></symbol>
+  <symbol id="ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="ico-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="ico-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.9.8c0 1.7-2.4 2-2.4 3.4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="ico-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="ico-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="ico-warn" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20Z"/><path d="M12 9v5M12 17h.01"/></symbol>
+  <symbol id="ico-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10V7a6 6 0 0 1 12 0v3"/><rect x="4" y="10" width="16" height="10" rx="2"/></symbol>
+
+  <symbol id="fig-A" viewBox="0 0 180 300">
+    <rect width="180" height="300" fill="#211d19"/>
+    <g opacity="0.5" stroke="#2d2820" stroke-width="1">
+      <path d="M0 46 C 60 40 120 52 180 44"/><path d="M0 150 C 70 158 120 140 180 150"/>
+      <path d="M0 244 C 60 236 130 250 180 240"/>
+    </g>
+    <path id="bodA" d="M90 14 C 71 40 67 88 75 128 C 81 166 60 208 68 248 C 72 270 85 286 96 288 C 110 285 120 266 116 244 C 110 208 127 168 121 128 C 115 90 114 42 96 16 Z" fill="#17140f"/>
+    <use href="#bodA" fill="#b6a996" opacity="0.15"/>
+    <use href="#bodA" fill="none" stroke="#ded7c9" stroke-width="1" opacity="0.75"/>
+    <path d="M92 20 C 81 68 85 128 82 178 C 80 218 87 258 93 282" fill="none" stroke="#a99e8d" stroke-width="1" stroke-dasharray="3 3" opacity="0.65"/>
+    <g fill="#d99a3f" fill-opacity="0.62" stroke="#e8b866" stroke-width="0.8">
+      <ellipse cx="86" cy="38" rx="7" ry="5"/><ellipse cx="104" cy="53" rx="5" ry="4"/>
+      <ellipse cx="82" cy="67" rx="6" ry="6"/><ellipse cx="101" cy="83" rx="8" ry="5"/>
+      <ellipse cx="86" cy="101" rx="5" ry="5"/><ellipse cx="104" cy="117" rx="6" ry="4"/>
+      <ellipse cx="84" cy="133" rx="7" ry="6"/><ellipse cx="98" cy="151" rx="5" ry="5"/>
+      <ellipse cx="80" cy="169" rx="6" ry="4"/><ellipse cx="93" cy="187" rx="7" ry="5"/>
+      <ellipse cx="84" cy="207" rx="5" ry="5"/><ellipse cx="96" cy="225" rx="5" ry="4"/>
+    </g>
+    <circle cx="92" cy="18" r="4.5" fill="#46b45f" stroke="#0c1a10"/>
+    <circle cx="93" cy="284" r="4.5" fill="#cf4b3d" stroke="#1a0c0a"/>
+  </symbol>
+
+  <symbol id="fig-B" viewBox="0 0 180 300">
+    <rect width="180" height="300" fill="#211d19"/>
+    <g opacity="0.5" stroke="#2d2820" stroke-width="1">
+      <path d="M0 60 C 60 52 120 66 180 56"/><path d="M0 168 C 70 176 120 158 180 170"/>
+    </g>
+    <path id="bodB" d="M88 16 C 73 42 78 92 80 132 C 82 172 74 214 82 250 C 86 272 92 286 98 288 C 108 285 116 266 114 244 C 110 206 120 166 116 128 C 112 88 106 42 96 18 Z" fill="#17140f"/>
+    <use href="#bodB" fill="#b6a996" opacity="0.15"/>
+    <use href="#bodB" fill="none" stroke="#ded7c9" stroke-width="1" opacity="0.75"/>
+    <path d="M90 22 C 84 70 88 130 88 180 C 88 220 92 258 96 282" fill="none" stroke="#a99e8d" stroke-width="1" stroke-dasharray="3 3" opacity="0.65"/>
+    <g fill="#d99a3f" fill-opacity="0.62" stroke="#e8b866" stroke-width="0.8">
+      <ellipse cx="90" cy="44" rx="6" ry="5"/><ellipse cx="82" cy="66" rx="5" ry="7"/>
+      <ellipse cx="101" cy="80" rx="7" ry="4"/><ellipse cx="88" cy="104" rx="9" ry="5"/>
+      <ellipse cx="97" cy="132" rx="4" ry="4"/><ellipse cx="84" cy="153" rx="6" ry="5"/>
+      <ellipse cx="101" cy="178" rx="5" ry="6"/><ellipse cx="90" cy="212" rx="7" ry="4"/>
+      <ellipse cx="88" cy="248" rx="4" ry="4"/>
+    </g>
+    <circle cx="90" cy="20" r="4.5" fill="#46b45f" stroke="#0c1a10"/>
+    <circle cx="97" cy="284" r="4.5" fill="#cf4b3d" stroke="#1a0c0a"/>
+  </symbol>
+
+  <symbol id="fig-C" viewBox="0 0 180 300">
+    <rect width="180" height="300" fill="#211d19"/>
+    <g opacity="0.5" stroke="#2d2820" stroke-width="1"><path d="M0 100 C 60 92 120 108 180 98"/><path d="M0 210 C 70 202 120 218 180 206"/></g>
+    <path id="bodC" d="M92 18 C 76 44 82 90 78 130 C 74 172 84 216 80 252 C 78 272 86 286 94 288 C 106 285 112 266 108 244 C 104 206 96 168 100 128 C 104 88 108 42 96 18 Z" fill="#17140f"/>
+    <use href="#bodC" fill="#b6a996" opacity="0.15"/>
+    <use href="#bodC" fill="none" stroke="#ded7c9" stroke-width="1" opacity="0.75"/>
+    <path d="M92 22 C 84 66 90 128 88 176 C 86 216 90 256 92 282" fill="none" stroke="#a99e8d" stroke-width="1" stroke-dasharray="3 3" opacity="0.65"/>
+    <g fill="#d99a3f" fill-opacity="0.62" stroke="#e8b866" stroke-width="0.8">
+      <ellipse cx="88" cy="40" rx="6" ry="5"/><ellipse cx="98" cy="58" rx="5" ry="6"/>
+      <ellipse cx="84" cy="78" rx="7" ry="4"/><ellipse cx="96" cy="100" rx="5" ry="5"/>
+      <ellipse cx="82" cy="124" rx="6" ry="5"/><ellipse cx="94" cy="146" rx="4" ry="4"/>
+      <ellipse cx="86" cy="170" rx="6" ry="6"/><ellipse cx="96" cy="196" rx="5" ry="4"/>
+      <ellipse cx="84" cy="220" rx="5" ry="5"/><ellipse cx="92" cy="244" rx="4" ry="4"/>
+    </g>
+    <circle cx="93" cy="20" r="4.5" fill="#46b45f" stroke="#0c1a10"/>
+    <circle cx="87" cy="284" r="4.5" fill="#cf4b3d" stroke="#1a0c0a"/>
+  </symbol>
+</svg>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a><svg><use href="#ico-home"/></svg>Overview</a>
+      <a><svg><use href="#ico-upload"/></svg>Upload</a>
+      <a class="on"><svg><use href="#ico-review"/></svg>Review</a>
+      <div class="subnav"><a class="on">Top match comparison</a></div>
+      <a><svg><use href="#ico-table"/></svg>Names</a>
+      <a><svg><use href="#ico-atom"/></svg>Models</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="foot"><b>M. Vardy</b>reviewer &middot; lead</div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <div class="urlbar"><span class="dots"><i></i><i></i><i></i></span><span class="pill"><svg><use href="#ico-lock"/></svg>spottersapp.com/review/<span class="cur">sd_1_2</span></span></div>
+    <header class="top">
+      <div>
+        <div class="crumb"><a>Review</a></div>
+        <span class="kicker">Top match comparison</span>
+      </div>
+      <h1 class="mono">sd_1_2</h1>
+      <div class="prog">
+        <span>18 / 74 reviewed</span>
+        <span class="bar"><i style="width:24%"></i></span>
+        <span class="nvg"><button><svg><use href="#ico-chev-l"/></svg></button><button><svg><use href="#ico-chev-r"/></svg></button></span>
+        <button style="width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:7px;color:var(--muted3);display:flex;align-items:center;justify-content:center"><svg style="width:15px;height:15px;stroke-width:2"><use href="#ico-help"/></svg></button>
+      </div>
+    </header>
+
+    <div class="bodywrap">
+      <div class="rail">
+        <div class="panel">
+          <h3>View</h3>
+          <div class="fld">Layout</div>
+          <div class="seg"><span class="on">Cards</span><span>Match lines</span></div>
+          <div class="seg"><span class="on">Image</span><span>Normalized</span></div>
+          <div class="fld">Match arcs <span style="color:var(--red);font-weight:700">&mdash;</span></div>
+          <div class="seg"><span class="on">All</span><span>Significant</span></div>
+          <div class="fld">Overlays</div>
+          <div class="chips">
+            <span class="chip on">spots</span><span class="chip on">body</span>
+            <span class="chip">spine</span><span class="chip on">anchors</span>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Matcher</h3>
+          <div class="mdl">
+            <div class="pick">strict_hand_pos<svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#9a9186" stroke-width="2"><path d="m6 9 6 6 6-6"/></svg></div>
+            <div class="meta">in production &middot; R@10 0.93<br>trained 2026&#8209;07&#8209;14</div>
+          </div>
+          <div style="margin-top:10px"><a style="font-size:11.5px;font-weight:600">Compare all models &rarr;</a></div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="autoband"><svg><use href="#ico-check"/></svg>3 of this batch's 5 sightings auto&#8209;approved at &ge;0.95 confidence &mdash; you're only seeing the 2 that need a decision. <a href="#">Change threshold in Settings &rarr;</a></div>
+        <div class="cols">
+          <section class="target">
+            <div class="card tgt" style="height:100%">
+              <div class="chead">
+                <div class="row1"><span class="id mono">sd_1_2</span><span class="rank">INCOMING</span></div>
+                <div class="sub">new sighting &middot; not yet enrolled</div>
+              </div>
+              <div class="figwrap">
+                <span class="vtag">sd_1_2</span>
+                <svg class="fig"><use href="#fig-A"/></svg>
+              </div>
+              <div class="qstrip">
+                <div><div class="k">Qual</div><div class="v">0.61</div></div>
+                <div><div class="k">Sharp</div><div class="v">0.48</div></div>
+                <div><div class="k">Spots</div><div class="v">0.72</div></div>
+                <div><div class="k">Body</div><div class="v">0.55</div></div>
+                <div><div class="k">q0.4</div><div class="v q-pass">&#10003;</div></div>
+              </div>
+              <div class="cmeta">
+                <div class="m"><span>Contributor</span><b>G. Esh&#8209;Am</b></div>
+                <div class="m"><span>Photographed</span><b>26 Aug 2026</b></div>
+                <div class="m"><span>Site</span><b>Sasa &middot; north slope</b></div>
+                <div class="m"><span>Spots extracted</span><b>21</b></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="cands">
+            <div class="lbl"><h2>Top 3 of 289 &mdash; covers 91% confidence</h2><span>coverage target 90%, set in Settings &middot; ranked by strict_hand_pos</span></div>
+            <div class="cardrow">
+
+              <div class="card suggested">
+                <div class="chead">
+                  <div class="row1"><span class="id mono">en_1</span><span class="tag sug">suggested</span></div>
+                  <div class="sub">4 photos enrolled &middot; since 2024</div>
+                </div>
+                <div class="figwrap">
+                  <span class="vtag">en_1_3</span>
+                  <span class="edit">Extraction &rarr;</span>
+                  <svg class="fig"><use href="#fig-A"/></svg>
+                  <div class="conf">
+                    <div class="simrow"><span>similarity</span><b>0.71</b></div>
+                    <div class="track"><i class="fill-hi" style="width:71%"></i></div>
+                    <div class="simrow" style="margin:6px 0 4px"><span>calibrated confidence</span><b>0.68</b></div>
+                    <div class="track"><i class="fill-hi" style="width:68%"></i></div>
+                  </div>
+                </div>
+                <div class="qstrip">
+                  <div><div class="k">Qual</div><div class="v">0.70</div></div>
+                  <div><div class="k">Sharp</div><div class="v">0.63</div></div>
+                  <div><div class="k">Spots</div><div class="v">0.66</div></div>
+                  <div><div class="k">Body</div><div class="v">0.71</div></div>
+                  <div><div class="k">q0.4</div><div class="v q-pass">&#10003;</div></div>
+                </div>
+                <div class="agree"><span>model agreement</span><span class="dots"><i class="y"></i><i class="y"></i><i class="y"></i><i class="y"></i><i></i></span><span>4 / 5</span><span class="editbtn" title="Extraction"><svg><use href="#ico-pencil"/></svg></span></div>
+              </div>
+
+              <div class="card">
+                <div class="chead">
+                  <div class="row1"><span class="id mono">rt_1</span><span class="rank">#2</span></div>
+                  <div class="sub">2 photos enrolled &middot; since 2025</div>
+                </div>
+                <div class="figwrap">
+                  <span class="vtag">rt_1_1</span>
+                  <span class="edit">Extraction &rarr;</span>
+                  <svg class="fig"><use href="#fig-B"/></svg>
+                  <div class="conf">
+                    <div class="simrow"><span>similarity</span><b>0.44</b></div>
+                    <div class="track"><i class="fill-mid" style="width:44%"></i></div>
+                    <div class="simrow" style="margin:6px 0 4px"><span>calibrated confidence</span><b>0.19</b></div>
+                    <div class="track"><i class="fill-lo" style="width:19%"></i></div>
+                  </div>
+                </div>
+                <div class="qstrip">
+                  <div><div class="k">Qual</div><div class="v">0.33</div></div>
+                  <div><div class="k">Sharp</div><div class="v">0.27</div></div>
+                  <div><div class="k">Spots</div><div class="v">0.51</div></div>
+                  <div><div class="k">Body</div><div class="v">0.40</div></div>
+                  <div><div class="k">q0.4</div><div class="v q-fail">&#10007;</div></div>
+                </div>
+                <div class="agree"><span>model agreement</span><span class="dots"><i class="y"></i><i></i><i></i><i></i><i></i></span><span>1 / 5</span><span class="editbtn" title="Extraction"><svg><use href="#ico-pencil"/></svg></span></div>
+              </div>
+
+              <div class="card">
+                <div class="chead">
+                  <div class="row1"><span class="id mono">ca_47</span><span class="rank">#3</span></div>
+                  <div class="sub">3 photos enrolled &middot; since 2023</div>
+                </div>
+                <div class="figwrap">
+                  <span class="vtag">ca_47_2</span>
+                  <span class="edit">Extraction &rarr;</span>
+                  <svg class="fig"><use href="#fig-C"/></svg>
+                  <div class="conf">
+                    <div class="simrow"><span>similarity</span><b>0.38</b></div>
+                    <div class="track"><i class="fill-mid" style="width:38%"></i></div>
+                    <div class="simrow" style="margin:6px 0 4px"><span>calibrated confidence</span><b>0.12</b></div>
+                    <div class="track"><i class="fill-lo" style="width:12%"></i></div>
+                  </div>
+                </div>
+                <div class="qstrip">
+                  <div><div class="k">Qual</div><div class="v">0.58</div></div>
+                  <div><div class="k">Sharp</div><div class="v">0.55</div></div>
+                  <div><div class="k">Spots</div><div class="v">0.49</div></div>
+                  <div><div class="k">Body</div><div class="v">0.62</div></div>
+                  <div><div class="k">q0.4</div><div class="v q-pass">&#10003;</div></div>
+                </div>
+                <div class="agree"><span>model agreement</span><span class="dots"><i></i><i></i><i></i><i></i><i></i></span><span>0 / 5</span><span class="editbtn" title="Extraction"><svg><use href="#ico-pencil"/></svg></span></div>
+              </div>
+
+            </div>
+            <div class="morebar"><span>+2 more candidates below 0.12 confidence complete the 91% coverage.</span><a href="#">Show all 5 &middot; or search all 289 individuals &rarr;</a></div>
+          </section>
+        </div>
+
+        <div class="sugg">
+          <svg><use href="#ico-info"/></svg>
+          <div><b>Suggested re-ID: <span class="mono">en_1</span></b> &mdash; confidence 0.68, above the 0.55 threshold. Still worth a look: open-set calibration on this dataset is weak (AUROC 0.59), and roughly a fifth of spots vanish between sightings of the same animal.</div>
+        </div>
+      </div>
+    </div>
+
+    <footer class="decide">
+      <button class="btn primary"><svg width="15" height="15"><use href="#ico-check"/></svg>Confirm re-ID <span class="mono">en_1</span><span class="kbd">1</span></button>
+      <button class="btn new"><svg width="15" height="15"><use href="#ico-plus"/></svg>New individual<span class="kbd">2</span></button>
+      <button class="btn unsure"><svg width="15" height="15"><use href="#ico-help"/></svg>Uncertain &mdash; flag<span class="kbd">3</span></button>
+      <button class="btn reject"><svg width="15" height="15"><use href="#ico-x"/></svg>Disqualify<span class="kbd">4</span></button>
+      <button class="btn ghost">Skip <span class="kbd">S</span></button>
+      <div class="end"><span class="save"><i></i>auto-saves to review queue</span></div>
+    </footer>
+  </div>
+
+  <div class="toast">
+    <span class="close"><svg><use href="#ico-x"/></svg></span>
+    <span class="ic"><svg><use href="#ico-warn"/></svg></span>
+    <div class="tbody">
+      <div class="t1">Assigning against the model's suggestion</div>
+      <div class="t2">You picked <span class="mono">ca_47</span> (0.12 confidence) over the suggested <span class="mono">en_1</span> (0.68). Sure this is the same animal?</div>
+      <div class="actrow">
+        <button class="confirm">Assign anyway</button>
+        <button class="cancel">Cancel</button>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,13 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html",          "x": 0,    "y": 0,    "w": 1440, "h": 1000, "title": "Review — undecided" },
+    { "file": "Confirmed.dc.html",      "x": 1600, "y": 0,    "w": 1440, "h": 1000, "title": "Review — confirmed re-ID" },
+    { "file": "NewIndividual.dc.html",  "x": 3200, "y": 0,    "w": 1440, "h": 1000, "title": "Review — new individual" },
+    { "file": "Uncertain.dc.html",      "x": 4800, "y": 0,    "w": 1440, "h": 1000, "title": "Review — uncertain / abstain" },
+    { "file": "ModelTrust.dc.html",     "x": 0,    "y": 1180, "w": 1600, "h": 1040, "title": "Model trust panel" }
+  ],
+  "annotations": [
+    { "id": "flow", "x": 0, "y": -132, "w": 900, "text": "Review & Approval — one incoming sighting at a time. The reviewer confirms a re-ID, enrols a new individual, or flags it as uncertain. Top row: the four decision states of the same screen. Bottom: the model-trust panel behind the ‘Compare all models’ link." }
+  ],
+  "launch": { "view": "canvas" }
+}

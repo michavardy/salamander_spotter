@@ -1,0 +1,530 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Salamander Spotter</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Spectral:ital,wght@0,400;0,500;0,600;1,400&family=Source+Sans+3:wght@400;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+  :root{
+    --paper:#fbfaf7;
+    --ink:#211d17;
+    --ink-soft:#6b6458;
+    --rule:#e4dfd2;
+    --accent:#9a6712;
+    --accent-soft:#f5e6c4;
+    --panel:#f4f0e6;
+    --pos:#3f6b4e;
+    --neg:#9c3f3a;
+    --measure:44rem;
+  }
+
+  *{box-sizing:border-box;}
+  html{-webkit-text-size-adjust:100%;}
+  body{
+    margin:0;
+    background:var(--paper);
+    color:var(--ink);
+    font-family:"Source Sans 3","Segoe UI",system-ui,sans-serif;
+    font-size:17px;
+    line-height:1.62;
+    font-feature-settings:"kern" 1;
+  }
+  .wrap{
+    max-width:var(--measure);
+    margin:0 auto;
+    padding:4rem 1.5rem 6rem;
+  }
+
+  /* ---- typography ---- */
+  h1,h2,h3{font-family:"Spectral",Georgia,serif;font-weight:600;line-height:1.2;text-wrap:balance;color:var(--ink);}
+  h1{font-size:2.6rem;margin:0 0 .4rem;letter-spacing:-.01em;}
+  h2{font-size:1.5rem;margin:0 0 1rem;padding-bottom:.4rem;border-bottom:2px solid var(--ink);}
+  h3{font-size:1.12rem;margin:2rem 0 .5rem;}
+  p{margin:0 0 1rem;}
+  a{color:var(--accent);text-decoration:none;}
+  strong{font-weight:600;}
+  em{font-style:italic;}
+  ul,ol{margin:0 0 1rem;padding-left:1.3rem;}
+  li{margin:.3rem 0;}
+  li::marker{color:var(--accent);}
+
+  .lede{font-size:1.05rem;color:var(--ink-soft);}
+  .eyebrow{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:.72rem;
+    letter-spacing:.16em;
+    text-transform:uppercase;
+    color:var(--accent);
+    margin:0 0 .6rem;
+  }
+
+  /* ---- masthead ---- */
+  .masthead{margin-bottom:2.4rem;}
+  .meta{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:.78rem;
+    color:var(--ink-soft);
+    border-top:1px solid var(--rule);
+    border-bottom:1px solid var(--rule);
+    padding:.7rem 0;
+    margin-top:1.6rem;
+    display:flex;
+    flex-wrap:wrap;
+    gap:.3rem 1.6rem;
+  }
+  .meta span{white-space:nowrap;}
+  .meta b{color:var(--ink);font-weight:500;}
+
+  /* ---- abstract ---- */
+  .abstract{
+    background:var(--panel);
+    border-left:3px solid var(--accent);
+    padding:1.2rem 1.4rem;
+    margin:2rem 0 0;
+  }
+  .abstract p:last-child{margin-bottom:0;}
+
+  /* ---- contents ---- */
+  .toc{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:.82rem;
+    line-height:1.9;
+    margin:2rem 0 0;
+    columns:2;
+    column-gap:2rem;
+  }
+  .toc a{color:var(--ink);display:block;}
+  .toc .n{color:var(--accent);margin-right:.6rem;}
+
+  /* ---- sections ---- */
+  section{margin-top:3.2rem;}
+  section > h2 .n{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:1rem;
+    color:var(--accent);
+    margin-right:.7rem;
+    vertical-align:.08em;
+  }
+
+  /* ---- tables ---- */
+  .tbl{
+    width:100%;
+    overflow-x:auto;
+    margin:1.4rem 0 .6rem;
+  }
+  table{
+    border-collapse:collapse;
+    width:100%;
+    font-size:.9rem;
+    font-variant-numeric:tabular-nums;
+  }
+  caption{
+    caption-side:top;
+    text-align:left;
+    font-family:"IBM Plex Mono",monospace;
+    font-size:.72rem;
+    letter-spacing:.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    margin-bottom:.5rem;
+  }
+  th,td{
+    text-align:left;
+    padding:.42rem .7rem;
+    border-bottom:1px solid var(--rule);
+    vertical-align:top;
+  }
+  thead th{
+    border-bottom:1.5px solid var(--ink);
+    font-weight:600;
+    font-family:"Source Sans 3",sans-serif;
+  }
+  tbody tr:last-child td{border-bottom:1.5px solid var(--ink);}
+  td.num,th.num{text-align:right;font-family:"IBM Plex Mono",monospace;font-size:.84rem;}
+  .win{color:var(--pos);font-weight:600;}
+  .lose{color:var(--neg);}
+  .note{font-size:.82rem;color:var(--ink-soft);margin:.3rem 0 1.4rem;}
+
+  /* ---- stat callouts ---- */
+  .stats{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(9.5rem,1fr));
+    gap:1px;
+    background:var(--rule);
+    border:1px solid var(--rule);
+    margin:1.6rem 0;
+  }
+  .stat{background:var(--paper);padding:.9rem 1rem;}
+  .stat .v{
+    font-family:"IBM Plex Mono",monospace;
+    font-size:1.35rem;
+    color:var(--accent);
+    display:block;
+    line-height:1.1;
+  }
+  .stat .k{font-size:.78rem;color:var(--ink-soft);display:block;margin-top:.35rem;}
+
+  .callout{
+    border:1px solid var(--rule);
+    border-top:3px solid var(--accent);
+    padding:1rem 1.2rem;
+    margin:1.6rem 0;
+    background:#fff;
+  }
+  .callout p:last-child{margin-bottom:0;}
+  .callout .h{font-family:"Spectral",serif;font-weight:600;display:block;margin-bottom:.3rem;}
+
+  hr{border:0;border-top:1px solid var(--rule);margin:2.4rem 0;}
+
+  footer{
+    margin-top:4rem;
+    padding-top:1.2rem;
+    border-top:1px solid var(--rule);
+    font-size:.82rem;
+    color:var(--ink-soft);
+  }
+  code{font-family:"IBM Plex Mono",monospace;font-size:.86em;background:var(--panel);padding:.05em .35em;border-radius:2px;}
+
+  /* ---- print ---- */
+  @page{margin:18mm 20mm;}
+  @media print{
+    body{background:#fff;font-size:10.3pt;line-height:1.5;}
+    .wrap{max-width:none;padding:0;}
+    a{color:var(--ink);}
+    .toc{display:none;}
+    section{break-before:page;margin-top:0;padding-top:.4rem;}
+    .masthead + .abstract{break-before:avoid;}
+    h2{font-size:15pt;}
+    h1{font-size:22pt;}
+    table{font-size:8.6pt;}
+    .tbl{overflow:visible;}
+    table,.callout,.stats,figure{break-inside:avoid;}
+    thead{display:table-header-group;}
+    .stat .v{font-size:12pt;}
+    h2,h3{break-after:avoid;}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="masthead">
+    <p class="eyebrow">Technical report</p>
+    <h1>Salamander Spotter</h1>
+    <p class="lede">Re-identifying individual fire salamanders from the pattern of yellow spots on their backs &mdash; the problem, the data engineering, the methods, the checks, and what the results actually deliver.</p>
+    <div class="meta">
+      <span>Prepared&nbsp;<b>2026-08-29</b></span>
+      <span>Dataset&nbsp;<b>all_sasa_norm_2026_23_07</b></span>
+      <span>Code&nbsp;<b>pipeline/spot_transformer/</b></span>
+      <span>Status&nbsp;<b>research / not yet field-deployed</b></span>
+    </div>
+  </header>
+
+  <div class="abstract">
+    <p><strong>In one line.</strong> Given a new photo of a fire salamander, decide whether it is an animal already in the database (and which one) or a never-seen individual &mdash; using only the natural spot pattern, no physical tags.</p>
+    <p>The work has produced a complete, honestly-measured pipeline: machine-extracted spots &rarr; a fixed 62-number description of each spot &rarr; a small trained rule that scores a photo against each known animal &rarr; a ranked shortlist with a calibrated confidence and an &ldquo;abstain&rdquo; option. On a modest gallery of about 65 candidate animals it ranks the correct known individual first <strong>60% &plusmn; 10%</strong> of the time (five-fold cross-validation), up from 43% for an untrained baseline and 35% for a whole-image approach. The harder half of the task &mdash; correctly flagging genuinely new animals &mdash; is weaker: novelty is separated at an area-under-curve of roughly <strong>0.60&ndash;0.69</strong> and the precision-first operating point commits to only 6&ndash;18% of photos. Repeated diagnostic checks locate the ceiling in the <strong>spot description and the label quality</strong>, not in the matching model, and show that adding more photos of the same kind will not move it.</p>
+  </div>
+
+  <nav class="toc">
+    <a href="#problem"><span class="n">1</span>The problem</a>
+    <a href="#data"><span class="n">2</span>Data engineering</a>
+    <a href="#methods"><span class="n">3</span>Methods</a>
+    <a href="#methods-depth"><span class="n">4</span>Methods in depth</a>
+    <a href="#checks"><span class="n">5</span>Checks run</a>
+    <a href="#results"><span class="n">6</span>Results</a>
+    <a href="#interpretation"><span class="n">7</span>Interpretation</a>
+  </nav>
+
+  <!-- ============================================================ -->
+  <section id="problem">
+    <h2><span class="n">1</span>The problem</h2>
+
+    <p>Fire salamanders (<em>Salamandra salamandra</em>) carry a unique, lifelong pattern of yellow spots on a black body. That pattern is effectively a natural fingerprint, so individual animals can be tracked over time without ever catching or tagging them: photograph the animal, and the pattern says who it is. The field collection this project serves began as <strong>445 photos from Kibbutz Sasa, Israel</strong>, and has since grown by merging further field collections. Its value is unlocked only if, for each photo, the question <em>&ldquo;have we seen this one before?&rdquo;</em> can be answered reliably &mdash; the foundation for non-invasive population counts and mark-and-recapture studies.</p>
+
+    <h3>It is open-set re-identification, not classification</h3>
+    <p>The list of individuals is not fixed. New salamanders keep appearing, so the system cannot be a classifier with a fixed set of classes. Every incoming photo needs two decisions:</p>
+    <ol>
+      <li><strong>Match</strong> &mdash; is this the same individual as one already enrolled, and if so which one? (a one-against-many search, then a yes/no check on the best candidate)</li>
+      <li><strong>Enroll as new</strong> &mdash; if no enrolled animal is a confident enough match, register this photo as a new individual.</li>
+    </ol>
+    <p>Concretely, the system turns a query photo into a <strong>ranked list of candidates, each with a similarity score between 0 and 1</strong>, and applies a decision threshold: above it, &ldquo;same as candidate X&rdquo;; below it, &ldquo;new animal.&rdquo; A third answer, <strong>abstain</strong> (&ldquo;too blurred / too few spots / cannot tell&rdquo;), is required as well, each with a calibrated confidence.</p>
+
+    <h3>Why it is hard</h3>
+    <ul>
+      <li><strong>Only the spot pattern is stable.</strong> Pose, body curvature, camera angle, lighting, skin wetness and background all vary widely between photos of the same animal. The system must be blind to everything except the spots.</li>
+      <li><strong>Very few photos per animal.</strong> At project start, <strong>203 of 290 individuals appeared in a single photo</strong>. Even after growth the collection averages roughly 1.4&ndash;2 real photos per individual. There is nowhere near enough data to train a per-animal model; the system has to learn a general sense of &ldquo;same pattern vs different pattern&rdquo; that transfers to animals it never saw in training.</li>
+      <li><strong>The labels are machine-made.</strong> The per-spot annotations come from an automatic pipeline (described in section 2), not from hand-verification, so the training signal contains errors.</li>
+      <li><strong>The costs are lopsided.</strong> A false <em>match</em> merges two animals into one and permanently deflates the population count &mdash; mark-and-recapture cannot undo it. A missed match only inflates the count with a phantom &ldquo;new&rdquo; animal, which later photos can correct. So the system is scored with <strong>precision weighted twice as heavily as recall</strong> (the measure called F0.5).</li>
+    </ul>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="data">
+    <h2><span class="n">2</span>Data engineering</h2>
+
+    <p>Everything downstream depends on turning raw field photos into a clean, pose-normalised description of each animal&rsquo;s spot pattern. That is done by an automatic labelling pipeline, then packaged into a versioned dataset with a DuckDB database of per-photo and per-spot rows.</p>
+
+    <div class="tbl">
+      <table>
+        <caption>Dataset at a glance &mdash; all_sasa_norm_2026_23_07</caption>
+        <thead><tr><th>Quantity</th><th class="num">Real photos only</th><th class="num">With synthetic views</th></tr></thead>
+        <tbody>
+          <tr><td>Images</td><td class="num">1,267</td><td class="num">1,869</td></tr>
+          <tr><td>Individuals (labels)</td><td class="num">751</td><td class="num">751</td></tr>
+          <tr><td>Individuals with one photo only</td><td class="num">427</td><td class="num">75</td></tr>
+          <tr><td>Individuals with two or more</td><td class="num">324</td><td class="num">676</td></tr>
+          <tr><td>Same-individual photo pairs</td><td class="num">761</td><td class="num">1,616</td></tr>
+          <tr><td>Extracted spots (total)</td><td class="num" colspan="2">40,185 &nbsp;(min 1 / avg 21.5 / max 83 per photo)</td></tr>
+          <tr><td>Spots assigned a body position</td><td class="num" colspan="2">28,296 of 40,185 (70%)</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">At project start the collection was 445 photos, 290 individuals, ~16,500 spots. Growth came from additional field sources and from synthetic views (below).</p>
+
+    <h3>How identity is labelled</h3>
+    <p>Identity is encoded in the filename. A file stem is <code>&lt;code&gt;_&lt;individual&gt;_&lt;instance&gt;</code> (e.g. <code>aj_1_2</code>); the identity label is the stem with the trailing instance number removed (<code>aj_1</code>). Two photos with the same label are the same animal; different labels are different animals. This convention is both the training signal and the evaluation ground truth. Note that <code>aj_1</code> and <code>aj_2</code> are <em>different</em> animals.</p>
+
+    <h3>The automatic labelling pipeline</h3>
+    <p>All four stages are automatic and approximate; none is hand-verified.</p>
+    <ol>
+      <li><strong>Spots &mdash; the &ldquo;magenta trick.&rdquo;</strong> Instead of asking a vision model for spot coordinates (which it does poorly), the model is asked to <em>recolour</em> every yellow spot flat magenta. OpenCV then keys that one colour and traces each spot&rsquo;s outline, centroid, area and pixel mask deterministically. Annotation becomes a recolouring task, which the model is genuinely good at.</li>
+      <li><strong>Body outline and centre-line.</strong> The model paints the whole trunk-and-tail one colour (legs excluded); the mask is keyed, and the head/tail tips and centre-line are then <em>computed from the mask&rsquo;s shape</em>. The centre-line is defined as the curve with equal body area on each side, so it bisects the animal by construction. Asking the model directly for a bisecting line failed the &ldquo;does it actually bisect?&rdquo; check for every model tried &mdash; the line always hugged one flank &mdash; whereas tracing the two visible edges and averaging them works, and on a synthetic curved body tracks the true centre to within 2 pixels.</li>
+      <li><strong>Body grid.</strong> The centre-line is cut at 25/50/75% of its length into four segments (segment 1 = head end) and split left/right, giving every spot a position key that survives the animal being photographed at any angle or scale. Coverage: 1,867 of 1,869 photos got a usable axis; 1,857 passed all geometric quality gates, 10 failed and are flagged.</li>
+      <li><strong>Quality markers.</strong> Cheap, model-free per-photo scores from 0 to 1 (sharpness, lighting, spot-extraction quality, body-extraction quality, and an overall score) plus raw measurements, used later to filter or down-weight bad photos.</li>
+    </ol>
+
+    <h3>Synthetic training views</h3>
+    <p>602 of the 1,869 images are model-generated re-renderings of an animal already in the set &mdash; different lighting, background and angle, spot pattern held fixed &mdash; named <code>&lt;label&gt;_g&lt;k&gt;</code> so they inherit the same identity label. They add <strong>855 same-individual pairs</strong> and take <strong>352 individuals out of single-photo status</strong>. They are used for <em>training only</em>: they never enter the gallery or the query set, because evaluating on generated images would measure the image generator, not the matcher. A self-consistency filter keeps a synthetic view only if its extracted spot set still matches the source animal.</p>
+
+    <h3>The per-spot description the matcher consumes</h3>
+    <p>Each spot is turned into a fixed list of <strong>62 numbers</strong>, built by hand (no training), in two blocks:</p>
+    <ul>
+      <li><strong>Shape &mdash; 37 numbers.</strong> A normalised Elliptic Fourier Descriptor of the spot outline, keeping the first 10 harmonics. This is unchanged by translation, scale, rotation and where the tracing starts, and the dropped high harmonics remove pixel-edge jaggedness. Two deliberate consequences: <em>absolute size is not represented</em> (a big blotch and a small dot with the same outline get the same 37 numbers), and fine lobes and notches are partly filtered out along with the noise.</li>
+      <li><strong>Position &mdash; 25 numbers.</strong> Body-intrinsic location: how far along the head&ndash;tail line the spot sits, how far off the centre-line (as a fraction of body width), and which side. Encoded as smooth sine/cosine features so that spots far apart on the body land far apart in the description, and so the encoding survives the photo being rotated or resized.</li>
+    </ul>
+    <p>Each block is scaled to unit length and the two are joined, so the similarity between two spots is the average of their shape agreement and their position agreement &mdash; an additive rule in which neither block can veto the other. The similarity numbers are low in absolute terms (about 0.3&ndash;0.5 even for the same animal); only the <em>ranking</em> of matches matters. Conjunctive variants (shape <em>and</em> position must agree) and a variant that re-adds size and shape-irregularity were built and tested (section 4).</p>
+
+    <h3>The evaluation harness</h3>
+    <p>Because the data is small, the way results are measured is itself engineered carefully.</p>
+    <ul>
+      <li><strong>Split by individual</strong>, five-fold cross-validation: no animal appears in both training and test. Test queries are drawn only from individuals with two or more real photos. Synthetic images are training-only.</li>
+      <li><strong>Two fixed anchors on every run.</strong> A <code>dummy</code> matcher with random descriptions must score at chance; an <code>oracle</code> that reads the labels must score ~1.0. If the dummy ever scores well, something is leaking and no other number is trusted. The acceptance check (<code>emb-selfcheck</code>) asserts 9 of 9.</li>
+      <li><strong>Confidence intervals over individuals, not queries</strong>, because several queries from one animal are correlated; query-level intervals come out 2&ndash;3&times; too narrow.</li>
+      <li><strong>Gallery size always stated.</strong> The same matcher scores rank-1 of 0.60 against ~65 candidate animals and a fraction of that against ~687; chance itself moves from 0.071 to 0.010.</li>
+      <li><strong>Metrics.</strong> Identification: rank-1 / rank-5 (is the right animal the top guess / in the top five). Verification: area-under-ROC for telling same-animal from different-animal photo pairs. Open-set: area-under-ROC for telling new animals from known ones. Population census: F0.5 of the match-or-new decision, plus how far the resulting head-count is off.</li>
+    </ul>
+
+    <h3>Human supervision</h3>
+    <p>Two small web tools collect human judgement: a per-spot &ldquo;interesting spot&rdquo; tagger (<strong>~8,700 per-spot labels over 362 photos</strong>, about a quarter tagged interesting; a later revision has ~2,970 over 477 photos) and a pair-review tool where a reviewer accepts or rejects proposed spot-to-spot correspondences and writes why. The reviewer&rsquo;s reasons reduce to six: penalise an unmatched characteristic spot, a round/plain spot, few matches, mismatches, a position difference, a shape difference.</p>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="methods">
+    <h2><span class="n">3</span>Methods &mdash; the short version</h2>
+
+    <p>Three things could be learned from data: the <em>description</em> of each spot, the <em>rule</em> that combines spot matches into an animal-level score, or both together. The recurring finding across the whole project is:</p>
+
+    <div class="callout">
+      <span class="h">Learn the combining rule, not the description.</span>
+      <p>Identity labels are far too scarce to train a spot or image encoder (~1.4 photos per animal). But every (query photo, candidate animal) pair is a labelled example for the combining rule &mdash; about 6,000 per fold &mdash; so a tiny model over general, animal-agnostic match statistics has abundant supervision and transfers to unseen animals. Every time a more expressive model was tried, cross-validation variance beat it. The simplest model with the most direct supervision won, repeatedly.</p>
+    </div>
+
+    <h3>The pipeline end to end</h3>
+    <ol>
+      <li><strong>Extract</strong> spots from the photo (magenta trick).</li>
+      <li><strong>Describe</strong> each spot as the fixed 62-number vector.</li>
+      <li><strong>Score</strong> the query photo against each enrolled individual using 17 match statistics: how many query spots have a good partner, how broad that agreement is, how many partnerships are mutual (each spot is the other&rsquo;s best match), how geometrically consistent the matched spots are, and size-normalisation terms.</li>
+      <li><strong>Combine</strong> those 17 numbers with a logistic regression (a weighted sum through an S-curve) into one score per candidate.</li>
+      <li><strong>Decide.</strong> Rank the candidates; convert the top score to a calibrated probability; above the threshold, report the matched individual; below it, &ldquo;new animal.&rdquo; Abstain when the photo has too few spots or low quality.</li>
+    </ol>
+
+    <div class="tbl">
+      <table>
+        <caption>The pivot &mdash; whole image vs spots vs learned combining rule</caption>
+        <thead><tr><th>Approach</th><th>Training</th><th class="num">Rank-1</th><th>Regime</th></tr></thead>
+        <tbody>
+          <tr><td>Whole-image embedding (average of spot vectors)</td><td>none</td><td class="num">0.35</td><td>fold 0</td></tr>
+          <tr><td>Whole-image embedding, trained (contrastive)</td><td>yes</td><td class="num">0.37</td><td>fold 0 &mdash; no gain over the average</td></tr>
+          <tr><td>Raw spot voting (best partner per spot, summed)</td><td>none</td><td class="num">0.43&nbsp;&plusmn;&nbsp;0.09</td><td>5-fold, gallery &asymp;65</td></tr>
+          <tr><td>Trained spot description (contrastive on identity)</td><td>yes</td><td class="num lose">0.31&ndash;0.33</td><td>fold 0 &mdash; <em>worse</em> than raw voting</td></tr>
+          <tr><td><strong>Learned combining rule (logistic regression)</strong></td><td>yes</td><td class="num win">0.60&nbsp;&plusmn;&nbsp;0.10</td><td>5-fold, gallery &asymp;65</td></tr>
+          <tr><td>Learned combining rule (set-attention, more expressive)</td><td>yes</td><td class="num lose">0.43&nbsp;&plusmn;&nbsp;0.19</td><td>5-fold &mdash; ties raw voting, unstable</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Rank-1 = fraction of test photos whose correct known individual is the single top guess. &ldquo;Fold 0&rdquo; rows are one easy fold and would be lower averaged over five.</p>
+
+    <div class="stats">
+      <div class="stat"><span class="v">0.43&rarr;0.60</span><span class="k">rank-1, raw voting &rarr; learned rule (5-fold, gallery &asymp;65)</span></div>
+      <div class="stat"><span class="v">+0.17</span><span class="k">rank-1 lift, positive on all 5 folds</span></div>
+      <div class="stat"><span class="v">~6,000</span><span class="k">labelled (query, candidate) pairs per fold for the rule</span></div>
+      <div class="stat"><span class="v">seconds</span><span class="k">time to train the combining rule</span></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="methods-depth">
+    <h2><span class="n">4</span>Methods in depth</h2>
+
+    <h3>4.1&nbsp;&nbsp;Why spots beat the whole image</h3>
+    <p>A learned whole-image embedding never rises above the level of simply averaging the spot vectors (rank-1 ~0.35&ndash;0.37 either way). Training pulls an untrained model up to the average and no further. The reason is data: with ~1.4 photos per animal there are too few same-animal pairs to teach an encoder the invariances it would need.</p>
+    <p>Spot <em>voting</em> needs no training and does much better. For each spot in the query photo, find its single best-matching spot on a candidate animal and add up those best scores; the candidate with the highest sum wins. This scores rank-1 <strong>0.556 on the easy fold</strong> and <strong>0.434 &plusmn; 0.092 over five folds</strong>, against 0.352 for the whole image. The counter-intuitive part: the average same-animal spot pair is <em>not</em> similar (a spot classifier separates same-animal from different-animal spot pairs at area-under-curve ~0.51, essentially chance). Voting works anyway because it keys off the <em>nearest</em> match, and the handful of truly corresponding spots do match strongly (precision 0.77&ndash;1.0 once similarity is above 0.75). So the signal lives in the best few correspondences, not in the average.</p>
+
+    <h3>4.2&nbsp;&nbsp;Why training the spot description fails</h3>
+    <p>Training a spot encoder with a same/different loss on identity labels &mdash; tried both with cross-spot context (a transformer) and without (a plain network) &mdash; makes the spot classifier much better (area-under-curve 0.51&rarr;0.72) but makes <em>voting worse</em> (rank-1 drops to ~0.30&ndash;0.33). Both architectures fail the same way, which points at the objective rather than the model: a &ldquo;same individual&rdquo; loss pulls together an animal&rsquo;s <em>genuinely different</em> spots, which destroys the one-to-one correspondence that voting relies on. The hand-built 62-number description already preserves that correspondence. Conclusion recorded in the project: do not learn the spot description for this task.</p>
+
+    <h3>4.3&nbsp;&nbsp;The learned combining rule (the deliverable)</h3>
+    <p>Keep the 62-number spot descriptions fixed. Treat every (query photo &rarr; candidate individual) match as one labelled example and learn the function that turns its 17 match statistics into a score. The statistics are all <em>animal-agnostic</em> (they describe a match, not an identity), so the rule generalises to animals not seen in training.</p>
+
+    <div class="tbl">
+      <table>
+        <caption>Learned combining rule &mdash; five-fold cross-validation (dataset 2026_16_07, gallery &asymp;65&ndash;83)</caption>
+        <thead><tr><th class="num">Fold</th><th class="num">Raw voting</th><th class="num">Learned rule</th><th class="num">Change</th></tr></thead>
+        <tbody>
+          <tr><td class="num">0</td><td class="num">0.556</td><td class="num">0.685</td><td class="num win">+0.130</td></tr>
+          <tr><td class="num">1</td><td class="num">0.327</td><td class="num">0.423</td><td class="num win">+0.096</td></tr>
+          <tr><td class="num">2</td><td class="num">0.386</td><td class="num">0.568</td><td class="num win">+0.182</td></tr>
+          <tr><td class="num">3</td><td class="num">0.370</td><td class="num">0.717</td><td class="num win">+0.348</td></tr>
+          <tr><td class="num">4</td><td class="num">0.533</td><td class="num">0.622</td><td class="num win">+0.089</td></tr>
+          <tr><td class="num"><strong>mean</strong></td><td class="num"><strong>0.434&nbsp;&plusmn;&nbsp;0.092</strong></td><td class="num win"><strong>0.603&nbsp;&plusmn;&nbsp;0.104</strong></td><td class="num win"><strong>+0.169</strong></td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">Rank-5 mean 0.757. A logistic regression beats a small neural network here (0.685 vs 0.648 on fold 0); a more expressive set-attention model is unstable (fold 3 collapses to 0.087). Simpler wins.</p>
+
+    <div class="tbl">
+      <table>
+        <caption>What the rule learned &mdash; standardised weights</caption>
+        <thead><tr><th>Statistic</th><th class="num">Weight</th><th>Reading</th></tr></thead>
+        <tbody>
+          <tr><td>fraction of query spots matching above 0.6</td><td class="num win">+1.16</td><td>breadth dominates &mdash; many decent matches</td></tr>
+          <tr><td>single strongest match</td><td class="num lose">&minus;0.68</td><td>one strong peak is <em>negative</em>: four&times;0.7 beats one&times;0.9</td></tr>
+          <tr><td>log spot count of the query</td><td class="num">&minus;0.64</td><td>learned to size-normalise</td></tr>
+          <tr><td>summed best-partner score (the old hand score)</td><td class="num">+0.61</td><td>still helps, not dominant</td></tr>
+          <tr><td>mutual nearest-neighbour count</td><td class="num">+0.52</td><td>reciprocal matches</td></tr>
+          <tr><td>geometric-consistency inliers</td><td class="num">+0.51</td><td>the matched spots form the same arrangement</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p>The rule&rsquo;s summary: prefer <strong>many moderate, mutually-consistent, geometrically-coherent matches</strong> over one lucky strong match, and normalise for how many spots the animals have.</p>
+
+    <p><strong>Confidence.</strong> The gap between the top and second candidate scores predicts whether the top guess is right: low / medium / high gap corresponds to accuracy <strong>0.33 / 0.68 / 0.80</strong> &mdash; usable as-is. Platt scaling then fixes the probability numbers (the most-confident bin was claiming 0.72 when it was right 0.22 of the time; after scaling it claims 0.18).</p>
+
+    <h3>4.4&nbsp;&nbsp;The distinctiveness / &ldquo;strict&rdquo; track</h3>
+    <p>Driven by the human reviewer&rsquo;s written reasons, a second matcher scores a pair as <strong>coverage &times; support</strong>: coverage is the fraction of an animal&rsquo;s <em>distinctive</em> spot &ldquo;mass&rdquo; that is explained by good matches (an unmatched characteristic spot drags it down), and support rises with the number of corroborating matches (few matches &rarr; low). Each spot&rsquo;s distinctiveness weight is learned from the ~8,700 human tags by a six-factor logistic regression that recovers the human&rsquo;s &ldquo;interesting&rdquo; labels at <strong>area-under-curve 0.750 &plusmn; 0.018</strong> (a hand-tuned blend gets 0.708). What the fit says is &ldquo;special&rdquo;: <strong>shape irregularity (+0.96) and size (+0.68)</strong>; being isolated or rare fits at essentially zero. The reviewer&rsquo;s &ldquo;spot 96 / spot 100&rdquo; language turned out to mean size percentiles, not spot identifiers.</p>
+    <p>On a quality-filtered subset this matcher reaches <strong>census F0.5 0.622 &plusmn; 0.045</strong>. On the full, harder gallery with no quality filter it drops to <strong>0.347 &plusmn; 0.124</strong> &mdash; still the best and most stable of the tried scorers, and notably: letting a logistic regression <em>re-learn</em> the factor combination makes it worse (0.245), because the learned combo dilutes the human thesis and leans on size-normalisation. Removing the human distinctiveness supervision entirely drops census F0.5 from 0.609 to 0.493 and novelty separation to chance &mdash; the human signal is load-bearing.</p>
+
+    <h3>4.5&nbsp;&nbsp;Joint training, tested and set aside</h3>
+    <p>A model that learns its own spot description <em>and</em> the voting rule together, through a differentiable voting head, reaches census F0.5 <strong>0.609 &plusmn; 0.089</strong> &mdash; but a version with the spot encoder <em>frozen</em> reaches <strong>0.600</strong>. Learning the representation adds almost nothing; the differentiable-voting objective does the work. This is consistent with 4.2.</p>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="checks">
+    <h2><span class="n">5</span>Checks that have been run</h2>
+
+    <p>A large share of the project&rsquo;s effort went into keeping the numbers honest. Several headline gains were later shown by these checks to be artifacts. The main ones:</p>
+
+    <div class="tbl">
+      <table>
+        <caption>Diagnostic checks and what they found</caption>
+        <thead><tr><th>Check</th><th>What it tested</th><th>Finding</th></tr></thead>
+        <tbody>
+          <tr><td>Harness anchors</td><td>random vs label-reading matcher on every run</td><td>dummy at chance, oracle &asymp;1.0 (9/9). No leakage.</td></tr>
+          <tr><td>Gallery-size discipline</td><td>the same matcher against different-sized candidate pools</td><td>rank-1 0.60 at ~65 candidates falls to a fraction at ~687; chance moves 0.071&rarr;0.010. Never quote rank-1 without the gallery size.</td></tr>
+          <tr><td>Individual-level intervals</td><td>query- vs individual-level confidence intervals</td><td>query-level intervals 2&ndash;3&times; too narrow; all intervals recomputed over individuals.</td></tr>
+          <tr><td>Label self-consistency</td><td>do repeat photos of one animal share a consistent spot set</td><td>about one third of individuals sit at chance-level self-consistency; 8+ duplicate identities confirmed. Effort redirected to label hygiene.</td></tr>
+          <tr><td>Representation check</td><td>8 spot descriptions vs 417 human accept/reject verdicts on single spot-to-spot matches</td><td>all score area-under-curve 0.47&ndash;0.51 (chance is 0.50). The description, not the matcher, is the ceiling.</td></tr>
+          <tr><td>Edge-gate calibration</td><td>can any threshold on similarity or position reproduce the reviewer&rsquo;s keep/drop decision</td><td>no &mdash; the inputs are at chance on the human verdict (area-under-curve 0.48). The reviewer judges on structure the 62 numbers do not encode.</td></tr>
+          <tr><td>Coordinate-frame check</td><td>are the geometry statistics failing because computed in image, not body, coordinates</td><td>no (frame swap changes results by &lt;0.02). Instead: two geometry statistics were confounded with the <em>number</em> of matched spots &mdash; one scored 0.377 (worse than chance, backwards) on deliberately scrambled matches. Fixed by subtracting each pair&rsquo;s own random-shuffle baseline (0.544&rarr;0.621).</td></tr>
+          <tr><td>Correspondence-mining audit</td><td>precision and recall of machine-proposed spot matches vs human verdicts</td><td>precision 0.78&ndash;0.86; but recall of the true matches is only 0.02&ndash;0.08.</td></tr>
+          <tr><td>Feasibility, pre-registered</td><td>decision gates written into the script before any number existed</td><td>a spot finds a partner between two photos of the <em>same</em> animal only <strong>24%</strong> of the time, so &ldquo;a distinctive spot is missing&rdquo; is weak evidence by default; how surprising a disappearance is can be predicted at area-under-curve 0.68.</td></tr>
+          <tr><td>Data-scaling curve</td><td>fixed test fold, train on 25&rarr;50&rarr;75&rarr;100% of individuals (322&rarr;1,304 images)</td><td>census F0.5 flat; slope over the last step is &minus;0.006 per ~330 images and declining. More photos of the same kind will not move the learned matcher.</td></tr>
+          <tr><td>Synthetic-population study</td><td>scale questions the ~28-query real folds cannot answer</td><td>difficulty is set by gallery size (F0.5 0.92 at 25 animals &rarr; 0.35 at 200); the model is not limited by training scale. Absolute synthetic numbers diverge from real data and are treated as method-relative only.</td></tr>
+          <tr><td>Stacking check</td><td>do the extra shape descriptor and the scoring rule add up</td><td>no &mdash; combined effect +0.002 to +0.007 against a &plusmn;0.08 fold spread. They find the same signal.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="results">
+    <h2><span class="n">6</span>Results</h2>
+
+    <div class="tbl">
+      <table>
+        <caption>Baseline bake-off &mdash; 5-fold, split by individual (dataset 2026_11_07)</caption>
+        <thead><tr><th>Matcher</th><th class="num">Rank-1</th><th class="num">Rank-5</th><th class="num">Verify AUC</th><th class="num">Open-set AUC</th></tr></thead>
+        <tbody>
+          <tr><td>dummy (chance floor)</td><td class="num">0.06</td><td class="num">0.31</td><td class="num">0.49</td><td class="num">0.42</td></tr>
+          <tr><td>classical constellation matching</td><td class="num">0.17</td><td class="num">0.44</td><td class="num">0.56</td><td class="num">0.55</td></tr>
+          <tr><td>frozen ImageNet CNN on the spot image</td><td class="num">0.25</td><td class="num">0.50</td><td class="num">0.58</td><td class="num">0.52</td></tr>
+          <tr><td>set transformer (learned)</td><td class="num">0.27</td><td class="num">0.58</td><td class="num win">0.64</td><td class="num">0.54</td></tr>
+          <tr><td>GNN / Hungarian (learned)</td><td class="num">0.14&ndash;0.17</td><td class="num">0.50</td><td class="num">0.56&ndash;0.59</td><td class="num">0.51</td></tr>
+          <tr><td>oracle (ceiling)</td><td class="num">1.00</td><td class="num">1.00</td><td class="num">1.00</td><td class="num">1.00</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="note">On this dataset canonicalising each spot to its own principal axis <em>hurt</em> (rank-1 0.14 vs 0.19 as-is): most salamander spots are near-round, so their axis is unstable. Hand-crafted shape features alone did not beat pure geometry. These findings motivated the spot-voting + learned-rule direction.</p>
+
+    <div class="tbl">
+      <table>
+        <caption>Best system against the required capabilities</caption>
+        <thead><tr><th>Capability</th><th>Best measured</th><th>Regime</th></tr></thead>
+        <tbody>
+          <tr><td>Rank the correct known animal first</td><td class="win">0.60 &plusmn; 0.10</td><td>5-fold, gallery &asymp;65; lower at the full ~687 gallery</td></tr>
+          <tr><td>Correct animal in the top five</td><td>0.76</td><td>same</td></tr>
+          <tr><td>Tell same-animal from different-animal pairs</td><td>0.64 (area-under-curve)</td><td>best bake-off model</td></tr>
+          <tr><td>Tell new animals from known ones</td><td class="lose">0.60&ndash;0.69 (area-under-curve)</td><td>census protocol</td></tr>
+          <tr><td>Population count decision (F0.5)</td><td>0.62 &plusmn; 0.05 filtered / 0.35 &plusmn; 0.12 unfiltered</td><td>dataset 2026_23_07</td></tr>
+          <tr><td>Calibrated confidence + abstain</td><td class="win">delivered</td><td>margin bands 0.33 / 0.68 / 0.80; Platt-scaled; commits to 6&ndash;18% of photos at &ge;90% precision</td></tr>
+          <tr><td>Head-count bias before gating</td><td class="lose">over-counts by +15 to +90 per fold</td><td>missed re-sights become phantom new animals</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="stats">
+      <div class="stat"><span class="v">0.60</span><span class="k">rank-1, learned rule (gallery &asymp;65)</span></div>
+      <div class="stat"><span class="v">0.62</span><span class="k">census F0.5, quality-filtered</span></div>
+      <div class="stat"><span class="v">0.24</span><span class="k">chance a spot re-appears in a second photo of the same animal</span></div>
+      <div class="stat"><span class="v">0.48&ndash;0.51</span><span class="k">every spot description vs human verdicts (chance 0.50)</span></div>
+    </div>
+  </section>
+
+  <!-- ============================================================ -->
+  <section id="interpretation">
+    <h2><span class="n">7</span>Interpretation &mdash; how well it solves the problem</h2>
+
+    <h3>What works</h3>
+    <ul>
+      <li><strong>Spots plus voting is the right representation.</strong> Untrained spot voting (rank-1 0.43, five folds, ~65 candidates) already beats every whole-image approach (~0.35) with no training, and the learned combining rule lifts it to <strong>0.60 &plusmn; 0.10, positive on all five folds</strong>.</li>
+      <li><strong>The output shape the problem asked for exists.</strong> Ranked candidates, a similarity in [0,1], a decision threshold, a calibrated probability, and an abstain path (commit to 6&ndash;18% of photos while keeping emitted matches &ge;90% precise).</li>
+      <li><strong>Human distinctiveness supervision matters.</strong> Removing it costs census F0.5 0.609 &rarr; 0.493 and drops novelty separation to chance.</li>
+      <li><strong>The evaluation is trustworthy.</strong> Fixed dummy/oracle anchors, individual-level intervals, gallery-size discipline, pre-registered decision gates, and control arms that must fail. These checks caught multiple would-be results as artifacts.</li>
+    </ul>
+
+    <h3>What does not yet work</h3>
+    <ul>
+      <li><strong>Closed-set ranking is well short of the aspirational target</strong> (rank-1 ~0.85). The honest best is 0.60 at a ~65-candidate gallery, and a fraction of that at the full ~687-candidate gallery. For context, published wildlife re-identification on clean, curated data reaches rank-1 0.6&ndash;0.9; this project works from machine-extracted, unverified spots with ~1.4&ndash;2 photos per animal.</li>
+      <li><strong>The open-set decision is the hard half.</strong> Deciding &ldquo;this is a new animal&rdquo; separates at area-under-curve 0.60&ndash;0.69, and the precision-first operating point has recall around 0.10. Before gating, the population count over-counts by tens of animals per fold.</li>
+      <li><strong>The ceiling is the spot description, and it is firm.</strong> Eight descriptions &mdash; hand-built and learned &mdash; all score 0.47&ndash;0.51 against human accept/reject verdicts on single spot matches (chance 0.50). The human reviewer is judging on configural arrangement and absolute size relations that the 62-number vector does not encode. Learning the description from identity labels fails (too few labels); self-supervised learning from mined correspondences also fails to beat the hand-built description.</li>
+      <li><strong>More of the same data will not fix it.</strong> The data-scaling slope is &minus;0.006 in census F0.5 per ~330 added images and declining, and the synthetic study shows the learned model is not limited by training scale.</li>
+      <li><strong>The label substrate is noisy.</strong> Only 70% of spots get a body position; a spot re-appears across two photos of the same animal just 24% of the time; about a third of individuals are at chance-level self-consistency; 8 or more duplicate identities are confirmed.</li>
+    </ul>
+
+    <h3>Where the leverage is</h3>
+    <p>The project&rsquo;s own conclusion, backed by the checks above: the binding constraints are <strong>data quality and the spot description</strong>, not the matching model. Scoring-rule work is closed. The open levers are all data: de-duplicate identities, resolve multi-animal frames, align to the body axis, break results down per source collection, and build a small hand-verified validation set so label noise can actually be measured. A richer spot description &mdash; one that carries absolute size and configural geometry the human demonstrably uses &mdash; is the other open direction.</p>
+
+    <h3>Bottom line</h3>
+    <p>Salamander Spotter is a working, honestly-evaluated pipeline that solves the <em>easy fraction</em> of the problem. At roughly 90% precision it will commit to about 6&ndash;18% of query photos and, on a modest gallery, rank the correct known individual first around 60% of the time; for the rest it can answer &ldquo;new / not sure.&rdquo; It does not yet deliver field-ready open-set re-identification at full population scale. The gap has been diagnosed rather than guessed: it lies in how each spot is described and in the quality of the machine-made labels, and both of those are addressable.</p>
+  </section>
+
+  <footer>
+    <p>Compiled from the project&rsquo;s own records: <code>docs/project_goal.md</code>, <code>docs/modeling_strategy.md</code>, <code>docs/per_spot_embedding_aggregation.md</code>, <code>docs/tricks.md</code>, <code>pipeline/spot_transformer/results.md</code>, and the run artifacts under <code>artifacts/spot_transformer/</code> and <code>artifacts/spot_embedding/bakeoff/</code>. Numbers are quoted with their dataset version and gallery size because both materially change the result.</p>
+  </footer>
+
+</div>
+</body>
+</html>

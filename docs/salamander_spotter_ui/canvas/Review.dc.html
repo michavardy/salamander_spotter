@@ -1,0 +1,205 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9; --line-soft:#e6e1d9; --line-faint:#f0ebe2;
+      --panel:#fff;
+      --side:#2b2825; --side-active:#3a3632; --side-text:#a79e93; --side-text-on:#f4efe8;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-link:#4a72b8; --blue-link-h:#365a99; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+      --chip:#f1ece3;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:var(--blue-link);text-decoration:none}a:hover{color:var(--blue-link-h)}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    svg{display:block}
+
+    .screen{width:1440px;height:960px;display:flex;overflow:hidden;background:var(--bg)}
+    .side{width:220px;flex:none;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 20px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:var(--side-text-on)}
+    .brand .dot{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:var(--side-text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s ease,color .12s ease}
+    .nav a:hover{background:#332f2b;color:#e4ded4}
+    .nav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .nav a.on svg{color:var(--accent)}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .side-bottom{margin-top:auto;padding:0 12px}
+    .side .foot{padding:14px 20px 2px;border-top:1px solid var(--side-active);font-size:11.5px;color:var(--muted2);line-height:1.5;margin-top:10px}
+    .side .foot b{color:var(--side-text);font-weight:600;display:block;font-size:12.5px}
+
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .urlbar{height:32px;flex:none;background:#efeae0;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:9px;padding:0 14px}
+    .urlbar .dots{display:flex;gap:5px}
+    .urlbar .dots i{width:7px;height:7px;border-radius:50%;background:#d8d1c2}
+    .urlbar .pill{flex:none;background:#fff;border:1px solid var(--line);border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--muted2);font-family:"IBM Plex Mono"}
+    .urlbar .pill svg{width:10px;height:10px;stroke-width:2.2;color:var(--green);flex:none}
+    .urlbar .pill .cur{color:var(--ink);font-weight:600}
+    .top{height:60px;flex:none;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:16px;padding:0 28px;background:#fff}
+    .top h1{font-size:17px}
+    .top .sub{font-size:12.5px;color:var(--muted2)}
+    .body{flex:1;overflow:auto;padding:22px 28px 32px}
+
+    .autoband{display:flex;align-items:center;gap:9px;background:var(--green-soft);border:1px solid var(--green-line,#bfe0cd);color:var(--green);border-radius:11px;padding:9px 14px;font-size:11.5px;font-weight:500;margin-bottom:16px}
+    .autoband svg{width:15px;height:15px;stroke-width:2;flex:none}
+
+    .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+    .search{flex:1;max-width:340px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--muted2)}
+    .search svg{width:16px;height:16px;stroke-width:1.8;flex:none}
+    .search span{font-size:12.5px}
+    .toolbar .fchip{font-size:12px;padding:7px 13px;border-radius:20px;border:1px solid var(--line);color:var(--muted3);background:#fff;cursor:pointer;font-weight:500}
+    .toolbar .fchip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+    thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;padding:12px 16px;border-bottom:1px solid var(--line);background:#fbf9f5}
+    tbody td{padding:10px 16px;font-size:13px;border-bottom:1px solid var(--line-faint);color:var(--ink-soft);vertical-align:middle}
+    tbody tr{transition:background .12s ease}
+    tbody tr:hover{background:#fbf7ee}
+    tbody tr:last-child td{border-bottom:none}
+    .avatar{width:30px;height:42px;border-radius:6px;background:#211d19;overflow:hidden;flex:none}
+    .avatar svg{width:100%;height:100%}
+    .idcell{display:flex;align-items:center;gap:11px;cursor:pointer}
+    .idcell b{font-weight:700;color:var(--ink);font-family:"IBM Plex Mono";font-size:12.5px}
+    .site{font-size:11.5px;color:var(--muted2)}
+    .tier{display:inline-flex;align-items:center;gap:5px;font-size:10.5px;font-weight:700}
+    .tier::before{content:'';width:7px;height:7px;border-radius:50%;background:var(--tc);flex:none}
+    .sugg b{font-family:"IBM Plex Mono";color:var(--ink)}
+    .sugg span{color:var(--muted2);font-size:11.5px}
+    .qa{display:flex;gap:5px}
+    .qa a{width:28px;height:28px;border-radius:8px;border:1px solid var(--line);display:flex;align-items:center;justify-content:center;color:var(--muted3);cursor:pointer;transition:all .12s ease}
+    .qa a:hover{border-color:var(--accent-line);color:var(--amber-ink);background:var(--accent-soft)}
+    .qa a svg{width:14px;height:14px;stroke-width:1.9}
+    .pager{display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:12px;color:var(--muted2)}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></symbol>
+  <symbol id="ico-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M3 10h18M9 4v16"/></symbol>
+  <symbol id="ico-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><circle cx="19" cy="18" r="1.5"/><path d="M9.9 10.4 6.3 7.1M14.1 10.4l3.6-3.3M9.9 13.6l-3.6 3.3M14.1 13.6l3.6 3.3"/></symbol>
+  <symbol id="ico-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="ico-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10V7a6 6 0 0 1 12 0v3"/><rect x="4" y="10" width="16" height="10" rx="2"/></symbol>
+  <symbol id="ico-compare" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="8" height="16" rx="1.6"/><rect x="13" y="4" width="8" height="16" rx="1.6"/></symbol>
+  <symbol id="ico-link" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M9 15l6-6"/><path d="M11 6l1-1a4 4 0 1 1 6 6l-1 1"/><path d="M13 18l-1 1a4 4 0 1 1-6-6l1-1"/></symbol>
+  <symbol id="ico-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="fig-sal" viewBox="0 0 90 140">
+    <rect width="90" height="140" fill="#211d19"/>
+    <path d="M45 8 C 36 22 34 46 38 64 C 41 84 30 106 34 124 C 36 133 42 139 46 140 C 53 138 58 128 56 118 C 53 100 61 84 58 64 C 55 46 55 22 46 9 Z" fill="#17140f"/>
+    <path d="M45 8 C 36 22 34 46 38 64 C 41 84 30 106 34 124 C 36 133 42 139 46 140 C 53 138 58 128 56 118 C 53 100 61 84 58 64 C 55 46 55 22 46 9 Z" fill="#b6a996" opacity=".15"/>
+    <g fill="#d99a3f" fill-opacity=".62" stroke="#e8b866" stroke-width=".6">
+      <ellipse cx="42" cy="20" rx="3.6" ry="2.6"/><ellipse cx="51" cy="27" rx="2.6" ry="2"/>
+      <ellipse cx="40" cy="34" rx="3" ry="3"/><ellipse cx="50" cy="42" rx="4" ry="2.6"/>
+      <ellipse cx="42" cy="51" rx="2.6" ry="2.6"/><ellipse cx="51" cy="59" rx="3" ry="2"/>
+    </g>
+  </symbol>
+</svg>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a><svg><use href="#ico-home"/></svg>Overview</a>
+      <a><svg><use href="#ico-upload"/></svg>Upload</a>
+      <a class="on"><svg><use href="#ico-review"/></svg>Review</a>
+      <a><svg><use href="#ico-table"/></svg>Names</a>
+      <a><svg><use href="#ico-atom"/></svg>Models</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="foot"><b>M. Vardy</b>reviewer &middot; lead</div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <div class="urlbar"><span class="dots"><i></i><i></i><i></i></span><span class="pill"><svg><use href="#ico-lock"/></svg>spottersapp.com/<span class="cur">review</span></span></div>
+    <header class="top">
+      <h1>Review</h1>
+      <span class="sub">18 sightings need a decision</span>
+    </header>
+
+    <div class="body">
+      <div class="autoband"><svg><use href="#ico-check"/></svg>3 more sightings auto&#8209;approved at &ge;0.95 confidence this batch &mdash; they never landed here.</div>
+
+      <div class="toolbar">
+        <div class="search"><svg><use href="#ico-search"/></svg><span>Search by ID or contributor&hellip;</span></div>
+        <span class="fchip on">All (18)</span>
+        <span class="fchip">Needs a look</span>
+        <span class="fchip">Hand&#8209;correction</span>
+      </div>
+
+      <table>
+        <thead><tr>
+          <th style="width:210px">Incoming sighting</th>
+          <th>Site</th>
+          <th>Uploaded</th>
+          <th>Ladder tier</th>
+          <th>Top suggestion</th>
+          <th style="width:112px">Quick actions</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><div class="idcell"><span class="avatar"><svg><use href="#fig-sal"/></svg></span><div><b>sd_1_2</b><br><span class="site">G. Esh&#8209;Am</span></div></div></td>
+            <td class="site">Sasa &middot; north slope</td>
+            <td class="mono" style="font-size:12px">26 Aug 2026</td>
+            <td><span class="tier" style="--tc:var(--amber-ink)">Needs a look</span></td>
+            <td class="sugg"><b>en_1</b> <span>0.68</span></td>
+            <td><div class="qa"><a title="Top match comparison"><svg><use href="#ico-compare"/></svg></a><a title="Match lines"><svg><use href="#ico-link"/></svg></a><a title="Extraction"><svg><use href="#ico-pencil"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><div class="idcell"><span class="avatar"><svg><use href="#fig-sal"/></svg></span><div><b>sd_2_3</b><br><span class="site">Y. Mozer</span></div></div></td>
+            <td class="site">Sasa &middot; Uri garden</td>
+            <td class="mono" style="font-size:12px">25 Aug 2026</td>
+            <td><span class="tier" style="--tc:var(--amber-ink)">Needs a look</span></td>
+            <td class="sugg"><b>ac_3</b> <span>0.41</span></td>
+            <td><div class="qa"><a title="Top match comparison"><svg><use href="#ico-compare"/></svg></a><a title="Match lines"><svg><use href="#ico-link"/></svg></a><a title="Extraction"><svg><use href="#ico-pencil"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><div class="idcell"><span class="avatar"><svg><use href="#fig-sal"/></svg></span><div><b>ac_9_1</b><br><span class="site">G. Esh&#8209;Am</span></div></div></td>
+            <td class="site">Sasa &middot; Buza spring</td>
+            <td class="mono" style="font-size:12px">24 Aug 2026</td>
+            <td><span class="tier" style="--tc:var(--blue)">Hand&#8209;correction</span></td>
+            <td class="sugg"><b>rt_1</b> <span>0.22</span></td>
+            <td><div class="qa"><a title="Top match comparison"><svg><use href="#ico-compare"/></svg></a><a title="Match lines"><svg><use href="#ico-link"/></svg></a><a title="Extraction"><svg><use href="#ico-pencil"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><div class="idcell"><span class="avatar"><svg><use href="#fig-sal"/></svg></span><div><b>rt_4_2</b><br><span class="site">Y. Mozer</span></div></div></td>
+            <td class="site">Sasa &middot; Nof Harim school</td>
+            <td class="mono" style="font-size:12px">22 Aug 2026</td>
+            <td><span class="tier" style="--tc:var(--amber-ink)">Needs a look</span></td>
+            <td class="sugg"><b>ca_47</b> <span>0.55</span></td>
+            <td><div class="qa"><a title="Top match comparison"><svg><use href="#ico-compare"/></svg></a><a title="Match lines"><svg><use href="#ico-link"/></svg></a><a title="Extraction"><svg><use href="#ico-pencil"/></svg></a></div></td>
+          </tr>
+          <tr>
+            <td><div class="idcell"><span class="avatar"><svg><use href="#fig-sal"/></svg></span><div><b>kf_1_1</b><br><span class="site">M. Vardy</span></div></div></td>
+            <td class="site">Sasa &middot; north slope</td>
+            <td class="mono" style="font-size:12px">20 Aug 2026</td>
+            <td><span class="tier" style="--tc:var(--amber-ink)">Needs a look</span></td>
+            <td class="sugg"><b>en_1</b> <span>0.33</span></td>
+            <td><div class="qa"><a title="Top match comparison"><svg><use href="#ico-compare"/></svg></a><a title="Match lines"><svg><use href="#ico-link"/></svg></a><a title="Extraction"><svg><use href="#ico-pencil"/></svg></a></div></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pager"><span>Showing 5 of 18</span><span>Click a row for Top match comparison, or use a quick action &rarr;</span></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,14 @@
+# spec §2.1 — TLS termination for the single instance.
+# Replace spotter.example.org with your domain. Caddy gets a Let's Encrypt cert
+# automatically and proxies :443 -> the app container.
+
+spotter.example.org {
+	encode zstd gzip
+	reverse_proxy app:8756 {
+		header_up X-Forwarded-Proto {scheme}
+		header_up Host {host}
+	}
+
+	# Cloudflare Access / basic-auth can be layered here if the edge is Caddy.
+	# The app itself has no login in v1 (spec §1.3).
+}

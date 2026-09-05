@@ -1,0 +1,88 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --amber-ink:#8a5a1e;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-soft:#eef2f8;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+    h1{font-family:"Hanken Grotesk";margin:0;font-weight:700;font-size:22px;letter-spacing:-.01em}
+    .mono{font-family:"IBM Plex Mono",monospace}
+    svg{display:block}
+    .page{width:1240px;padding:36px 20px 60px;background:var(--bg)}
+    .kicker{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--amber-ink);font-weight:700;margin-bottom:6px}
+    .desc{font-size:13px;color:var(--muted2);margin-top:6px;max-width:640px;line-height:1.6}
+    .diagram{position:relative;width:1200px;height:720px;margin:34px auto 0}
+    .node{position:absolute;background:#fff;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;gap:10px;padding:0 15px;font-size:12px;font-weight:600;color:var(--ink-soft);box-shadow:0 1px 2px rgba(51,48,44,.05);line-height:1.28}
+    .node svg{width:18px;height:18px;stroke-width:1.8;flex:none;color:var(--accent)}
+    .node.terminal{border-style:dashed;color:var(--muted2);background:#fbf9f5}
+    .node.terminal svg{color:var(--muted2)}
+    .node.blue{border-color:var(--blue-line);background:var(--blue-soft);color:var(--blue)}
+    .node.blue svg{color:var(--blue)}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+  <symbol id="ico-bars" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="4" y="10" width="4" height="10"/><rect x="10" y="4" width="4" height="16"/><rect x="16" y="13" width="4" height="7"/></symbol>
+  <symbol id="ico-list" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M8 6h13M8 12h13M8 18h13"/><circle cx="3" cy="6" r="1.2"/><circle cx="3" cy="12" r="1.2"/><circle cx="3" cy="18" r="1.2"/></symbol>
+  <symbol id="ico-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.6 7-12a7 7 0 0 0-14 0c0 4.4 7 12 7 12Z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+  <symbol id="ico-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M3 10h18M9 4v16"/></symbol>
+  <symbol id="ico-clipboard" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="4" width="14" height="17" rx="2"/><path d="M9 4V3a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v1"/><path d="M9 12h6M9 16h6"/></symbol>
+  <symbol id="ico-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></symbol>
+  <symbol id="ico-report" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M7 3h7l5 5v13H7Z"/><path d="M14 3v5h5"/><path d="M9 13h6M9 17h6"/></symbol>
+</svg>
+
+<div class="page">
+  <div class="kicker">User workflow 3 of 4</div>
+  <h1>Statistics &amp; overall knowledge gathering</h1>
+  <div class="desc">How the Dashboard's three panels &mdash; counts, activity, and the map &mdash; roll up into the one artefact the biology team actually needs: a season census report.</div>
+
+  <div class="diagram">
+    <svg width="1200" height="720" style="position:absolute;left:0;top:0" aria-hidden="true">
+      <defs>
+        <marker id="ah3" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7a736a"/></marker>
+      </defs>
+      <g stroke="#7a736a" stroke-width="1.6" fill="none">
+        <path d="M600 82 L600 130 L280 130 L280 168" marker-end="url(#ah3)"/>
+        <path d="M600 130 L600 168" marker-end="url(#ah3)"/>
+        <path d="M600 130 L920 130 L920 168" marker-end="url(#ah3)"/>
+        <path d="M280 232 L280 328" marker-end="url(#ah3)"/>
+        <path d="M600 232 L600 328" marker-end="url(#ah3)"/>
+        <path d="M920 232 L920 328" marker-end="url(#ah3)"/>
+        <path d="M280 392 L280 430 L600 430 L600 488" marker-end="url(#ah3)"/>
+        <path d="M920 392 L920 430 L600 430" fill="none"/>
+        <path d="M600 552 L600 618" marker-end="url(#ah3)"/>
+      </g>
+    </svg>
+
+    <div class="node" style="left:490px;top:18px;width:220px;height:64px"><svg><use href="#ico-home"/></svg>Open Dashboard</div>
+
+    <div class="node" style="left:170px;top:168px;width:220px;height:64px"><svg><use href="#ico-bars"/></svg>Stat counts &mdash; Individuals / Images / Contributors</div>
+    <div class="node" style="left:490px;top:168px;width:220px;height:64px"><svg><use href="#ico-list"/></svg>Recent activity feed</div>
+    <div class="node" style="left:810px;top:168px;width:220px;height:64px"><svg><use href="#ico-pin"/></svg>Sightings map</div>
+
+    <div class="node" style="left:170px;top:328px;width:220px;height:64px"><svg><use href="#ico-table"/></svg>Open Names for the full roster</div>
+    <div class="node terminal" style="left:490px;top:328px;width:220px;height:64px"><svg><use href="#ico-clipboard"/></svg>Track review backlog &amp; contributor activity</div>
+    <div class="node" style="left:810px;top:328px;width:220px;height:64px"><svg><use href="#ico-pin"/></svg>Click a site marker &rarr; filtered sightings list</div>
+
+    <div class="node" style="left:490px;top:488px;width:220px;height:64px"><svg><use href="#ico-download"/></svg>Export CSV / Excel</div>
+    <div class="node" style="left:490px;top:618px;width:220px;height:64px"><svg><use href="#ico-report"/></svg>Season census report shared with the biology team</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

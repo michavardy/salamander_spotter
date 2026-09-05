@@ -1,0 +1,225 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9; --line-soft:#e6e1d9; --line-faint:#f0ebe2;
+      --side:#2b2825; --side-active:#3a3632; --side-text:#a79e93; --side-text-on:#f4efe8;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-link:#4a72b8; --blue-link-h:#365a99; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+      --chip:#f1ece3;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:var(--blue-link);text-decoration:none}a:hover{color:var(--blue-link-h)}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    svg{display:block}
+
+    .screen{width:1440px;height:1032px;display:flex;overflow:hidden;background:var(--bg)}
+    .side{width:220px;flex:none;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 20px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:var(--side-text-on)}
+    .brand .dot{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:var(--side-text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s ease,color .12s ease}
+    .nav a:hover{background:#332f2b;color:#e4ded4}
+    .nav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .nav a.on svg{color:var(--accent)}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .subnav{display:flex;flex-direction:column;gap:1px;margin:1px 0 2px 30px;padding-left:10px;border-left:1px solid var(--side-active)}
+    .subnav a{display:flex;align-items:center;gap:8px;padding:6px 10px;border-radius:7px;color:var(--side-text);font-size:12px;font-weight:500;cursor:pointer}
+    .subnav a:hover{background:#332f2b;color:#e4ded4}
+    .subnav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .subnav2{display:flex;flex-direction:column;gap:1px;margin:1px 0 1px 14px;padding-left:9px;border-left:1px solid #4a453f}
+    .subnav2 a{display:flex;align-items:center;gap:7px;padding:5px 9px;border-radius:6px;color:#8f877c;font-size:11px;font-weight:500;cursor:pointer}
+    .subnav2 a:hover{background:#332f2b;color:#e4ded4}
+    .subnav2 a.on{background:var(--side-active);color:var(--side-text-on)}
+    .side-bottom{margin-top:auto;padding:0 12px}
+    .side .foot{padding:14px 20px 2px;border-top:1px solid var(--side-active);font-size:11.5px;color:var(--muted2);line-height:1.5;margin-top:10px}
+    .side .foot b{color:var(--side-text);font-weight:600;display:block;font-size:12.5px}
+
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .urlbar{height:32px;flex:none;background:#efeae0;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:9px;padding:0 14px}
+    .urlbar .dots{display:flex;gap:5px}
+    .urlbar .dots i{width:7px;height:7px;border-radius:50%;background:#d8d1c2}
+    .urlbar .pill{flex:none;background:#fff;border:1px solid var(--line);border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--muted2);font-family:"IBM Plex Mono"}
+    .urlbar .pill svg{width:10px;height:10px;stroke-width:2.2;color:var(--green);flex:none}
+    .urlbar .pill .cur{color:var(--ink);font-weight:600}
+
+    .top{height:58px;flex:none;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:12px;padding:0 24px;background:#fff}
+    .crumb{font-size:12.5px;color:var(--muted2);display:flex;align-items:center;gap:6px}
+    .crumb a{color:var(--muted2);font-weight:600}
+    .crumb a:hover{color:var(--blue-link)}
+    .kicker{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2);font-weight:700}
+    .top h1{font-size:16px}
+    .top .close{margin-left:auto;width:30px;height:30px;border-radius:8px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--muted3);cursor:pointer}
+
+    .bodywrap{flex:1;display:flex;gap:18px;padding:20px 22px 22px;min-height:0}
+    .rail{width:196px;flex:none;display:flex;flex-direction:column;gap:12px}
+    .panel{background:#fff;border:1px solid var(--line);border-radius:12px;padding:13px 13px 14px}
+    .panel h3{font-size:10.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700;margin-bottom:9px}
+    .seg{display:flex;background:#f1ece3;border-radius:8px;padding:3px;gap:3px;margin-bottom:9px}
+    .seg span{flex:1;text-align:center;font-size:11px;padding:5px 0;border-radius:6px;color:var(--muted3);cursor:pointer}
+    .seg span.on{background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 3px #0000000f}
+    .fld{font-size:10.5px;color:var(--muted);font-weight:600;margin:2px 0 5px}
+    .chips{display:flex;flex-wrap:wrap;gap:5px}
+    .chip{font-size:11px;padding:4px 9px;border-radius:20px;border:1px solid var(--line);color:var(--muted2);background:#fbf8f3}
+    .chip.on{background:var(--accent-soft);border-color:var(--accent-line);color:var(--amber-ink);font-weight:600}
+
+    .mtable{display:flex;flex-direction:column;gap:6px}
+    .mrow{display:flex;flex-direction:column;gap:2px;padding:7px 8px;border:1px solid var(--line);border-radius:8px;background:#fbf9f5}
+    .mrow .ssids{display:flex;align-items:center;gap:5px;font-size:10.5px;font-family:"IBM Plex Mono";color:var(--ink-soft)}
+    .mrow .ssids svg{width:10px;height:10px;stroke-width:2.4;color:var(--red);flex:none}
+    .mrow .score{font-size:10px;color:var(--muted2)}
+    .mrow .score b{color:var(--red);font-family:"IBM Plex Mono"}
+
+    .stage{flex:1;display:flex;flex-direction:column;min-height:0}
+    .compare{flex:1;background:#211d19;border-radius:16px;position:relative;overflow:hidden}
+    .compare svg.overlay{position:absolute;left:0;top:0;width:100%;height:100%}
+    .panelfig{position:absolute}
+    .panelfig .lbl{position:absolute;left:0;top:-24px;font-size:11px;color:#e9e2d3;opacity:.7;font-family:"IBM Plex Mono"}
+
+    .caption{margin-top:12px;font-size:12px;color:var(--muted2);text-align:center}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></symbol>
+  <symbol id="ico-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M3 10h18M9 4v16"/></symbol>
+  <symbol id="ico-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><circle cx="19" cy="18" r="1.5"/><path d="M9.9 10.4 6.3 7.1M14.1 10.4l3.6-3.3M9.9 13.6l-3.6 3.3M14.1 13.6l3.6 3.3"/></symbol>
+  <symbol id="ico-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="ico-arrow-sm" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+  <symbol id="ico-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10V7a6 6 0 0 1 12 0v3"/><rect x="4" y="10" width="16" height="10" rx="2"/></symbol>
+
+  <symbol id="fig-A" viewBox="0 0 180 300">
+    <rect width="180" height="300" fill="#211d19"/>
+    <path id="bodMA" d="M90 14 C 71 40 67 88 75 128 C 81 166 60 208 68 248 C 72 270 85 286 96 288 C 110 285 120 266 116 244 C 110 208 127 168 121 128 C 115 90 114 42 96 16 Z" fill="#17140f"/>
+    <use href="#bodMA" fill="#b6a996" opacity="0.15"/>
+    <use href="#bodMA" fill="none" stroke="#ded7c9" stroke-width="1" opacity="0.75"/>
+    <path d="M92 20 C 81 68 85 128 82 178 C 80 218 87 258 93 282" fill="none" stroke="#a99e8d" stroke-width="1" stroke-dasharray="3 3" opacity="0.65"/>
+    <g fill="#d99a3f" fill-opacity="0.62" stroke="#e8b866" stroke-width="0.8">
+      <ellipse cx="86" cy="38" rx="7" ry="5"/><ellipse cx="104" cy="53" rx="5" ry="4"/>
+      <ellipse cx="82" cy="67" rx="6" ry="6"/><ellipse cx="101" cy="83" rx="8" ry="5"/>
+      <ellipse cx="86" cy="101" rx="5" ry="5"/><ellipse cx="104" cy="117" rx="6" ry="4"/>
+      <ellipse cx="84" cy="133" rx="7" ry="6"/><ellipse cx="98" cy="151" rx="5" ry="5"/>
+      <ellipse cx="80" cy="169" rx="6" ry="4"/><ellipse cx="93" cy="187" rx="7" ry="5"/>
+      <ellipse cx="84" cy="207" rx="5" ry="5"/><ellipse cx="96" cy="225" rx="5" ry="4"/>
+    </g>
+    <circle cx="92" cy="18" r="4.5" fill="#46b45f" stroke="#0c1a10"/>
+    <circle cx="93" cy="284" r="4.5" fill="#cf4b3d" stroke="#1a0c0a"/>
+  </symbol>
+
+  <symbol id="fig-C" viewBox="0 0 180 300">
+    <rect width="180" height="300" fill="#211d19"/>
+    <path id="bodMC" d="M92 18 C 76 44 82 90 78 130 C 74 172 84 216 80 252 C 78 272 86 286 94 288 C 106 285 112 266 108 244 C 104 206 96 168 100 128 C 104 88 108 42 96 18 Z" fill="#17140f"/>
+    <use href="#bodMC" fill="#b6a996" opacity="0.15"/>
+    <use href="#bodMC" fill="none" stroke="#ded7c9" stroke-width="1" opacity="0.75"/>
+    <path d="M92 22 C 84 66 90 128 88 176 C 86 216 90 256 92 282" fill="none" stroke="#a99e8d" stroke-width="1" stroke-dasharray="3 3" opacity="0.65"/>
+    <g fill="#d99a3f" fill-opacity="0.62" stroke="#e8b866" stroke-width="0.8">
+      <ellipse cx="88" cy="40" rx="6" ry="5"/><ellipse cx="98" cy="58" rx="5" ry="6"/>
+      <ellipse cx="84" cy="78" rx="7" ry="4"/><ellipse cx="96" cy="100" rx="5" ry="5"/>
+      <ellipse cx="82" cy="124" rx="6" ry="5"/><ellipse cx="94" cy="146" rx="4" ry="4"/>
+      <ellipse cx="86" cy="170" rx="6" ry="6"/><ellipse cx="96" cy="196" rx="5" ry="4"/>
+      <ellipse cx="84" cy="220" rx="5" ry="5"/><ellipse cx="92" cy="244" rx="4" ry="4"/>
+    </g>
+    <circle cx="93" cy="20" r="4.5" fill="#46b45f" stroke="#0c1a10"/>
+    <circle cx="87" cy="284" r="4.5" fill="#cf4b3d" stroke="#1a0c0a"/>
+  </symbol>
+</svg>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a><svg><use href="#ico-home"/></svg>Overview</a>
+      <a><svg><use href="#ico-upload"/></svg>Upload</a>
+      <a class="on"><svg><use href="#ico-review"/></svg>Review</a>
+      <div class="subnav">
+        <a>Top match comparison</a>
+        <div class="subnav2"><a class="on">Match lines</a></div>
+      </div>
+      <a><svg><use href="#ico-table"/></svg>Names</a>
+      <a><svg><use href="#ico-atom"/></svg>Models</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="foot"><b>M. Vardy</b>reviewer &middot; lead</div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <div class="urlbar"><span class="dots"><i></i><i></i><i></i></span><span class="pill"><svg><use href="#ico-lock"/></svg>spottersapp.com/review/sd_1_2/<span class="cur">match-lines</span></span></div>
+    <header class="top">
+      <div>
+        <div class="crumb"><a>Review</a><span>&rsaquo;</span><a>Top match comparison</a></div>
+        <span class="kicker">Match lines</span>
+      </div>
+      <h1 class="mono">sd_1_2 vs en_1_3</h1>
+      <span class="close"><svg><use href="#ico-x"/></svg></span>
+    </header>
+
+    <div class="bodywrap">
+      <div class="rail">
+        <div class="panel">
+          <h3>View</h3>
+          <div class="fld">Layout</div>
+          <div class="seg"><span>Cards</span><span class="on">Match lines</span></div>
+          <div class="fld">Overlays</div>
+          <div class="chips">
+            <span class="chip on">spots</span><span class="chip">body</span>
+          </div>
+        </div>
+        <div class="panel">
+          <h3>Spot matches &middot; 5</h3>
+          <div class="mtable">
+            <div class="mrow"><div class="ssids">SD-1-2-01 <svg><use href="#ico-arrow-sm"/></svg> EN-1-3-01</div><div class="score">score <b>0.84</b></div></div>
+            <div class="mrow"><div class="ssids">SD-1-2-04 <svg><use href="#ico-arrow-sm"/></svg> EN-1-3-03</div><div class="score">score <b>0.71</b></div></div>
+            <div class="mrow"><div class="ssids">SD-1-2-07 <svg><use href="#ico-arrow-sm"/></svg> EN-1-3-05</div><div class="score">score <b>0.63</b></div></div>
+            <div class="mrow"><div class="ssids">SD-1-2-10 <svg><use href="#ico-arrow-sm"/></svg> EN-1-3-07</div><div class="score">score <b>0.58</b></div></div>
+            <div class="mrow"><div class="ssids">SD-1-2-12 <svg><use href="#ico-arrow-sm"/></svg> EN-1-3-09</div><div class="score">score <b>0.41</b></div></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage">
+        <div class="compare">
+          <div class="panelfig" style="left:20px;top:40px;width:234px;height:390px"><span class="lbl">sd_1_2 &middot; incoming</span><svg width="234" height="390"><use href="#fig-A"/></svg></div>
+          <div class="panelfig" style="left:746px;top:40px;width:234px;height:390px"><span class="lbl">en_1_3 &middot; suggested match</span><svg width="234" height="390"><use href="#fig-C"/></svg></div>
+          <svg class="overlay" viewBox="0 0 1000 480" preserveAspectRatio="none">
+            <g fill="none" stroke="#e66767" stroke-width="1.6" stroke-dasharray="6 4">
+              <path d="M131.8 89.4 C 496 89.4 496 92 860.4 92"/>
+              <path d="M151.3 147.9 C 503 147.9 503 141.4 855.2 141.4"/>
+              <path d="M129.2 212.9 C 490 212.9 490 201.2 852.6 201.2"/>
+              <path d="M140.9 283.1 C 499 283.1 499 261 857.8 261"/>
+              <path d="M144.8 332.5 C 500 332.5 500 326 855.2 326"/>
+            </g>
+            <g font-family="'IBM Plex Mono',monospace" font-size="11" fill="#e9e2d3">
+              <rect x="472" y="80" width="34" height="16" rx="4" fill="#20242bdd"/><text x="479" y="92">.84</text>
+              <rect x="479" y="138" width="34" height="16" rx="4" fill="#20242bdd"/><text x="486" y="150">.71</text>
+              <rect x="466" y="203" width="34" height="16" rx="4" fill="#20242bdd"/><text x="473" y="215">.63</text>
+              <rect x="475" y="273" width="34" height="16" rx="4" fill="#20242bdd"/><text x="482" y="285">.58</text>
+              <rect x="476" y="323" width="34" height="16" rx="4" fill="#20242bdd"/><text x="483" y="335">.41</text>
+            </g>
+          </svg>
+        </div>
+        <div class="caption">Red = machine&#8209;proposed spot correspondence. Switch back to <b>Cards</b> in the rail for the plain side&#8209;by&#8209;side view.</div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

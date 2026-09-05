@@ -1,23 +1,383 @@
 [workspace]
 channels = ["conda-forge"]
 name = "salamander_spotter"
-platforms = ["win-64"]
+platforms = ["win-64", "linux-64"]
 version = "0.1.0"
 
 [tasks]
-normalize = "python scripts/normalize_names.py"
-# spot labels — one script; pick a stage via the subcommand (all | segment | contours):
-#   pixi run extract-spot-labels all --input <dir>      (full: Gemini purple + contours)
-#   pixi run extract-spot-labels segment  --input <dir> (stage 1: images  -> purple/)
-#   pixi run extract-spot-labels contours --input <dir> (stage 2: purple/ -> contours.db, per-spot contours + masks)
-extract-spot-labels = "python scripts/extract_spot_labels.py"
-# package a normalized image dir + its contours.db into datasets/<name>/ (raw/ + db/ + README) and zip it:
+# --- salamander-spotter application (docs/salamander_spotter_spec.md) ---
+"app:serve"          = "python -m app serve"
+"app:dev"            = "uvicorn app.main:app --reload --port 8756"
+"app:migrate"        = "python -m app migrate"
+"app:import-dataset" = "python -m app import-dataset"
+"app:backup"         = "python -m app backup"
+"app:test"           = "pytest"
+"app:test-unit"      = "pytest tests/unit"
+"app:test-integration" = "pytest tests/integration"
+# frontend (web/)
+"ui:install"         = { cmd = "pnpm install", cwd = "web" }
+"ui:dev"             = { cmd = "pnpm dev", cwd = "web" }
+"ui:build"           = { cmd = "pnpm build", cwd = "web" }
+"ui:bake"            = "python -c \"import shutil,pathlib; d=pathlib.Path('app/resources/web'); shutil.rmtree(d,ignore_errors=True); shutil.copytree('web/out', d); print('baked', d)\""
+"docker:build"       = { cmd = "docker build -f deploy/Dockerfile -t salamander-spotter:local .", depends-on = ["ui:build"] }
+
+normalize = "python scripts/dataset/normalize_names.py"
+# Flatten images/amir/raw/<hebrew dir per salamander>/ into one dir of ASCII names
+# amr_<dir_number>_<index> (number verbatim from the folder, index 1..N per folder).
+# Copies only — raw/ is never touched. Writes rename_map.csv.
+#   pixi run rename-amir --dry-run     <- ALWAYS first: the plan + per-folder counts
+#   pixi run rename-amir               <- copy into images/amir/processes/renamed/
+#   pixi run rename-amir --with-json   <- also copy each Takeout sidecar as <new_stem>.json
+rename-amir = "python scripts/dataset/rename_amir.py"
+# Merge a Roboflow COCO export (haifa_v2) into all_sasa_norm: each KF field individual
+# (series+number) becomes one label with its own fresh code; yearly photos become instances;
+# whole images copied (coin kept); filename_map.csv + label_map.csv updated (backed up first).
+#   pixi run merge-haifa --dry-run   <- ALWAYS first: the plan, no writes
+#   pixi run merge-haifa             <- copy files + update the maps
+#   pixi run merge-haifa --force     <- rebuild the KF portion from scratch
+merge-haifa = "python scripts/dataset/merge_haifa.py"
+# spot labels — one script; pick a stage via the subcommand (all | count | segment | anatomy | contours):
+#   pixi run extract-spot-labels all --input <dir>      (full: Gemini purple + anatomy + contours)
+#   pixi run extract-spot-labels count    --input <dir> (stage 0:  images  -> animals/ how many
+#                                                        salamanders per frame. NOT part of `all`)
+#   pixi run extract-spot-labels segment  --input <dir> (stage 1:  images  -> purple/)
+#   pixi run extract-spot-labels anatomy  --input <dir> (stage 1b: images  -> anatomy/ head+tail+midline)
+#   pixi run extract-spot-labels contours --input <dir> (stage 2:  purple/ + anatomy/ -> contours.db:
+#                                                        per-spot contours + masks + body-grid bins 1..8)
+# Every stage is resumable (existing purple/anatomy reused unless --overwrite), so a dir that
+# already has purple images costs only the anatomy call to gain bins. --no-anatomy skips stage 1b.
+# `count` is standalone: every other stage ASSUMES one animal per frame; this is what checks it.
+#   pixi run extract-spot-labels count --input all_sasa_norm --dry-run   <- ALWAYS first (BILLED)
+#   pixi run extract-spot-labels count --input all_sasa_norm --limit 25  <- calibrate on a sample
+#   pixi run extract-spot-labels count --input all_sasa_norm --workers 6 <- the full pass
+extract-spot-labels = "python scripts/dataset/extract_spot_labels.py"
+# Re-purple only the images whose spots score poorly (shaded magenta -> fragmented spots): re-send
+# the ORIGINAL photo to Gemini with a flat-magenta/no-shadow prompt on the 2nd-most-expensive model,
+# and keep the new purple only if it actually scores better (then re-key that image's DB rows).
+#   pixi run repurple --input all_sasa_norm --dry-run   <- ALWAYS first: which images + which model
+#   pixi run repurple --input all_sasa_norm             <- the real run (BILLED)
+repurple = "python scripts/dataset/repurple_bad_spots.py"
+# ONE COMMAND for a whole dataset: purple + anatomy + contours, a synthetic duplicate for every
+# single-photo individual, then packaged+zipped into datasets/<input>_<date>. Resumable; every
+# stage appends to one JSONL log (task, image, attempt, models, judgment, decision, billed calls).
+#   pixi run build-dataset --dry-run     <- ALWAYS first: the plan + the billed-call estimate
+#   pixi run build-dataset               <- the real run (BILLED)
+#   pixi run build-dataset --report      <- what happened, which models, what it cost
+#   pixi run build-dataset --rebuild     <- NO API: re-derive the DB from on-disk artifacts
+#                                           (contours + masks + bins), correct-axis, quality, package
+build-dataset = "python scripts/dataset/build_dataset.py"
+# package a normalized image dir + its contours.db into datasets/<name>/ (raw/ + db/ + README) and zip it.
+# Several --input dirs are MERGED into one dataset (each needs its own contours.db) — this is how
+# Gemini-augmented synthetic views (<label>_g<k>) get folded in next to the real photos:
 #   pixi run package-dataset --input all_sasa_norm --name all_sasa_norm_2026_10_07
-package-dataset = "python scripts/package_dataset.py"
+#   pixi run package-dataset --input all_sasa_norm synth_all_sasa_norm_2026_11_07 --name <name>
+#   pixi run build-dataset --rebuild --dry-run --only-dir all_sasa_norm --name all_sasa_norm_2026_15_07
+package-dataset = "python scripts/dataset/package_dataset.py"
+# Geometrically correct mis-tipped body axes from the SAVED masks — no model, no cost. When the
+# painter made a good body but dropped the head/tail dots mid-body, the axis collapsed; this
+# finds the mask's true ends and re-derives the line. Writes the passing corrections by default;
+# --dry-run previews (before/after QA only). Masks are never touched, so it is reversible.
+#   pixi run correct-axis --input all_sasa_norm --dry-run  <- report + before/after QA, no writes
+#   pixi run correct-axis --input all_sasa_norm            <- rewrite the passing corrections
+# then re-bin (free):  pixi run extract-spot-labels contours --input all_sasa_norm
+correct-axis = "python scripts/dataset/correct_axis.py"
+# Fold a synthetic-views dir INTO the master image dir, bumping each view's _g<k> index so it
+# sits next to the real photos without colliding (image + purple + anatomy + mask copied
+# together, nothing re-billed). --dry-run prints the rename map only.
+#   pixi run fold-synth --synth synth_all_sasa_norm_2026_15_07 --into all_sasa_norm --dry-run
+#   pixi run fold-synth --synth synth_all_sasa_norm_2026_15_07 --into all_sasa_norm
+fold-synth = "python scripts/dataset/fold_synth.py"
+# Cheap, model-free per-image quality markers into an image_quality table (blur, lighting, spot-
+# and body-extraction quality, + raw shape/exposure/spot numbers) for filtering later. Runs after
+# contours (reads the body mask + spots from the DB). Only touches its own table.
+#   pixi run compute-quality --input all_sasa_norm --dry-run   <- compute + stats, no writes
+#   pixi run compute-quality --input all_sasa_norm             <- (re)build the table
+compute-quality = "python scripts/dataset/compute_quality.py"
+
+# --- spot-embedding matcher (see docs/spot_embedding_aggregation_plan.md) ---
+# Phase 0: shared eval harness + dummy/oracle sanity matchers (pure numpy/duckdb, no torch yet).
+emb-prepare   = "python scripts/embedding/emb_prepare.py"    # dataset -> cached SpotSets + CV splits + manifest
+emb-eval      = "python scripts/embedding/emb_eval.py"       # run a matcher through the harness  --model dummy|oracle
+emb-selfcheck = "python scripts/embedding/emb_selfcheck.py"  # doctor: ground-truth table + oracle/dummy sanity
+emb-train     = "python scripts/embedding/emb_train.py"      # (Phase 3) train a candidate
+emb-identify  = "python scripts/embedding/emb_identify.py"   # (Phase 4) query one photo vs a gallery
+emb-bakeoff   = "python scripts/embedding/emb_bakeoff.py"    # (Phase 3) all candidates -> comparison.md
+# (opt-in, BILLED) Gemini whole-image augmentation -> images/synth_<dataset>/<label>_g<k>.png.
+# --which real-singletons counts only REAL photos, so an individual whose synthetic views are
+# already folded into all_sasa_norm still qualifies; --top-up makes --n-per a TARGET TOTAL and
+# subtracts the views the dataset already carries, so nothing already paid for is re-billed:
+#   pixi run emb-gen-augment --dataset <ds> --which real-singletons --n-per 2 --top-up \
+#       --limit 0 --dry-run    <- ALWAYS first: per-individual plan + billed-call estimate
+emb-gen-augment = "python scripts/embedding/emb_gen_augment.py"
+emb-quality   = "python scripts/embedding/emb_quality.py"    # review image quality; preview what a threshold drops
+# The MANDATORY self-consistency gate on Gemini views (free, no API): score every <label>_g<k>
+# against that individual's REAL photo(s) with the classical constellation matcher and quarantine
+# the ones whose spot pattern drifted. Calibrates on real same-individual / different-individual
+# pairs first, so the threshold comes from the data instead of being guessed.
+#   pixi run emb-filter-synth --input all_sasa_norm                    <- calibrate + report only
+#   pixi run emb-filter-synth --input all_sasa_norm --threshold 0.30   <- + list the rejects
+#   pixi run emb-filter-synth --input all_sasa_norm --threshold 0.30 --apply   <- quarantine them
+emb-filter-synth = "python scripts/embedding/emb_filter_synth.py"
+
+# D1 — label-consistency diagnostic (free, no API, no training). Does an individual's own photos
+# agree MORE than two random animals do? AUROC ~0.5 => the extracted spots cannot support matching
+# and no aggregator can fix it (data branch); high => the matcher is leaving signal on the table.
+# Also scans for two labels that are probably ONE animal (a query scored wrong for being right).
+# Writes artifacts/label_consistency/<dataset>/{per_individual.csv,suspect_duplicates.csv}.
+#   pixi run label-consistency                     <- the gate + worst individuals + duplicates
+#   pixi run label-consistency --dup-top 1000      <- deeper duplicate scan (slower)
+label-consistency = "python pipeline/spot_transformer/eval/label_consistency.py"
+
+# --- training on the hand labels from the preprocessing web app ---------------------------------
+# Everything below reads artifacts/preprocessing/<dataset>/review.json through
+# pipeline/spot_transformer/core/review_labels.py — one loader, so no two experiments can disagree
+# about which labels they trained on. Run this first to see what supervision exists:
+#   pixi run review-labels        <- interesting spots, match verdicts, image decisions, queue
+review-labels = "python pipeline/spot_transformer/core/review_labels.py"
+# R1 — is "special" learnable from the six strict_match factors? Held-out AUROC (individual-split),
+# the learned factor weights (WHICH factor makes a spot special), and the legacy-vs-live label
+# comparison: does the 385->477 image refresh actually move the score, or is it results.md #34
+# ("more of the same does not help") showing up at the label level?
+#   pixi run distinctiveness
+distinctiveness = "python pipeline/spot_transformer/models/distinctiveness.py"
+# R2 — fit the strict matcher's edge gate (sigma_pos / match_thr / good_thr) on the 427
+# machine-proposed correspondences a human accepted or rejected. Reports the separability check
+# FIRST: if the gate's inputs are at chance on the verdicts, no threshold can reproduce them.
+#   pixi run gate-calibration
+#   pixi run gate-calibration --pair-kind real-real   <- the only fully honest subset (n=59)
+gate-calibration = "python pipeline/spot_transformer/models/gate_calibration.py"
+# R3 — audit the SSL correspondence-mining rule (results.md #29's 0.375-vs-0.277 rests on it) against
+# the human verdicts: mining precision with a Wilson interval, the precision/yield curve over
+# SSL_MIN_SIM, and whether the RANSAC filter earns the yield it costs.
+#   pixi run mining-audit
+#   pixi run mining-audit --no-geom-only   <- skip the RANSAC ablation (halves runtime)
+mining-audit = "python pipeline/spot_transformer/eval/mining_audit.py"
+# The fast screen for representation work: does a spot descriptor predict the accept/reject calls a
+# human made on 427 correspondences? Seconds, no training, no folds — so a descriptor change can be
+# judged before committing to a multi-hour census run. A SCREEN, not a result: one edge-level axis
+# on a small hand-labelled set; headline numbers still come from sweep_all9. Always read the
+# control column (accepted vs random cross-animal pairs) next to it — high control + chance verdict
+# means the descriptor is fine and the human's rejections are configurational, not appearance-based.
+#   pixi run repr-check                                  <- every built embedding table
+#   pixi run repr-check --ssl-tags simclr,corr,corr_audit
+repr-check = "python pipeline/spot_transformer/eval/representation_check.py"
+# Step 1 of the constellation plan: three measurements that decide whether the rest is worth
+# building. (A) is a spot's disappearance predictable, so can "absence" be weighted? (B) do curl /
+# camera angle / quality actually degrade matching? (C) is geometry more trustworthy on comparable
+# photo pairs — the test for whether INTERACTION terms are justified, as opposed to plain extra
+# columns. No training, no new labels; every input is already in the DB.
+#   pixi run feasibility                 <- real photos only
+#   pixi run feasibility --include-synth <- include Gemini views (generator artifacts, see docstring)
+feasibility = "python pipeline/spot_transformer/eval/feasibility.py"
+# accuracy@1/5/10 sliced by CONFIDENCE band — the triage table: which queries can be accepted
+# unseen, which need a look at the top-5, which are worth nobody's time. Confidence is per QUERY
+# (accuracy@k is a property of the whole ranked list, so a per-candidate probability cannot be
+# bucketed against it) and strictly out-of-fold. Writes per_query.csv, so re-banding is free.
+# --source picks the COLLECTION: all_sasa_norm is two merged populations (sasa 290 individuals /
+# 87 eval-eligible; Haifa-KF 461 / 237). Every results.md number predates the merge and is a
+# sasa-only number, so --source sasa is the like-for-like comparison, not a easier subset.
+#   pixi run confidence-bands --smoke              <- ALWAYS first: ~2min, proves it runs
+#   pixi run confidence-bands --source sasa --workers 14        <- sasa population only (~15min)
+#   pixi run confidence-bands --source sasa --sasa-train-only --workers 14  <- Haifa gone from
+#                                                    TRAINING too (the literal removal; ~6min)
+#   pixi run confidence-bands --workers 14         <- both populations, 750-individual gallery
+#   pixi run confidence-bands --fold-gallery       <- small gallery; faster, acc@10 means less
+#   pixi run confidence-bands --from-csv <path>    <- re-band a finished run, no recompute
+confidence-bands = "python pipeline/spot_transformer/eval/confidence_bands.py"
+# Phase 0 of the constellation plan, and the one that decides the shape of the work: the two
+# deployed geometry features (`geom_consistency`, `ransac_frac`) run on IMAGE PIXELS under a rigid
+# similarity transform, while the curl-invariant body frame the DB already carries (axis_t,
+# axis_offset/length) is only ever consulted one spot at a time. (M1) recomputes the same features
+# in both frames on the same pairs; (M2) counts how often geometry is undefined and silently scored
+# as 0.0 = "contradictory"; (M3) asks whether RELATIONAL edge scores recover the human verdict that
+# the appearance cosine cannot (0.484). A shuffled-correspondence control runs alongside and must
+# sit at chance. No training, no new labels, ~2-4 min.
+#   pixi run constellation-check
+#   pixi run constellation-check --include-synth   <- Gemini views too (generator artifacts)
+constellation-check = "python pipeline/spot_transformer/eval/constellation_check.py"
+# LOOK at the 76%: same-animal photo pairs whose spots fail to find each other, rendered. Cases are
+# picked to differ from one another (ideal conditions that still fail / big spots unmatched /
+# the two photos disagreeing on spot COUNT / hard pose / a success for contrast), because a random
+# sample of failures is dominated by the commonest kind and hides the rest.
+#   pixi run unmatched-examples                        <- 2 per case
+#   pixi run unmatched-examples --case ideal_fail --per-case 6
+unmatched-examples = "python pipeline/spot_transformer/viz/unmatched_examples.py"
+# Two mechanical input faults, counted dataset-wide and ranked for review: (1) more than one
+# salamander in the frame -- the body mask fuses them, so the spots belong to two individuals and
+# poison the ground truth as well as the matching; (2) a body axis running head-to-tail backwards.
+# Both are worklists, NOT classifiers: there is no ground truth for either, so the confirmed
+# example's rank is printed so the ordering can be sanity-checked. The axis check includes a
+# held-out validation, because "flipping helped" is otherwise selected on the metric it reports.
+#   pixi run data-hygiene --top 40
+data-hygiene = "python pipeline/spot_transformer/eval/data_hygiene.py"
+corrections = "python pipeline/spot_transformer/core/corrections.py"
+# The failing pairs as PHOTOGRAPHS, not contours. Contours hide the cause -- reviewing them produced
+# two confident wrong diagnoses that the photos settled in a second. `--mode residual` picks the
+# failures that every known cause has been excluded from, which is where a new cause shows up.
+#   pixi run failing-photos --n 8
+#   pixi run failing-photos --mode worst
+failing-photos = "python pipeline/spot_transformer/viz/failing_photos.py"
+# Are two photos labelled as one animal actually the same animal? Checked against EXIF GPS -- 61% of
+# photos carry coordinates, which is evidence the matcher never sees and so cannot be circular
+# about. Reports implausibly distant "same animal" pairs AND whether distance predicts worse spot
+# matching, which is what says whether the fault matters.
+#   pixi run geo-check --max-metres 300
+geo-check = "python pipeline/spot_transformer/eval/geo_check.py"
+# How many photos actually contain more than one salamander? The geometric detector for this failed
+# completely -- solidity flags splayed limbs and leaf-occluded animals exactly as hard as a fused
+# pair, and six other candidate signals separated nothing -- so this asks the vision model already
+# used to draw the spots. One cheap call per photo, cached and resumable.
+# Measures PREVALENCE first: whether the right response is "exclude a few frames" or "build an
+# instance-segmentation stage" depends on a number that does not exist yet. Also cross-checks the
+# counts against spot survival, because a fault that does not predict worse matching is not worth
+# building a pipeline stage for.
+#   pixi run count-animals --dry-run     <- ALWAYS first: the plan + billed-call estimate
+#   pixi run count-animals --limit 150   <- the prevalence estimate (~+/-3%)
+#   pixi run count-animals --report      <- analyse the cache, no calls
+count-animals = "python pipeline/spot_transformer/eval/count_animals.py"
+# The winning matcher (summary match-features + logreg) — 5-fold CV vs raw voting, learned weights,
+# Platt calibration. NOTE the gallery: by default each query is ranked only against its own eval
+# fold (~65 individuals); --full-gallery ranks against the whole population (~687), which is the
+# deployment task and the honest number. Full-gallery is ~35 min; the default is minutes.
+#   pixi run aggregator                    <- fold-only gallery (~65 candidates/query)
+#   pixi run aggregator --full-gallery     <- population gallery (~687 candidates/query)
+#   pixi run aggregator --interactive      <- drop into breakpoint() at the end (was the default)
+aggregator = "python pipeline/spot_transformer/models/aggregator.py"
+
+# --- embedding flows + bakeoff (see docs: additive vs conjunctive spot matching) ---
+# Build ONE embedding flow into its OWN table, so both live side by side and comparing is a
+# table swap with nothing to rebuild:
+#   spot_embeddings         62-dim  [shape|position] -> cosine = (cos_shape + cos_pos)/2  ADDITIVE
+#   spot_embeddings_tensor  988-dim shape (x) position -> cosine = cos_shape * cos_pos  CONJUNCTIVE
+# The tensor flow is the outer product of the two blocks: <a1(x)b1, a2(x)b2> = <a1,a2>*<b1,b2>,
+# so a spot only matches when shape AND position agree. --c-shape/--c-pos tune veto strength.
+#   pixi run build-embeddings --combine both          <- build/refresh both tables
+#   pixi run build-embeddings --combine tensor --c-shape 0.5 --c-pos 0.5
+build-embeddings = "python pipeline/spot_transformer/core/embeddings.py"
+# The bakeoff: every embedding flow x every matcher family x a hyper-parameter grid,
+# cross-validated, with EVERY EPOCH logged to metrics.jsonl (train+eval loss, R@1/5/10, MRR, pair
+# AUROC, margin AUROC, gate AUROC). Families: raw / logreg / mlp (score what MATCHES),
+# strict / strict_logreg (also charge for what does NOT -- a distinctive spot the other animal
+# visibly lacks pushes the score down), e2e_xf / e2e_frozen (transformer).
+#   pixi run bakeoff --space quick                    <- ALWAYS first: smoke test, minutes
+#   pixi run bakeoff                                  <- the full grid (LONG -- see RESULTS.md)
+#   pixi run bakeoff --models raw,logreg --folds 5    <- a subset
+#   pixi run bakeoff --models strict --folds 5        <- penalty sweep (lam/gamma), no training
+#   pixi run bakeoff --full-gallery                   <- rank against all ~687 individuals
+# Then review the winners' pairs side by side in the web app:
+#   pixi run pair-review-gen --from-bakeoff artifacts/bakeoff/<dataset>/<run-id>
+#   pixi run pair-review
+bakeoff = "python pipeline/spot_transformer/sweeps/sweep_bakeoff.py"
+
+# Full-scale training run for the app's Models page: the ALL-9/13-model census bake-off
+# (sweep_all9.py's protocol, unchanged) plus a final-fit checkpoint per model on 100% of
+# real images, so every model can be registered for inference selection. Also invoked as a
+# subprocess by app/pipeline_bridge/training.py::PipelineTrainingBridge — this task is the
+# standalone-CLI equivalent.
+#   pixi run train-all13            <- the real run: 5 folds, real epochs (LONG, hours)
+#   QUICK=1 pixi run train-all13    <- smoke test: 2 folds, few epochs (minutes)
+train-all13 = "python pipeline/spot_transformer/sweeps/train_all13.py"
+
+# --- interesting-spot selector (local web app) — DEPRECATED, DO NOT SPEND HOURS HERE ---
+# Superseded twice over. Functionally by `preprocess-review`, which records the same click plus
+# which spot in which other photo (docs/preprocessing_ui.md); and empirically by results.md #46:
+# growing the clicks from 362 to 454 images moved held-out distinctiveness AUROC by -0.002. The
+# last ~92 images of clicking added no signal. What is scarce is animals (#35) and representation
+# (#36), not clicks — see docs/labeling_priorities.md for where an annotation hour goes now.
+# Kept runnable only because its store is the `LABELS=legacy` ablation arm; the labels themselves
+# live in review.json and are read from there.
+# Page through images/<folder>/ one at a time; click inside a spot to toggle it GREEN (the whole
+# spot, mapped from contours.db masks). Arrow keys / buttons move between images, U jumps to the
+# next unlabeled one. Every toggle is saved to
+# artifacts/interesting_spots/<folder>/interesting_spots.json  ({ "aa_1_1": [3, 7], ... }).
+# Opens on the first not-yet-labeled image, so it is stop-and-resume.
+#   pixi run interesting-spot-selector                     <- folder: all_sasa_norm
+#   pixi run interesting-spot-selector --output sasa_norm  <- a different image folder
+interesting-spot-selector = "python scripts/tools/interesting_spot_selector.py"
+
+# --- spot correspondence (local web app) — the label the matcher has never had ---
+# Image labels say "same animal"; a correspondence says "spot 7 here IS spot 3 there". That is
+# the only label that separates the four failures the pipeline currently sees as one number:
+# the spot was never extracted, it shattered, its descriptor drifted, or matching picked wrong.
+#   pixi run correspondence                      <- label: click LEFT spot, then its RIGHT partner
+#   pixi run correspondence --n-individuals 25   <- how many animals to sample (default 25)
+#   pixi run correspondence --only aj_1,rz_1     <- target specific animals (e.g. D1's worst)
+#   pixi run correspondence-analyze              <- extraction recall, descriptor rank, matching
+#                                                   precision/recall, body-frame drift + flips
+# Stop-and-resume: every click saves, and it opens on the first unfinished pair.
+# Store: artifacts/correspondence/<folder>/links.json
+correspondence = "python scripts/tools/spot_correspondence.py label"
+correspondence-analyze = "python scripts/tools/spot_correspondence.py analyze"
+
+# --- spot-match pair reviewer (local web app) — THE ANNOTATION SURFACE TO SPEND HOURS IN ---
+# Review match pairs one at a time, FULL SCREEN, and judge each: 1 same animal / 2 different /
+# 3 can't tell (the key judges AND advances), plus optional reason chips and a free-text note.
+# This is the label results.md #44 says humans are reliable at — they judge the PAIR on global
+# structure, not the edge on appearance — and it costs seconds where a spot-click pass cost a
+# minute per image for -0.002 AUROC (#46). Two side effects worth as much as the labels:
+# a verdict conflicting with the filename label is flagged as a suspected identity error (open
+# thread #4), and the `multi-animal` chip collects the frames of next_steps_2.md §4.
+# Read them back with `pixi run review-labels`, or review_labels.pair_verdicts(dataset).
+# Stores: verdicts.json (the labels) · comments.json (notes) · review.json (both, merged).
+# The grid packs pairs tiny with size numbers over the back — this is the opposite. Two steps:
+#   pixi run pair-review-gen                       <- render one big PNG per pair + manifest
+#   pixi run pair-review-gen --methods raw,logreg  <- include a learned matcher's pairs (slower)
+#   pixi run pair-review-gen --random 60 --seed 0  <- UNSTRATIFIED sample. Every other mode picks
+#      pairs BY score, so only this one can measure the score itself (results.md #50). Regenerating
+#      archives the previous manifest+review under archive/<stamp>/ — the band info the old
+#      verdicts are interpreted against lives there, not in verdicts.json.
+#   pixi run pair-review                           <- open the browser app: 1/2/3 judge, U next
+#                                                     unjudged, ←/→ page, Ctrl+Enter save note
+# Each panel also shows what the match does NOT explain: arcs are the scorer's one-to-one
+# assignment, MAGENTA spots are pattern with no counterpart on the other animal (filled = big
+# enough to decide the pair on its own), and the header gives explained-vs-contradicted mass.
+# Add --no-residual for the plain arcs-only panel.
+# Everything saves per pair under artifacts/pair_review/<dataset>/: verdicts.json (the labels),
+# comments.json (notes), review.json (both merged — the file to work through and the one
+# review_labels.pair_verdicts reads). Regenerating never drops a verdict.
+pair-review-gen = "python scripts/tools/pair_review.py generate"
+pair-review = "python scripts/tools/pair_review.py serve"
+
+# --- preprocessing review (local web app) — REPLACES interesting-spot-selector ---
+# One individual at a time, every photo of it side by side: accept/reject each image, mark
+# duplicates, toggle training membership, reject bad machine matches, draw the ones the machine
+# missed, record misses, queue re-extractions. Every edit is written immediately to
+# artifacts/preprocessing/<dataset>/review.json — the one file every consumer filters against.
+# Individuals come lowest-quality-first, so the pass starts where the edits are.
+#   pixi run preprocess-review                            <- dataset: all_sasa_norm_2026_23_07
+#   pixi run preprocess-review --dataset all_sasa_norm_2026_19_07
+#   pixi run preprocess-review --port 9000 --no-browser
+#   pixi run preprocess-interest                          <- build the interest cache (~4 min, once)
+#   pixi run preprocess-export                            <- legacy interesting_spots.json + queue CSVs
+# The existing ~8.7k interesting-spot clicks are imported on first run and preprocess-export keeps
+# writing that legacy file, so no downstream consumer changes. Spec: docs/preprocessing_ui.md
+preprocess-review = "python scripts/tools/preprocessing_review.py"
+preprocess-export = "python scripts/tools/preprocessing_review.py export"
+preprocess-interest = "python scripts/tools/preprocessing_review.py interest"
 
 [dependencies]
 python = ">=3.10"
 numpy = "*"
-opencv = "*"                  # cv2: image IO + magenta keying + contours
+opencv = "*"                  # cv2: image IO + magenta keying + contours + classical SIFT/constellation
 duckdb = ">=1.5.4,<2"         # contour store (images/<input>/contours/contours.db)
-google-genai = ">=2.10.0,<3"  # Gemini image inpainting (stage 1)
+google-genai = ">=2.10.0,<3"  # Gemini image inpainting (stage 1) + gemini-matcher reference
+# --- spot-embedding matcher, Phase 1 (CNN baseline) ---
+pytorch = "*"                 # frozen ResNet18 features for the CNN holistic baseline (CPU)
+torchvision = "*"             # pretrained ResNet18 + weights
+scipy = "*"                   # spatial / assignment helpers (classical + later phases)
+# --- Phase 2 (per-spot shape encoding) ---
+scikit-image = "*"            # skeleton branch/endpoint topology for spot shape features
+pandas = ">=3.0.3,<4"
+matplotlib = ">=3.11.0,<4"
+pygbif = ">=0.6.6,<0.7"
+fastapi = ">=0.141.1,<0.142"
+uvicorn = ">=0.52.4,<0.53"
+pydantic = ">=2"
+python-multipart = ">=0.0.32,<0.0.33"
+pillow-heif = ">=1.6.0,<2"
+pytest = ">=9.1.1,<10"
+pytest-asyncio = ">=1.4.0,<2"
+openpyxl = ">=3.1.5,<4"
+reportlab = ">=5.0.1,<6"
+nodejs = ">=26.8.0,<26.9"
+pnpm = ">=12.3.2,<13"

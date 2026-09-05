@@ -17,7 +17,7 @@ IMAGES_ROOT = REPO_ROOT / "images"
 IMAGE_EXTS = {".jpg", ".jpeg", ".png", ".tif", ".tiff", ".bmp", ".webp"}
 
 # Subdirectories the pipeline writes *inside* an input dir. Never treated as input.
-RESERVED_SUBDIRS = {"purple", "contours"}
+RESERVED_SUBDIRS = {"purple", "contours", "anatomy", "animals"}
 
 
 def reconfigure_utf8() -> None:

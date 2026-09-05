@@ -3,6 +3,15 @@
 !.pixi/config.toml
 datasets/
 images/
+artifacts/
 .env
 *__pycache__/
+*.pyc
+.pytest_cache/
+
+# salamander-spotter app runtime data dir (spec §4.3) — never committed
+/data/
+spotter-data/
+*.duckdb
+*.duckdb.wal
 

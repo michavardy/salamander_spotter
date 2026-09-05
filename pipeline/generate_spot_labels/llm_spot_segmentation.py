@@ -13,7 +13,7 @@ artefacts on the flat key colour) to::
 
 Pure logic: no argument parsing here. Import :class:`GeminiSpotSegmenter` and call
 :meth:`segment_file`, or :func:`segment_dir` for a whole folder. The CLI that configures
-and calls it is ``scripts/extract_spot_labels.py segment`` (``pixi run extract-spot-labels
+and calls it is ``scripts/dataset/extract_spot_labels.py segment`` (``pixi run extract-spot-labels
 segment``). The network is only touched inside this module.
 """
 from __future__ import annotations
@@ -21,6 +21,7 @@ from __future__ import annotations
 import random
 import sys
 import time
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from pathlib import Path
 from typing import NamedTuple
 
@@ -31,6 +32,13 @@ from ._common import (
     purple_dir_for,
     resolve_input_dir,
 )
+
+_REPO_ROOT_FOR_LOGGER = Path(__file__).resolve().parents[2]
+if str(_REPO_ROOT_FOR_LOGGER) not in sys.path:
+    sys.path.insert(0, str(_REPO_ROOT_FOR_LOGGER))
+
+from pipeline.utils.logger_utils import get_logger
+logger = get_logger(Path(__file__).stem)
 
 # The inpainting instruction. Sent as the text part alongside the source image.
 # Written to fight the two observed failure modes: (a) magenta flooding the whole
@@ -211,18 +219,19 @@ class GeminiSpotSegmenter:
         raise RuntimeError("Gemini response contained no image part")
 
     def segment(self, image_bytes: bytes, mime_type: str = "image/jpeg",
-                model: str | None = None) -> bytes:
+                model: str | None = None, prompt: str | None = None) -> bytes:
         """Return PNG/JPEG bytes of the image with spots recoloured to magenta.
 
         ``model`` overrides the primary model for this call (used by the escalation
-        ladder); ``max_retries`` here is transport-level backoff for API errors, not the
-        quality-driven re-draws that :meth:`segment_file` does.
+        ladder); ``prompt`` overrides the default inpaint instruction (used to re-issue a
+        stronger, anti-shadow request on a re-roll); ``max_retries`` here is transport-level
+        backoff for API errors, not the quality-driven re-draws that :meth:`segment_file` does.
         """
         from google.genai import types
 
         contents = [
             types.Part.from_bytes(data=image_bytes, mime_type=mime_type),
-            PROMPT,
+            prompt or PROMPT,
         ]
         config = types.GenerateContentConfig(
             response_modalities=["IMAGE"],
@@ -263,6 +272,7 @@ class GeminiSpotSegmenter:
         keep_gemini_size: bool = False,
         max_attempts: int = DEFAULT_MAX_ATTEMPTS,
         max_bleed: float = DEFAULT_MAX_BLEED,
+        prompt: str | None = None,
     ) -> SegmentResult:
         """Segment ``src`` with a judged, escalating retry loop; return the chosen draft.
 
@@ -286,7 +296,7 @@ class GeminiSpotSegmenter:
         for model, n_attempts in self._tiers(max_attempts):
             for _ in range(n_attempts):
                 draws += 1
-                raw = self.segment(src_bytes, mime, model=model)
+                raw = self.segment(src_bytes, mime, model=model, prompt=prompt)
                 png = raw if keep_gemini_size else conform_to_original(raw, src)
 
                 if original is None:  # nothing to judge against — take the first draft
@@ -321,11 +331,17 @@ def segment_dir(
     temperature: float | None = None,
     escalate_models: str | list[str] | None = None,
     escalate_attempts: int = DEFAULT_ESCALATE_ATTEMPTS,
+    workers: int = 1,
 ) -> int:
     """Stage 1 over one input dir: write ``purple/<stem>.png`` for each image.
 
     Judged + retried + escalating per :meth:`GeminiSpotSegmenter.segment_file`. Returns a
     process exit code (non-zero if any image errored).
+
+    ``workers`` > 1 runs that many Gemini calls concurrently in a thread pool. Each image is
+    an independent network call writing its own PNG (no shared state; the genai client is
+    thread-safe and the per-call path already backs off on 429/quota), so this is safe. Order
+    of the progress lines is then non-deterministic. ``workers=1`` keeps the serial path.
     """
     input_dir = resolve_input_dir(input)
     purple_dir = purple_dir_for(input_dir)
@@ -335,41 +351,64 @@ def segment_dir(
     if limit is not None:
         images = images[:limit]
     if not images:
-        print(f"error: no images found in {input_dir}", file=sys.stderr)
+        logger.error(f"error: no images found in {input_dir}")
         return 1
+
+    # Pre-filter the work so skips don't occupy a worker (and the count is right up front).
+    todo = [src for src in images
+            if overwrite or not purple_path_for(purple_dir, src).exists()]
+    skipped = len(images) - len(todo)
 
     segmenter = GeminiSpotSegmenter(model=model, temperature=temperature,
                                     escalate_models=escalate_models,
                                     escalate_attempts=escalate_attempts)
-    print(f"processing images in dir {input_dir}")
-    total = len(images)
+    total = len(todo)
+    logger.info(f"processing images in dir {input_dir}")
+    logger.info(f"  purple model: {segmenter.model}")
+    logger.info(f"  to do: {total}   already have purple (skipped): {skipped}"
+          + (f"   workers: {workers}" if workers > 1 else ""))
     failures = 0
     flagged = 0
-    for i, src in enumerate(images, start=1):
-        out = purple_path_for(purple_dir, src)
-        print(f"processing image {i} / {total}: {src.name}")
-        if out.exists() and not overwrite:
-            print("  purple exists, skipping (use --overwrite to redo)")
-            continue
-        print("  stage 1: extracting purple image from gemini")
-        try:
-            res = segmenter.segment_file(
-                src, keep_gemini_size=keep_gemini_size,
-                max_attempts=max_attempts, max_bleed=max_bleed,
-            )
-            out.write_bytes(res.png)
-            tag = "ok" if res.passed else "FLAGGED (bleed)"
-            if not res.passed:
-                flagged += 1
-            print(f"  saved {out.relative_to(input_dir)} "
-                  f"[bleed={res.bleed:.2f}, {res.attempts} draw(s), "
-                  f"{res.model}, {tag}]")
-        except Exception as exc:
+
+    def _do(src: Path) -> "SegmentResult":
+        res = segmenter.segment_file(
+            src, keep_gemini_size=keep_gemini_size,
+            max_attempts=max_attempts, max_bleed=max_bleed,
+        )
+        purple_path_for(purple_dir, src).write_bytes(res.png)
+        return res
+
+    def _report(i: int, src: Path, res, exc) -> None:
+        nonlocal failures, flagged
+        if exc is not None:
             failures += 1
-            print(f"  ERROR: {exc}", file=sys.stderr)
+            logger.error(f"[{i}/{total}] {src.name}  ERROR: {exc}")
+            return
+        if not res.passed:
+            flagged += 1
+        tag = "ok" if res.passed else "FLAGGED (bleed)"
+        logger.info(f"[{i}/{total}] {src.name} -> "
+              f"{purple_path_for(purple_dir, src).name} "
+              f"[bleed={res.bleed:.2f}, {res.attempts} draw(s), {res.model}, {tag}]")
+
+    if workers > 1:
+        with ThreadPoolExecutor(max_workers=workers) as ex:
+            futs = {ex.submit(_do, src): src for src in todo}
+            for i, fut in enumerate(as_completed(futs), start=1):
+                src = futs[fut]
+                try:
+                    _report(i, src, fut.result(), None)
+                except Exception as exc:
+                    _report(i, src, None, exc)
+    else:
+        for i, src in enumerate(todo, start=1):
+            try:
+                _report(i, src, _do(src), None)
+            except Exception as exc:
+                _report(i, src, None, exc)
 
     done = total - failures
-    print(f"\ndone: {done}/{total} purple images in {purple_dir}"
+    logger.info(f"done: {done}/{total} purple images in {purple_dir}"
           + (f", {flagged} flagged for bleed" if flagged else "")
           + (f" ({failures} failed)" if failures else ""))
     return 1 if failures else 0

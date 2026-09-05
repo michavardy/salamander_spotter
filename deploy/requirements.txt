@@ -1,0 +1,19 @@
+# Runtime deps for the Docker image (spec §5.1). Kept in sync with pixi.toml.
+# CPU-only Torch to match the pipeline's stated baseline; GPU users run from source.
+fastapi>=0.141,<0.142
+uvicorn[standard]>=0.52,<0.53
+pydantic>=2
+python-multipart>=0.0.32
+duckdb>=1.5.4,<2
+pillow>=10
+pillow-heif>=1.6
+numpy
+opencv-python-headless
+openpyxl>=3.1
+reportlab>=4
+google-genai>=2.10,<3
+--extra-index-url https://download.pytorch.org/whl/cpu
+torch
+torchvision
+scikit-image
+scipy

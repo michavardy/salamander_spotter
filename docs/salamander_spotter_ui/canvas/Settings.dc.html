@@ -1,0 +1,273 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9; --line-soft:#e6e1d9; --line-faint:#f0ebe2;
+      --panel:#fff;
+      --side:#2b2825; --side-active:#3a3632; --side-text:#a79e93; --side-text-on:#f4efe8;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-link:#4a72b8; --blue-link-h:#365a99; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+      --chip:#f1ece3;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:var(--blue-link);text-decoration:none}a:hover{color:var(--blue-link-h)}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    svg{display:block}
+
+    .screen{width:1440px;height:960px;display:flex;overflow:hidden;background:var(--bg)}
+    .side{width:220px;flex:none;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 20px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:var(--side-text-on)}
+    .brand .dot{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:var(--side-text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s ease,color .12s ease}
+    .nav a:hover{background:#332f2b;color:#e4ded4}
+    .nav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .nav a.on svg{color:var(--accent)}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .side-bottom{margin-top:auto;padding:0 12px}
+    .side .foot{padding:14px 20px 2px;border-top:1px solid var(--side-active);font-size:11.5px;color:var(--muted2);line-height:1.5;margin-top:10px}
+    .side .foot b{color:var(--side-text);font-weight:600;display:block;font-size:12.5px}
+
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .top{height:60px;flex:none;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:16px;padding:0 28px;background:#fff}
+    .top h1{font-size:17px}
+    .top .actions{margin-left:auto}
+    .savebtn{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;border-radius:9px;padding:9px 16px;cursor:pointer;background:var(--green);color:#fff;border:1px solid var(--green);transition:filter .13s ease}
+    .savebtn:hover{filter:brightness(1.08)}
+    .savebtn svg{width:15px;height:15px;stroke-width:2}
+
+    .tabbar{display:flex;gap:26px;padding:0 28px;background:#fff;border-bottom:1px solid var(--line-soft)}
+    .tab{padding:12px 2px;font-size:13px;font-weight:600;color:var(--muted2);cursor:pointer;border-bottom:2.5px solid transparent;transition:color .12s ease,border-color .12s ease}
+    .tab:hover{color:var(--ink-soft)}
+    .tab.on{color:var(--ink);border-bottom-color:var(--accent)}
+
+    .body{flex:1;overflow:auto;padding:22px 28px 40px;max-width:980px}
+    .section{display:flex;gap:22px;margin-bottom:22px}
+    .section .label{width:150px;flex:none;padding-top:4px}
+    .section .label h3{font-size:14.5px}
+    .section .label p{font-size:12px;color:var(--muted2);margin:5px 0 0;line-height:1.5}
+    .card{flex:1;background:#fff;border:1px solid var(--line);border-radius:14px;padding:20px 22px}
+    .field{margin-bottom:18px}
+    .field:last-child{margin-bottom:0}
+    .field label{display:flex;justify-content:space-between;font-size:12.5px;font-weight:600;color:var(--ink-soft);margin-bottom:8px}
+    .field label .val{font-family:"IBM Plex Mono";color:var(--accent);font-weight:600}
+    .field .hint{font-size:11px;color:var(--muted2);margin-top:6px;line-height:1.5}
+    .slidewrap{display:flex;align-items:center;gap:12px}
+    input[type=range]{flex:1;accent-color:var(--accent);height:4px}
+    input[type=text],input[type=number],input[type=password],select{width:100%;font-family:inherit;font-size:13px;border:1px solid var(--line);border-radius:8px;padding:9px 12px;color:var(--ink);background:#fff;transition:border-color .12s ease}
+    input:hover,select:hover{border-color:var(--accent-line)}
+    input:focus,select:focus{outline:none;border-color:var(--accent)}
+    .row2{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+    .divider{height:1px;background:var(--line-faint);margin:18px 0}
+
+    .toggle{display:flex;align-items:center;justify-content:space-between;gap:16px}
+    .toggle .tt{font-size:12.5px;font-weight:600;color:var(--ink-soft)}
+    .toggle .hint{margin-top:4px}
+    .switch{width:38px;height:22px;border-radius:20px;background:var(--green);position:relative;flex:none;cursor:pointer;transition:background .15s ease}
+    .switch::after{content:'';position:absolute;top:2px;left:18px;width:18px;height:18px;border-radius:50%;background:#fff;box-shadow:0 1px 3px rgba(0,0,0,.25);transition:left .15s ease}
+    .switch.off{background:#dcd5c8}
+    .switch.off::after{left:2px}
+
+    .subgrid{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+    .subcard{border:1px solid var(--line);border-radius:11px;padding:15px 16px;background:#fbf9f5}
+    .subcard h4{font-size:12px;color:var(--ink-soft);margin-bottom:12px;display:flex;align-items:center;gap:7px}
+    .subcard h4 svg{width:14px;height:14px;stroke-width:1.9;color:var(--amber-ink)}
+    .subfield{margin-bottom:11px}
+    .subfield:last-child{margin-bottom:0}
+    .subfield label{display:block;font-size:10.5px;font-weight:600;color:var(--muted2);margin-bottom:5px;text-transform:uppercase;letter-spacing:.03em}
+    .tokrow{display:flex;gap:6px}
+    .tokrow button{flex:none;font-size:11px;font-weight:600;color:var(--amber-ink);background:var(--accent-soft);border:1px solid var(--accent-line);border-radius:8px;padding:0 11px;cursor:pointer}
+    .tokrow button:hover{background:var(--amber-line);color:#fff}
+
+    .ladderlist{display:flex;flex-direction:column;gap:6px}
+    .lstep{display:flex;align-items:center;gap:8px}
+    .lstep .num{width:18px;height:18px;border-radius:50%;background:var(--accent-soft);color:var(--amber-ink);font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center;flex:none}
+    .lstep select{flex:1;font-size:12px;padding:6px 9px}
+    .lstep .rm{width:20px;height:20px;border-radius:6px;color:var(--muted2);display:flex;align-items:center;justify-content:center;cursor:pointer;flex:none;transition:all .12s ease}
+    .lstep .rm:hover{background:var(--red-soft);color:var(--red)}
+    .lstep .rm svg{width:12px;height:12px;stroke-width:2}
+    .addstep{display:flex;align-items:center;gap:5px;font-size:11px;font-weight:600;color:var(--amber-ink);cursor:pointer;padding:6px 9px;border:1.4px dashed var(--amber-line);border-radius:8px;justify-content:center;margin-top:2px;transition:background .12s ease}
+    .addstep:hover{background:var(--amber-soft)}
+    .addstep svg{width:12px;height:12px;stroke-width:2}
+    .laddernote{font-size:10.5px;color:var(--muted2);margin-top:8px;line-height:1.5}
+
+    .ncard .field.toggle{padding-bottom:14px;margin-bottom:14px;border-bottom:1px solid var(--line-faint)}
+    .ncard .field.toggle:last-child{border-bottom:none;padding-bottom:0;margin-bottom:0}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></symbol>
+  <symbol id="ico-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M3 10h18M9 4v16"/></symbol>
+  <symbol id="ico-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><circle cx="19" cy="18" r="1.5"/><path d="M9.9 10.4 6.3 7.1M14.1 10.4l3.6-3.3M9.9 13.6l-3.6 3.3M14.1 13.6l3.6 3.3"/></symbol>
+  <symbol id="ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="ico-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+  <symbol id="ico-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="ico-cpu" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="6" y="6" width="12" height="12" rx="2"/><path d="M9 3v3M15 3v3M9 18v3M15 18v3M3 9h3M3 15h3M18 9h3M18 15h3"/></symbol>
+  <symbol id="ico-gavel" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m14 4 6 6"/><path d="m4 14 6 6"/><path d="m6.5 11.5 6-6 4 4-6 6Z"/><path d="M4 20h8"/></symbol>
+</svg>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a><svg><use href="#ico-home"/></svg>Overview</a>
+      <a><svg><use href="#ico-upload"/></svg>Upload</a>
+      <a><svg><use href="#ico-review"/></svg>Review</a>
+      <a><svg><use href="#ico-table"/></svg>Names</a>
+      <a class="on"><svg><use href="#ico-atom"/></svg>Models</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="foot"><b>M. Vardy</b>reviewer &middot; lead</div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="top">
+      <h1>Models</h1>
+      <div class="actions"><button class="savebtn"><svg><use href="#ico-check"/></svg>Save changes</button></div>
+    </header>
+    <div class="tabbar">
+      <span class="tab">Models</span>
+      <span class="tab on">Settings</span>
+    </div>
+
+    <div class="body">
+      <div class="section">
+        <div class="label"><h3>Pipeline</h3><p>Which LLMs extract and judge each photo, and the fallback order if one is unavailable.</p></div>
+        <div class="card">
+          <div class="subgrid">
+            <div class="subcard">
+              <h4><svg><use href="#ico-cpu"/></svg>Extraction model</h4>
+              <div class="subfield"><label>Provider</label>
+                <select><option>Google Gemini</option><option>OpenAI</option><option>Anthropic Claude</option><option>Azure OpenAI</option><option>Local / self&#8209;hosted</option></select>
+              </div>
+              <div class="subfield"><label>API token</label>
+                <div class="tokrow"><input type="password" value="sk-&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;7f2a"><button>Update</button></div>
+              </div>
+              <div class="subfield"><label>Model ladder &mdash; tried in order</label>
+                <div class="ladderlist">
+                  <div class="lstep"><span class="num">1</span><select><option>gemini-2.5-pro</option></select><span class="rm"><svg><use href="#ico-x"/></svg></span></div>
+                  <div class="lstep"><span class="num">2</span><select><option>gemini-2.5-flash</option></select><span class="rm"><svg><use href="#ico-x"/></svg></span></div>
+                  <div class="lstep"><span class="num">3</span><select><option>gemini-2.0-flash</option></select><span class="rm"><svg><use href="#ico-x"/></svg></span></div>
+                  <div class="addstep"><svg><use href="#ico-plus"/></svg>Add fallback</div>
+                </div>
+                <div class="laddernote">If step 1 errors, times out, or runs out of budget, step 2 is tried automatically, then step 3.</div>
+              </div>
+            </div>
+
+            <div class="subcard">
+              <h4><svg><use href="#ico-gavel"/></svg>Judge model</h4>
+              <div class="subfield"><label>Provider</label>
+                <select><option>Google Gemini</option><option>OpenAI</option><option>Anthropic Claude</option><option>Azure OpenAI</option><option>Local / self&#8209;hosted</option></select>
+              </div>
+              <div class="subfield"><label>API token</label>
+                <div class="tokrow"><input type="password" value="sk-&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;9c31"><button>Update</button></div>
+              </div>
+              <div class="subfield"><label>Model ladder &mdash; tried in order</label>
+                <div class="ladderlist">
+                  <div class="lstep"><span class="num">1</span><select><option>gemini-2.5-flash</option></select><span class="rm"><svg><use href="#ico-x"/></svg></span></div>
+                  <div class="lstep"><span class="num">2</span><select><option>gemini-2.0-flash</option></select><span class="rm"><svg><use href="#ico-x"/></svg></span></div>
+                  <div class="lstep"><span class="num">3</span><select><option>rule&#8209;based (no LLM)</option></select><span class="rm"><svg><use href="#ico-x"/></svg></span></div>
+                  <div class="addstep"><svg><use href="#ico-plus"/></svg>Add fallback</div>
+                </div>
+                <div class="laddernote">The last step never needs a token &mdash; it's a fixed fallback so scoring never fully stops.</div>
+              </div>
+            </div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="field"><label>Quality cut&#8209;off <span class="val">0.40</span></label>
+            <div class="slidewrap"><input type="range" min="0" max="1" step="0.01" value="0.4"></div>
+            <div class="hint">Photos scoring below this are kept as training data only, not used as review queries &mdash; you can still choose &ldquo;Use anyway&rdquo; per photo in Upload.</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="label"><h3>Notifications</h3><p>What's worth an alert on Overview, and what can wait.</p></div>
+        <div class="card ncard">
+          <div class="field toggle">
+            <div><div class="tt">Training complete</div><div class="hint">A model finished a full background run, promoted or not.</div></div>
+            <span class="switch"></span>
+          </div>
+          <div class="field toggle">
+            <div><div class="tt">Extraction LLM low on tokens</div><div class="hint">Copy&#8209;pastable toast, ready to send to the research team.</div></div>
+            <span class="switch"></span>
+          </div>
+          <div class="field toggle">
+            <div><div class="tt">Judge LLM low on tokens</div><div class="hint">Same copy&#8209;pastable format as the extraction alert.</div></div>
+            <span class="switch"></span>
+          </div>
+          <div class="field toggle">
+            <div><div class="tt">Unusual spike in hand&#8209;correction&#8209;needed photos</div><div class="hint">Fires when a batch's failure rate is well above the recent average.</div></div>
+            <span class="switch"></span>
+          </div>
+          <div class="field toggle">
+            <div><div class="tt">A model is auto&#8209;promoted to active</div><div class="hint">Whenever the promotion rule in Models picks a new active model on its own.</div></div>
+            <span class="switch"></span>
+          </div>
+        </div>
+      </div>
+
+      <div class="section">
+        <div class="label"><h3>Review &amp; automation</h3><p>Where the model decides alone, and where you're pulled in.</p></div>
+        <div class="card">
+          <div class="field"><label>Auto&#8209;approve threshold <span class="val">0.95</span></label>
+            <div class="slidewrap"><input type="range" min="0" max="1" step="0.01" value="0.95"></div>
+            <div class="hint">At or above this confidence, a re&#8209;ID is confirmed automatically &mdash; it never reaches your queue. Below it, you decide. Lower this to see more sightings, raise it to see fewer.</div>
+          </div>
+
+          <div class="row2">
+            <div class="field"><label>Candidate coverage <span class="val">90%</span></label>
+              <div class="slidewrap"><input type="range" min="50" max="99" step="1" value="90"></div>
+              <div class="hint">Show alternatives until they cover this much of the total match confidence.</div>
+            </div>
+            <div class="field"><label>Max candidates shown <span class="val">6</span></label>
+              <input type="number" value="6" min="1" max="12">
+              <div class="hint">A hard cap on Top&#8209;N, however high coverage runs.</div>
+            </div>
+          </div>
+
+          <div class="field"><label>Active matching model</label>
+            <div class="seg" style="display:flex;background:#f1ece3;border-radius:8px;padding:3px;gap:3px;margin-bottom:10px"><span style="flex:1;text-align:center;font-size:11px;padding:5px 0;border-radius:6px;color:var(--muted3);cursor:pointer">Manual pick</span><span style="flex:1;text-align:center;font-size:11px;padding:5px 0;border-radius:6px;background:#fff;color:var(--ink);font-weight:600;box-shadow:0 1px 3px #0000000f;cursor:pointer">Optimize by metric</span></div>
+            <select style="margin-bottom:8px"><option>strict_hand_pos &middot; active</option><option>set_transformer_v4 &middot; candidate</option><option>ensemble_vote</option><option>raw</option></select>
+            <div class="row2">
+              <select><option>Novelty AUROC</option><option>Review@90</option><option>Balanced accuracy</option><option>R@10</option><option>Custom formula &darr;</option></select>
+              <input type="text" placeholder="Custom formula, e.g. 0.5&times;R@1 + 0.5&times;noveltyAUROC">
+            </div>
+            <div class="hint">Whichever model currently leads on the metric or formula becomes active automatically. Synced with the model tables on the Models tab &mdash; changing either updates both.</div>
+          </div>
+
+          <div class="divider"></div>
+
+          <div class="field toggle">
+            <div><div class="tt">Warn before assigning against the model's suggestion</div><div class="hint">Shows a confirmation toast when you hand&#8209;pick an individual or call &ldquo;new&rdquo; over a suggested match.</div></div>
+            <span class="switch"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

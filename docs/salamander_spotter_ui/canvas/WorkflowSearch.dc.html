@@ -1,0 +1,103 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee; --green-line:#bfe0cd;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg)}
+    h1{font-family:"Hanken Grotesk";margin:0;font-weight:700;font-size:22px;letter-spacing:-.01em}
+    .mono{font-family:"IBM Plex Mono",monospace}
+    svg{display:block}
+    .page{width:1240px;padding:36px 20px 60px;background:var(--bg)}
+    .kicker{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--amber-ink);font-weight:700;margin-bottom:6px}
+    .desc{font-size:13px;color:var(--muted2);margin-top:6px;max-width:640px;line-height:1.6}
+    .diagram{position:relative;width:1200px;height:1160px;margin:34px auto 0}
+    .node{position:absolute;background:#fff;border:1px solid var(--line);border-radius:12px;display:flex;align-items:center;gap:10px;padding:0 15px;font-size:12px;font-weight:600;color:var(--ink-soft);box-shadow:0 1px 2px rgba(51,48,44,.05);line-height:1.28}
+    .node svg{width:18px;height:18px;stroke-width:1.8;flex:none;color:var(--accent)}
+    .node.decision{background:var(--accent-soft);border:1.4px dashed var(--amber-line);color:var(--amber-ink);justify-content:center;text-align:center;border-radius:27px}
+    .node.decision svg{color:var(--amber-ink)}
+    .node.terminal{border-style:dashed;color:var(--muted2);background:#fbf9f5}
+    .node.terminal svg{color:var(--muted2)}
+    .node.amber{border-color:var(--amber-line);background:var(--amber-soft);color:var(--amber-ink)}
+    .node.amber svg{color:var(--amber-ink)}
+    .node.red{border-color:var(--red-line);background:var(--red-soft);color:var(--red)}
+    .node.red svg{color:var(--red)}
+    .elabel{position:absolute;font-size:10px;font-weight:700;color:var(--muted2);background:var(--bg);padding:1px 6px;border-radius:4px}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="ico-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="18" r="2"/></symbol>
+  <symbol id="ico-pointer" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 3l6.5 17 2-6.7L20 11.5Z"/></symbol>
+  <symbol id="ico-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c1-3.4 3.2-5.2 6-5.2s5 1.8 6 5.2"/><circle cx="17.5" cy="8.8" r="2.4"/><path d="M16 14.8c2.3.3 3.7 1.9 4.4 4.4"/></symbol>
+  <symbol id="ico-images" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="15" rx="2.2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 17 5-5 3.5 3.5L17 11l3 3"/></symbol>
+  <symbol id="ico-spine" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="4" r="1.8"/><path d="M12 6v12"/><circle cx="12" cy="20" r="1.8"/></symbol>
+  <symbol id="ico-help" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.5 9a2.5 2.5 0 0 1 4.9.8c0 1.7-2.4 2-2.4 3.4"/><path d="M12 17h.01"/></symbol>
+  <symbol id="ico-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="ico-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V3"/><path d="M4 4h14l-3 4.5L18 13H4"/></symbol>
+</svg>
+
+<div class="page">
+  <div class="kicker">User workflow 2 of 4</div>
+  <h1>Salamander search &amp; review</h1>
+  <div class="desc">How a name, a hunch, or a spotted mistake turns into an open Frame Card &mdash; from the Names table down to a single annotated photo, and back out to a correction if one is needed.</div>
+
+  <div class="diagram">
+    <svg width="1200" height="1160" style="position:absolute;left:0;top:0" aria-hidden="true">
+      <defs>
+        <marker id="ah2" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#7a736a"/></marker>
+        <marker id="ah2m" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0 0 L10 5 L0 10 z" fill="#9a9186"/></marker>
+      </defs>
+      <g stroke="#7a736a" stroke-width="1.6" fill="none">
+        <path d="M600 82 L600 158" marker-end="url(#ah2)"/>
+        <path d="M600 222 L600 278" marker-end="url(#ah2)"/>
+        <path d="M600 342 L600 403" marker-end="url(#ah2)"/>
+        <path d="M600 457 L600 528" marker-end="url(#ah2)"/>
+        <path d="M600 592 L600 658" marker-end="url(#ah2)"/>
+        <path d="M600 722 L600 788" marker-end="url(#ah2)"/>
+        <path d="M600 852 L600 923" marker-end="url(#ah2)"/>
+        <path d="M600 977 L600 1020 L280 1020 L280 1068" marker-end="url(#ah2)"/>
+        <path d="M600 1020 L600 1068" marker-end="url(#ah2)"/>
+        <path d="M600 1020 L920 1020 L920 1068" marker-end="url(#ah2)"/>
+      </g>
+      <path d="M170 1100 L60 1100 L60 560 L490 560" stroke="#9a9186" stroke-width="1.4" fill="none" stroke-dasharray="4 4" marker-end="url(#ah2m)"/>
+    </svg>
+
+    <div class="node" style="left:490px;top:18px;width:220px;height:64px"><svg><use href="#ico-search"/></svg>Open Names &amp; search table</div>
+    <div class="node" style="left:490px;top:158px;width:220px;height:64px"><svg><use href="#ico-sliders"/></svg>Filter by ID, site, date or contributor</div>
+    <div class="node" style="left:490px;top:278px;width:220px;height:64px"><svg><use href="#ico-pointer"/></svg>Click a row</div>
+    <div class="node" style="left:490px;top:403px;width:220px;height:54px"><svg><use href="#ico-users"/></svg>Family Card opens &mdash; profile mode</div>
+    <div class="node" style="left:490px;top:528px;width:220px;height:64px"><svg><use href="#ico-images"/></svg>Browse all confirmed photos of this individual</div>
+    <div class="node" style="left:490px;top:658px;width:220px;height:64px"><svg><use href="#ico-pointer"/></svg>Click a photo</div>
+    <div class="node" style="left:490px;top:788px;width:220px;height:64px"><svg><use href="#ico-spine"/></svg>Frame Card opens &mdash; profile mode</div>
+
+    <div class="node decision" style="left:470px;top:923px;width:260px;height:54px">Reviewer spots an issue?</div>
+    <div class="elabel" style="left:235px;top:1043px">no issue</div>
+    <div class="elabel" style="left:555px;top:1043px">wrong spot</div>
+    <div class="elabel" style="left:860px;top:1043px">wrong animal</div>
+
+    <div class="node terminal" style="left:170px;top:1068px;width:220px;height:64px"><svg><use href="#ico-images"/></svg>No issue &mdash; keeps browsing the family</div>
+    <div class="node amber" style="left:490px;top:1068px;width:220px;height:64px"><svg><use href="#ico-pencil"/></svg>Wrong spot / axis &mdash; edit &amp; save correction in place</div>
+    <div class="node red" style="left:810px;top:1068px;width:220px;height:64px"><svg><use href="#ico-flag"/></svg>Wrong individual &mdash; flagged, returns to Review &amp; Approval</div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

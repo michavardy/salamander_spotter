@@ -1,0 +1,307 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9; --line-soft:#e6e1d9; --line-faint:#f0ebe2;
+      --panel:#fff;
+      --side:#2b2825; --side-active:#3a3632; --side-text:#a79e93; --side-text-on:#f4efe8;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-link:#4a72b8; --blue-link-h:#365a99; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+      --chip:#f1ece3;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:var(--blue-link);text-decoration:none}a:hover{color:var(--blue-link-h)}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    svg{display:block}
+
+    .screen{width:1440px;height:1000px;display:flex;overflow:hidden;background:var(--bg)}
+    .side{width:220px;flex:none;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 20px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:var(--side-text-on)}
+    .brand .dot{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:var(--side-text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s ease,color .12s ease}
+    .nav a:hover{background:#332f2b;color:#e4ded4}
+    .nav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .nav a.on svg{color:var(--accent)}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .side-bottom{margin-top:auto;padding:0 12px}
+    .side .foot{padding:14px 20px 2px;border-top:1px solid var(--side-active);font-size:11.5px;color:var(--muted2);line-height:1.5;margin-top:10px}
+    .side .foot b{color:var(--side-text);font-weight:600;display:block;font-size:12.5px}
+
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .top{height:58px;flex:none;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:12px;padding:0 24px;background:#fff}
+    .crumb{font-size:12.5px;color:var(--muted2);display:flex;align-items:center;gap:6px}
+    .crumb a{color:var(--muted2);font-weight:600}
+    .crumb a:hover{color:var(--blue-link)}
+    .kicker{font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted2);font-weight:700}
+    .top h1{font-size:16px;display:flex;align-items:center;gap:8px}
+    .top h1 .pencil{color:var(--muted2);cursor:pointer;opacity:0;transition:opacity .12s ease}
+    .top h1:hover .pencil{opacity:1}
+    .top h1 .pencil svg{width:14px;height:14px;stroke-width:1.8}
+    .top .prog{margin-left:auto;display:flex;align-items:center;gap:12px;font-size:12px;color:var(--muted2)}
+    .nvg{display:flex;gap:4px}
+    .nvg button{width:28px;height:28px;border:1px solid var(--line);background:#fff;border-radius:7px;color:var(--muted3);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:border-color .12s ease}
+    .nvg button:hover{border-color:var(--accent-line);color:var(--ink)}
+    .nvg svg{width:15px;height:15px;stroke-width:2}
+
+    .bodywrap{flex:1;display:flex;gap:16px;padding:20px 22px 0;min-height:0}
+    .stage{flex:1;display:flex;flex-direction:column;min-width:0}
+    .cols{flex:1;display:flex;gap:16px;min-height:0}
+    .target{width:296px;flex:none}
+    .cands{flex:1;display:flex;flex-direction:column;min-width:0}
+    .cands .lbl{display:flex;align-items:baseline;gap:8px;margin-bottom:10px}
+    .cands .lbl h2{font-size:13px}
+    .cands .lbl span{font-size:11px;color:var(--muted)}
+    .cardrow{flex:1;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));grid-auto-rows:1fr;gap:12px;min-height:0}
+
+    .card{background:#fff;border:1px solid var(--line);border-radius:13px;display:flex;flex-direction:column;overflow:hidden;transition:box-shadow .16s ease,transform .16s ease,border-color .16s ease;cursor:pointer}
+    .card:hover{box-shadow:0 12px 28px -16px rgba(51,48,44,.32);transform:translateY(-2px);border-color:var(--accent-line)}
+    .card.ref{border-color:#d9c9a3}
+    .chead{padding:11px 13px 9px;border-bottom:1px solid var(--line-faint)}
+    .chead .row1{display:flex;align-items:center;justify-content:space-between;gap:6px}
+    .chead .id{font-size:13.5px;font-weight:700}
+    .rank{font-size:10px;font-weight:700;color:var(--muted3);background:var(--chip);border-radius:5px;padding:2px 7px}
+    .chead .sub{font-size:11px;color:var(--muted);margin-top:2px}
+    .tag{font-size:9.5px;font-weight:700;letter-spacing:.03em;text-transform:uppercase;padding:3px 7px;border-radius:5px}
+    .tag.ref{background:var(--accent-soft);color:var(--amber-ink)}
+
+    .figwrap{position:relative;flex:1;background:#211d19;min-height:0;display:flex}
+    .fig{width:100%;height:100%;display:block}
+    .figwrap .vtag{position:absolute;left:8px;top:7px;font-size:9px;color:#e9e2d3;opacity:.55;letter-spacing:.04em;font-family:"IBM Plex Mono"}
+    .figwrap .open{position:absolute;right:8px;top:7px;font-size:9.5px;font-weight:600;color:#f4efe8;background:#00000055;border:1px solid #ffffff33;border-radius:6px;padding:3px 8px;opacity:0;transition:opacity .15s ease}
+    .figwrap:hover .open{opacity:1}
+    .figwrap .datebar{position:absolute;left:8px;right:8px;bottom:8px;background:#20242bdd;border-radius:8px;padding:7px 9px;backdrop-filter:blur(2px);display:flex;justify-content:space-between;font-size:10px;color:#cbc4b7}
+    .figwrap .datebar b{color:#fff;font-family:"IBM Plex Mono";font-weight:500}
+
+    .qstrip{display:flex;border-top:1px solid var(--line-faint)}
+    .qstrip div{flex:1;text-align:center;padding:7px 2px;border-right:1px solid var(--line-faint)}
+    .qstrip div:last-child{border-right:0}
+    .qstrip .k{font-size:8.5px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600}
+    .qstrip .v{font-size:11.5px;font-weight:600;margin-top:1px;font-family:"IBM Plex Mono"}
+    .q-pass{color:var(--green)}.q-fail{color:var(--red)}
+
+    .cmeta{display:flex;flex-direction:column;gap:6px;padding:11px 13px;font-size:11px;color:var(--muted3);border-top:1px solid var(--line-faint)}
+    .cmeta .m{display:flex;justify-content:space-between}
+    .cmeta .m b{color:var(--ink-soft);font-weight:600}
+
+    .addcard{border:1.6px dashed var(--line);border-radius:13px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;color:var(--muted2);cursor:pointer;transition:border-color .12s ease,color .12s ease}
+    .addcard:hover{border-color:var(--accent-line);color:var(--amber-ink)}
+    .addcard svg{width:22px;height:22px;stroke-width:1.7}
+    .addcard span{font-size:12px;font-weight:600}
+
+    .actionbar{height:76px;flex:none;display:flex;align-items:center;gap:10px;padding:0 24px;border-top:1px solid var(--line-soft);background:#fff;margin-top:14px}
+    .btn{border:1px solid var(--line);background:#fff;border-radius:10px;padding:11px 16px;font-size:13px;font-weight:600;color:var(--ink-soft);cursor:pointer;display:flex;align-items:center;gap:8px;transition:all .13s ease}
+    .btn:hover{transform:translateY(-1px);box-shadow:0 6px 16px -8px rgba(51,48,44,.3);border-color:var(--accent-line)}
+    .btn svg{width:15px;height:15px;stroke-width:1.8}
+    .btn.reject{border-color:var(--red-line);color:var(--red)}
+    .btn.reject:hover{background:var(--red-soft)}
+    .actionbar .end{margin-left:auto;font-size:12px;color:var(--muted2)}
+    .actionbar .end b{color:var(--ink-soft);font-family:"IBM Plex Mono";font-weight:600}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></symbol>
+  <symbol id="ico-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M3 10h18M9 4v16"/></symbol>
+  <symbol id="ico-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><circle cx="19" cy="18" r="1.5"/><path d="M9.9 10.4 6.3 7.1M14.1 10.4l3.6-3.3M9.9 13.6l-3.6 3.3M14.1 13.6l3.6 3.3"/></symbol>
+  <symbol id="ico-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="18" r="2"/></symbol>
+  <symbol id="ico-chev-l" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m15 6-6 6 6 6"/></symbol>
+  <symbol id="ico-chev-r" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="ico-pencil" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"/><path d="M16.5 3.5a2.1 2.1 0 0 1 3 3L7 19l-4 1 1-4Z"/></symbol>
+  <symbol id="ico-merge" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M8 3v6a4 4 0 0 0 4 4"/><path d="M16 3v6a4 4 0 0 1-4 4v8"/></symbol>
+  <symbol id="ico-flag" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 22V3"/><path d="M4 4h14l-3 4.5L18 13H4"/></symbol>
+  <symbol id="ico-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></symbol>
+  <symbol id="ico-plus" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 5v14M5 12h14"/></symbol>
+
+  <symbol id="fig-A" viewBox="0 0 180 300">
+    <rect width="180" height="300" fill="#211d19"/>
+    <g opacity="0.5" stroke="#2d2820" stroke-width="1">
+      <path d="M0 46 C 60 40 120 52 180 44"/><path d="M0 150 C 70 158 120 140 180 150"/>
+      <path d="M0 244 C 60 236 130 250 180 240"/>
+    </g>
+    <path id="bodA2" d="M90 14 C 71 40 67 88 75 128 C 81 166 60 208 68 248 C 72 270 85 286 96 288 C 110 285 120 266 116 244 C 110 208 127 168 121 128 C 115 90 114 42 96 16 Z" fill="#17140f"/>
+    <use href="#bodA2" fill="#b6a996" opacity="0.15"/>
+    <use href="#bodA2" fill="none" stroke="#ded7c9" stroke-width="1" opacity="0.75"/>
+    <path d="M92 20 C 81 68 85 128 82 178 C 80 218 87 258 93 282" fill="none" stroke="#a99e8d" stroke-width="1" stroke-dasharray="3 3" opacity="0.65"/>
+    <g fill="#d99a3f" fill-opacity="0.62" stroke="#e8b866" stroke-width="0.8">
+      <ellipse cx="86" cy="38" rx="7" ry="5"/><ellipse cx="104" cy="53" rx="5" ry="4"/>
+      <ellipse cx="82" cy="67" rx="6" ry="6"/><ellipse cx="101" cy="83" rx="8" ry="5"/>
+      <ellipse cx="86" cy="101" rx="5" ry="5"/><ellipse cx="104" cy="117" rx="6" ry="4"/>
+      <ellipse cx="84" cy="133" rx="7" ry="6"/><ellipse cx="98" cy="151" rx="5" ry="5"/>
+      <ellipse cx="80" cy="169" rx="6" ry="4"/><ellipse cx="93" cy="187" rx="7" ry="5"/>
+      <ellipse cx="84" cy="207" rx="5" ry="5"/><ellipse cx="96" cy="225" rx="5" ry="4"/>
+    </g>
+    <circle cx="92" cy="18" r="4.5" fill="#46b45f" stroke="#0c1a10"/>
+    <circle cx="93" cy="284" r="4.5" fill="#cf4b3d" stroke="#1a0c0a"/>
+  </symbol>
+  <symbol id="fig-B" viewBox="0 0 180 300">
+    <rect width="180" height="300" fill="#211d19"/>
+    <g opacity="0.5" stroke="#2d2820" stroke-width="1"><path d="M0 60 C 60 52 120 66 180 56"/><path d="M0 168 C 70 176 120 158 180 170"/></g>
+    <path id="bodB2" d="M88 16 C 73 42 78 92 80 132 C 82 172 74 214 82 250 C 86 272 92 286 98 288 C 108 285 116 266 114 244 C 110 206 120 166 116 128 C 112 88 106 42 96 18 Z" fill="#17140f"/>
+    <use href="#bodB2" fill="#b6a996" opacity="0.15"/>
+    <use href="#bodB2" fill="none" stroke="#ded7c9" stroke-width="1" opacity="0.75"/>
+    <path d="M90 22 C 84 70 88 130 88 180 C 88 220 92 258 96 282" fill="none" stroke="#a99e8d" stroke-width="1" stroke-dasharray="3 3" opacity="0.65"/>
+    <g fill="#d99a3f" fill-opacity="0.62" stroke="#e8b866" stroke-width="0.8">
+      <ellipse cx="90" cy="44" rx="6" ry="5"/><ellipse cx="82" cy="66" rx="5" ry="7"/>
+      <ellipse cx="101" cy="80" rx="7" ry="4"/><ellipse cx="88" cy="104" rx="9" ry="5"/>
+      <ellipse cx="97" cy="132" rx="4" ry="4"/><ellipse cx="84" cy="153" rx="6" ry="5"/>
+      <ellipse cx="101" cy="178" rx="5" ry="6"/><ellipse cx="90" cy="212" rx="7" ry="4"/>
+    </g>
+    <circle cx="90" cy="20" r="4.5" fill="#46b45f" stroke="#0c1a10"/>
+    <circle cx="97" cy="284" r="4.5" fill="#cf4b3d" stroke="#1a0c0a"/>
+  </symbol>
+  <symbol id="fig-C" viewBox="0 0 180 300">
+    <rect width="180" height="300" fill="#211d19"/>
+    <g opacity="0.5" stroke="#2d2820" stroke-width="1"><path d="M0 100 C 60 92 120 108 180 98"/><path d="M0 210 C 70 202 120 218 180 206"/></g>
+    <path id="bodC2" d="M92 18 C 76 44 82 90 78 130 C 74 172 84 216 80 252 C 78 272 86 286 94 288 C 106 285 112 266 108 244 C 104 206 96 168 100 128 C 104 88 108 42 96 18 Z" fill="#17140f"/>
+    <use href="#bodC2" fill="#b6a996" opacity="0.15"/>
+    <use href="#bodC2" fill="none" stroke="#ded7c9" stroke-width="1" opacity="0.75"/>
+    <path d="M92 22 C 84 66 90 128 88 176 C 86 216 90 256 92 282" fill="none" stroke="#a99e8d" stroke-width="1" stroke-dasharray="3 3" opacity="0.65"/>
+    <g fill="#d99a3f" fill-opacity="0.62" stroke="#e8b866" stroke-width="0.8">
+      <ellipse cx="88" cy="40" rx="6" ry="5"/><ellipse cx="98" cy="58" rx="5" ry="6"/>
+      <ellipse cx="84" cy="78" rx="7" ry="4"/><ellipse cx="96" cy="100" rx="5" ry="5"/>
+      <ellipse cx="82" cy="124" rx="6" ry="5"/><ellipse cx="94" cy="146" rx="4" ry="4"/>
+    </g>
+    <circle cx="93" cy="20" r="4.5" fill="#46b45f" stroke="#0c1a10"/>
+    <circle cx="87" cy="284" r="4.5" fill="#cf4b3d" stroke="#1a0c0a"/>
+  </symbol>
+</svg>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a><svg><use href="#ico-home"/></svg>Overview</a>
+      <a><svg><use href="#ico-upload"/></svg>Upload</a>
+      <a><svg><use href="#ico-review"/></svg>Review</a>
+      <a class="on"><svg><use href="#ico-table"/></svg>Names</a>
+      <a><svg><use href="#ico-atom"/></svg>Models</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="foot"><b>M. Vardy</b>reviewer &middot; lead</div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="top">
+      <div class="crumb"><a>Names</a><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m9 6 6 6-6 6"/></svg></div>
+      <div>
+        <span class="kicker">Family Card &middot; profile mode</span>
+        <h1 class="mono">AC-3 <span style="font-family:'Hanken Grotesk';font-weight:600;color:var(--muted2)">&ldquo;Notch&rdquo;</span><span class="pencil"><svg><use href="#ico-pencil"/></svg></span></h1>
+      </div>
+      <div class="prog">
+        <span>4 sightings &middot; Sasa, north slope</span>
+        <span class="nvg"><button><svg><use href="#ico-chev-l"/></svg></button><button><svg><use href="#ico-chev-r"/></svg></button></span>
+      </div>
+    </header>
+
+    <div class="bodywrap">
+      <div class="stage">
+        <div class="cols">
+          <section class="target">
+            <div class="card ref" style="height:100%">
+              <div class="chead">
+                <div class="row1"><span class="id mono">ac_3_1</span><span class="tag ref">reference</span></div>
+                <div class="sub">highest-quality confirmed photo</div>
+              </div>
+              <div class="figwrap">
+                <span class="vtag">ac_3_1</span>
+                <span class="open">Open frame &rarr;</span>
+                <svg class="fig"><use href="#fig-A"/></svg>
+              </div>
+              <div class="qstrip">
+                <div><div class="k">Qual</div><div class="v">0.71</div></div>
+                <div><div class="k">Sharp</div><div class="v">0.63</div></div>
+                <div><div class="k">Spots</div><div class="v">0.66</div></div>
+                <div><div class="k">Body</div><div class="v">0.71</div></div>
+                <div><div class="k">q0.4</div><div class="v q-pass">&#10003;</div></div>
+              </div>
+              <div class="cmeta">
+                <div class="m"><span>First seen</span><b>03 Apr 2024</b></div>
+                <div class="m"><span>Last seen</span><b>26 Aug 2026</b></div>
+                <div class="m"><span>Contributors</span><b>G. Esh&#8209;Am, Y. Mozer</b></div>
+                <div class="m"><span>Spots tracked</span><b>21</b></div>
+              </div>
+            </div>
+          </section>
+
+          <section class="cands">
+            <div class="lbl"><h2>All photos of this individual</h2><span>4 confirmed &middot; sorted most recent first</span></div>
+            <div class="cardrow">
+
+              <div class="card">
+                <div class="chead">
+                  <div class="row1"><span class="id mono">ac_3_g0</span><span class="rank">synthetic</span></div>
+                  <div class="sub">generated training view</div>
+                </div>
+                <div class="figwrap">
+                  <span class="vtag">ac_3_g0</span>
+                  <span class="open">Open frame &rarr;</span>
+                  <svg class="fig"><use href="#fig-B"/></svg>
+                  <div class="datebar"><span>added</span><b>26 Aug 2026</b></div>
+                </div>
+                <div class="qstrip">
+                  <div><div class="k">Qual</div><div class="v">&ndash;</div></div>
+                  <div><div class="k">Sharp</div><div class="v">&ndash;</div></div>
+                  <div><div class="k">Spots</div><div class="v">&ndash;</div></div>
+                  <div><div class="k">Body</div><div class="v">&ndash;</div></div>
+                  <div><div class="k">q0.4</div><div class="v q-pass">&#10003;<sup style="font-size:8px">g</sup></div></div>
+                </div>
+              </div>
+
+              <div class="card">
+                <div class="chead">
+                  <div class="row1"><span class="id mono">ac_3_2</span><span class="rank">confirmed</span></div>
+                  <div class="sub">field photo</div>
+                </div>
+                <div class="figwrap">
+                  <span class="vtag">ac_3_2</span>
+                  <span class="open">Open frame &rarr;</span>
+                  <svg class="fig"><use href="#fig-C"/></svg>
+                  <div class="datebar"><span>photographed</span><b>02 May 2025</b></div>
+                </div>
+                <div class="qstrip">
+                  <div><div class="k">Qual</div><div class="v">0.38</div></div>
+                  <div><div class="k">Sharp</div><div class="v">0.55</div></div>
+                  <div><div class="k">Spots</div><div class="v">1.00</div></div>
+                  <div><div class="k">Body</div><div class="v">0.84</div></div>
+                  <div><div class="k">q0.4</div><div class="v q-fail">&#10007;</div></div>
+                </div>
+              </div>
+
+              <div class="addcard"><svg><use href="#ico-plus"/></svg><span>Link another sighting</span></div>
+            </div>
+          </section>
+        </div>
+      </div>
+    </div>
+
+    <footer class="actionbar">
+      <button class="btn"><svg><use href="#ico-pencil"/></svg>Rename</button>
+      <button class="btn"><svg><use href="#ico-merge"/></svg>Merge with&hellip;</button>
+      <button class="btn reject"><svg><use href="#ico-flag"/></svg>Flag for re&#8209;review</button>
+      <button class="btn"><svg><use href="#ico-download"/></svg>Export sightings</button>
+      <div class="end">12 spots tracked across <b>4</b> photos</div>
+    </footer>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

@@ -1,0 +1,257 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9; --line-soft:#e6e1d9; --line-faint:#f0ebe2;
+      --panel:#fff;
+      --side:#2b2825; --side-active:#3a3632; --side-text:#a79e93; --side-text-on:#f4efe8;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee; --green-line:#bfe0cd;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-link:#4a72b8; --blue-link-h:#365a99; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+      --chip:#f1ece3;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:var(--blue-link);text-decoration:none}a:hover{color:var(--blue-link-h)}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    svg{display:block}
+
+    .screen{width:1440px;height:960px;display:flex;overflow:hidden;background:var(--bg)}
+    .side{width:220px;flex:none;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 20px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:var(--side-text-on)}
+    .brand .dot{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:var(--side-text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s ease,color .12s ease}
+    .nav a:hover{background:#332f2b;color:#e4ded4}
+    .nav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .nav a.on svg{color:var(--accent)}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .side-bottom{margin-top:auto;padding:0 12px}
+    .side .foot{padding:14px 20px 2px;border-top:1px solid var(--side-active);font-size:11.5px;color:var(--muted2);line-height:1.5;margin-top:10px}
+    .side .foot b{color:var(--side-text);font-weight:600;display:block;font-size:12.5px}
+
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .top{height:56px;flex:none;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:16px;padding:0 28px;background:#fff}
+    .top h1{font-size:17px}
+    .top .actions{margin-left:auto;display:flex;gap:10px}
+    .btn{display:flex;align-items:center;gap:7px;font-size:12px;font-weight:600;border-radius:9px;padding:8px 13px;cursor:pointer;border:1px solid var(--line);background:#fff;color:var(--ink-soft);transition:all .13s ease}
+    .btn svg{width:14px;height:14px;stroke-width:1.8}
+    .btn:hover{border-color:var(--accent-line);box-shadow:0 4px 14px -8px rgba(51,48,44,.3)}
+    .btn.primary{background:var(--ink);border-color:var(--ink);color:#fff}
+    .btn.primary:hover{background:#1f1c19}
+
+    .tabbar{display:flex;gap:26px;padding:0 28px;background:#fff;border-bottom:1px solid var(--line-soft)}
+    .tab{padding:10px 2px;font-size:13px;font-weight:600;color:var(--muted2);cursor:pointer;border-bottom:2.5px solid transparent;transition:color .12s ease,border-color .12s ease}
+    .tab:hover{color:var(--ink-soft)}
+    .tab.on{color:var(--ink);border-bottom-color:var(--accent)}
+
+    .body{flex:1;overflow:auto;padding:16px 26px 22px;display:flex;flex-direction:column;gap:13px}
+    .chips{display:flex;gap:12px}
+    .infochip{flex:1;background:#fff;border:1px solid var(--line);border-radius:11px;padding:9px 15px;font-size:11px;color:var(--muted2)}
+    .infochip b{display:block;font-size:13px;color:var(--ink);font-weight:700;margin-top:1px;font-family:"Hanken Grotesk"}
+
+    .panel{background:#fff;border:1px solid var(--line);border-radius:13px;padding:14px 18px}
+
+    /* ---- tabbed table ---- */
+    .tblhead{display:flex;align-items:center;justify-content:space-between;margin-bottom:9px}
+    .tbltabs{display:flex;gap:4px;background:#f1ece3;border-radius:9px;padding:3px}
+    .tbltab{font-size:11.5px;font-weight:600;color:var(--muted3);padding:6px 14px;border-radius:7px;cursor:pointer;transition:all .12s ease}
+    .tbltab.on{background:#fff;color:var(--ink);box-shadow:0 1px 3px #0000000f}
+    .tblnote{font-size:11px;color:var(--muted2)}
+    table{width:100%;border-collapse:collapse}
+    thead th{text-align:left;font-size:10px;text-transform:uppercase;letter-spacing:.04em;color:var(--muted);font-weight:600;padding:6px 9px;border-bottom:1px solid var(--line)}
+    tbody td{padding:8px 9px;font-size:12.5px;color:var(--ink-soft);border-bottom:1px solid var(--line-faint)}
+    tbody tr{cursor:pointer;transition:background .12s ease}
+    tbody tr:hover{background:#fbf7ee}
+    tbody tr:last-child td{border-bottom:none}
+    tbody tr.active{background:var(--green-soft)}
+    tbody tr.active:hover{background:var(--green-soft)}
+    .mnum{font-family:"IBM Plex Mono";font-weight:600;color:var(--ink)}
+    .mname{font-family:"IBM Plex Mono";font-weight:700;color:var(--ink);font-size:12.5px}
+    .mstatus{font-size:9px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:1px 7px;border-radius:20px;margin-left:8px}
+    .mstatus.active{background:var(--green);color:#fff}
+    .mstatus.cand{background:var(--blue-soft);color:var(--blue)}
+    .scorecol{color:var(--accent);font-weight:700}
+
+    /* ---- best-fit compact card ---- */
+    .fitcard{display:flex;align-items:center;gap:13px;background:linear-gradient(180deg,#fffefb,#fefaf2);border:1px solid var(--accent-line);border-radius:12px;padding:11px 16px;cursor:pointer;transition:all .13s ease}
+    .fitcard:hover{box-shadow:0 8px 22px -14px rgba(185,120,42,.4);transform:translateY(-1px)}
+    .fitcard .ficon{width:36px;height:36px;border-radius:10px;background:var(--accent-soft);color:var(--amber-ink);display:flex;align-items:center;justify-content:center;flex:none}
+    .fitcard .ficon svg{width:18px;height:18px;stroke-width:1.9}
+    .fitcard .ftext{flex:1;min-width:0}
+    .fitcard .ft1{font-size:12.5px;font-weight:700;color:var(--ink)}
+    .fitcard .ft2{font-size:11.5px;color:var(--muted2);margin-top:1px}
+    .fitcard .ft2 b{color:var(--amber-ink)}
+    .fitcard .fchev{width:26px;height:26px;border-radius:50%;background:#fff;border:1px solid var(--accent-line);display:flex;align-items:center;justify-content:center;color:var(--amber-ink);flex:none}
+    .fitcard .fchev svg{width:13px;height:13px;stroke-width:2.4}
+
+    /* ---- training (quiet) ---- */
+    .trainrow{display:flex;align-items:center;gap:22px;flex-wrap:wrap}
+    .trainfield{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted2)}
+    .trainfield input,.trainfield select{font-family:inherit;font-size:12.5px;border:1px solid var(--line);border-radius:7px;padding:6px 9px;color:var(--ink)}
+    .trainfield input{width:56px;text-align:center;font-family:"IBM Plex Mono"}
+    .factrow{display:flex;align-items:center;gap:7px;font-size:11.5px;color:var(--green);font-weight:600}
+    .factrow svg{width:13px;height:13px;stroke-width:2.2}
+
+    /* ---- promotion, the dramatic bit ---- */
+    .promopanel{border:1.4px solid var(--accent);background:linear-gradient(180deg,#fff,#fffdf8);box-shadow:0 10px 30px -20px rgba(185,120,42,.5)}
+    .promohead{display:flex;align-items:baseline;gap:8px;margin-bottom:12px}
+    .promohead h3{font-size:14px}
+    .promohead span{font-size:11.5px;color:var(--muted2)}
+    .promogrid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:14px}
+    .promotile{border-radius:12px;padding:15px 16px;display:flex;flex-direction:column;gap:9px;transition:transform .13s ease,box-shadow .13s ease}
+    .promotile:hover{transform:translateY(-2px)}
+    .ptnum{width:22px;height:22px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;flex:none}
+    .ptlabel{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:700}
+    .pthint{font-size:10.5px;line-height:1.5}
+
+    .promotile.select{background:#fff;border:1.4px solid var(--line)}
+    .promotile.select .ptnum{background:var(--chip);color:var(--muted3)}
+    .promotile.select select{width:100%;font-family:"IBM Plex Mono";font-size:13px;font-weight:600;border:1px solid var(--line);border-radius:8px;padding:9px 10px;color:var(--ink)}
+    .promotile.select .pthint{color:var(--muted2)}
+
+    .promotile.promote{background:var(--green);color:#fff}
+    .promotile.promote .ptnum{background:#ffffff30;color:#fff}
+    .promotile.promote .ptlabel{color:#fff}
+    .promobtn{background:#fff;color:var(--green);border:none;border-radius:9px;padding:11px 14px;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:filter .13s ease}
+    .promobtn:hover{filter:brightness(.96)}
+    .promobtn svg{width:15px;height:15px;stroke-width:2.4}
+    .promotile.promote .pthint{color:#eaf3ee}
+
+    .promotile.rollback{background:#fff;border:1.4px solid var(--red-line)}
+    .promotile.rollback .ptnum{background:var(--red-soft);color:var(--red)}
+    .rollbackbtn{background:var(--red-soft);color:var(--red);border:1px solid var(--red-line);border-radius:9px;padding:11px 14px;font-size:13.5px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:7px;transition:all .13s ease}
+    .rollbackbtn:hover{background:var(--red);color:#fff}
+    .rollbackbtn svg{width:15px;height:15px;stroke-width:2.4}
+    .promotile.rollback .pthint{color:var(--muted2)}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></symbol>
+  <symbol id="ico-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M3 10h18M9 4v16"/></symbol>
+  <symbol id="ico-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><circle cx="19" cy="18" r="1.5"/><path d="M9.9 10.4 6.3 7.1M14.1 10.4l3.6-3.3M9.9 13.6l-3.6 3.3M14.1 13.6l3.6 3.3"/></symbol>
+  <symbol id="ico-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></symbol>
+  <symbol id="ico-undo" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 12a9 9 0 1 0 3-6.7"/><path d="M3 3v6h6"/></symbol>
+  <symbol id="ico-clock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3.5 2"/></symbol>
+  <symbol id="ico-check" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 6 9 17l-5-5"/></symbol>
+  <symbol id="ico-target" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="8"/><circle cx="12" cy="12" r="3.4"/><circle cx="12" cy="12" r="0.6" fill="currentColor"/></symbol>
+  <symbol id="ico-chevdown" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></symbol>
+  <symbol id="ico-arrowup" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5"/><path d="m5 12 7-7 7 7"/></symbol>
+</svg>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a><svg><use href="#ico-home"/></svg>Overview</a>
+      <a><svg><use href="#ico-upload"/></svg>Upload</a>
+      <a><svg><use href="#ico-review"/></svg>Review</a>
+      <a><svg><use href="#ico-table"/></svg>Names</a>
+      <a class="on"><svg><use href="#ico-atom"/></svg>Models</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="foot"><b>M. Vardy</b>reviewer &middot; lead</div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="top">
+      <h1>Models</h1>
+      <div class="actions">
+        <button class="btn"><svg><use href="#ico-download"/></svg>Download model_stats.log</button>
+        <button class="btn primary"><svg><use href="#ico-clock"/></svg>Retrain all now</button>
+      </div>
+    </header>
+    <div class="tabbar">
+      <span class="tab on">Models</span>
+      <span class="tab">Settings</span>
+    </div>
+
+    <div class="body">
+      <div class="chips">
+        <div class="infochip">Last full run<b class="mono">2026&#8209;09&#8209;04 14:15</b></div>
+        <div class="infochip">Images used<b class="mono">1,421 &middot; full dataset</b></div>
+        <div class="infochip">Next scheduled run<b class="mono">in 12 days, or +49 images</b></div>
+      </div>
+
+      <div class="panel">
+        <div class="tblhead">
+          <div class="tbltabs">
+            <span class="tbltab on">Current</span>
+            <span class="tbltab">Trained</span>
+            <span class="tbltab">Best</span>
+          </div>
+          <span class="tblnote">Top 4 of 13 &middot; 9 more incl. <span class="mono">ensemble_vote</span> (training now) &middot; ranked by Score</span>
+        </div>
+        <table>
+          <thead><tr><th>Model</th><th>Trained</th><th>R@1</th><th>R@5</th><th>R@10</th><th>Bal. acc</th><th>Novelty AUROC</th><th>Review@90</th><th>Score</th></tr></thead>
+          <tbody>
+            <tr class="active"><td><span class="mname">strict_hand_pos</span><span class="mstatus active">active</span></td><td class="mono">07&#8209;14</td><td class="mnum">0.34</td><td class="mnum">0.71</td><td class="mnum">0.93</td><td class="mnum">0.79</td><td class="mnum">0.67</td><td class="mnum">0.86</td><td class="mnum scorecol">0.505</td></tr>
+            <tr><td><span class="mname">strict_hand_neg</span></td><td class="mono">07&#8209;10</td><td class="mnum">0.31</td><td class="mnum">0.68</td><td class="mnum">0.90</td><td class="mnum">0.77</td><td class="mnum">0.64</td><td class="mnum">0.84</td><td class="mnum scorecol">0.475</td></tr>
+            <tr><td><span class="mname">set_transformer_v4</span><span class="mstatus cand">candidate</span></td><td class="mono">09&#8209;04</td><td class="mnum">0.19</td><td class="mnum">0.38</td><td class="mnum">0.52</td><td class="mnum">0.68</td><td class="mnum">0.71</td><td class="mnum">0.79</td><td class="mnum scorecol">0.450</td></tr>
+            <tr><td><span class="mname">supcon_v2</span></td><td class="mono">06&#8209;15</td><td class="mnum">0.27</td><td class="mnum">0.55</td><td class="mnum">0.70</td><td class="mnum">0.71</td><td class="mnum">0.63</td><td class="mnum">0.78</td><td class="mnum scorecol">0.450</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="fitcard">
+        <span class="ficon"><svg><use href="#ico-target"/></svg></span>
+        <div class="ftext">
+          <div class="ft1">Best fit to your corrections</div>
+          <div class="ft2">6 of your last 8 picks favored a different model &middot; avg rank <b>#5.4</b> vs the model's <b>#1.8</b> &middot; click to see the suggested fix</div>
+        </div>
+        <span class="fchev"><svg><use href="#ico-chevdown"/></svg></span>
+      </div>
+
+      <div class="panel">
+        <div class="promohead"><h3>Training</h3><span>Applies to every model, every run</span></div>
+        <div class="factrow"><svg><use href="#ico-check"/></svg>Every retrain uses the full dataset, not just what's new.</div>
+        <div class="trainrow" style="margin-top:10px">
+          <div class="trainfield">Retrain every <input type="number" value="60"> days</div>
+          <div class="trainfield">or every <input type="number" value="100"> new reviewed images</div>
+          <div class="trainfield">Train/eval split <select><option>Keep current (recommended)</option><option>Re&#8209;split</option></select></div>
+        </div>
+      </div>
+
+      <div class="panel promopanel">
+        <div class="promohead"><h3>Promotion</h3><span>What actually goes live as the active matcher</span></div>
+        <div class="promogrid">
+          <div class="promotile select">
+            <div class="ptlabel"><span class="ptnum">1</span>Select model</div>
+            <select><option>set_transformer_v4 &middot; candidate</option><option>strict_hand_pos &middot; active</option><option>ensemble_vote</option><option>supcon_v2</option></select>
+            <div class="pthint">Or click any row in the table above.</div>
+          </div>
+          <div class="promotile promote">
+            <div class="ptlabel"><span class="ptnum">2</span>Promote</div>
+            <button class="promobtn"><svg><use href="#ico-arrowup"/></svg>Make active</button>
+            <div class="pthint">set_transformer_v4 replaces strict_hand_pos immediately.</div>
+          </div>
+          <div class="promotile rollback">
+            <div class="ptlabel"><span class="ptnum">3</span>Rollback</div>
+            <button class="rollbackbtn"><svg><use href="#ico-undo"/></svg>Restore previous best</button>
+            <div class="pthint">Back to strict_hand_pos's 05&#8209;02 run.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

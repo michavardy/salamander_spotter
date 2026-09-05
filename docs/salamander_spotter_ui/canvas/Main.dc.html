@@ -1,0 +1,285 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9; --line-soft:#e6e1d9; --line-faint:#f0ebe2;
+      --panel:#fff;
+      --side:#2b2825; --side-active:#3a3632; --side-text:#a79e93; --side-text-on:#f4efe8;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-link:#4a72b8; --blue-link-h:#365a99; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+      --chip:#f1ece3;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:var(--blue-link);text-decoration:none}a:hover{color:var(--blue-link-h)}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    svg{display:block}
+
+    .screen{width:1440px;height:960px;display:flex;overflow:hidden;background:var(--bg)}
+
+    /* ---- sidebar (shared chrome) ---- */
+    .side{width:220px;flex:none;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 20px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:var(--side-text-on)}
+    .brand .dot{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:var(--side-text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s ease,color .12s ease}
+    .nav a:hover{background:#332f2b;color:#e4ded4}
+    .nav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .nav a.on svg{color:var(--accent)}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .side-bottom{margin-top:auto;padding:0 12px}
+    .side .foot{padding:14px 20px 2px;border-top:1px solid var(--side-active);font-size:11.5px;color:var(--muted2);line-height:1.5;margin-top:10px}
+    .side .foot b{color:var(--side-text);font-weight:600;display:block;font-size:12.5px}
+
+    /* ---- work area ---- */
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .top{height:60px;flex:none;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:16px;padding:0 28px;background:#fff}
+    .top h1{font-size:17px}
+    .top .sub{font-size:12.5px;color:var(--muted2)}
+    .bell{margin-left:auto;position:relative;width:36px;height:36px;border-radius:9px;border:1px solid var(--line);background:#fff;display:flex;align-items:center;justify-content:center;color:var(--muted3);cursor:pointer;transition:border-color .12s ease}
+    .bell:hover{border-color:var(--accent-line);color:var(--ink)}
+    .bell svg{width:17px;height:17px;stroke-width:1.8}
+    .bell .badge{position:absolute;top:-5px;right:-5px;width:16px;height:16px;border-radius:50%;background:var(--amber-ink);color:#fff;font-size:9.5px;font-weight:700;display:flex;align-items:center;justify-content:center;border:2px solid #fff}
+    .navdot{width:6px;height:6px;border-radius:50%;background:var(--amber-ink);margin-left:auto}
+    .body{flex:1;overflow:auto;padding:26px 28px 32px}
+
+    .alertband{display:flex;align-items:flex-start;gap:12px;background:var(--amber-soft);border:1px solid var(--amber-line);border-radius:13px;padding:13px 16px;margin-bottom:20px}
+    .alertband .aico{width:34px;height:34px;border-radius:10px;background:#fff;display:flex;align-items:center;justify-content:center;color:var(--amber-ink);flex:none}
+    .alertband .aico svg{width:18px;height:18px;stroke-width:1.9}
+    .alertband .atext{font-size:12.5px;color:#6b5a3e;line-height:1.6}
+    .alertband .atext b{color:#4b3d24;font-weight:600}
+    .alertband .aactions{margin-left:auto;display:flex;gap:8px;flex:none;align-items:center}
+    .alertband .aactions a{font-size:12px;font-weight:600}
+    .alertband .dismiss{width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;color:var(--muted2);cursor:pointer;flex:none}
+    .alertband .dismiss:hover{background:#00000010}
+    .alertband .dismiss svg{width:13px;height:13px;stroke-width:2}
+
+    /* ---- stat cards ---- */
+    .stats{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:16px;margin-bottom:22px}
+    .stat{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:18px 20px;display:flex;align-items:center;gap:14px;transition:box-shadow .16s ease,transform .16s ease,border-color .16s ease;cursor:default}
+    .stat:hover{box-shadow:0 8px 24px -14px rgba(51,48,44,.28);transform:translateY(-2px);border-color:var(--accent-line)}
+    .stat .ico{width:42px;height:42px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex:none}
+    .stat .ico svg{width:21px;height:21px;stroke-width:1.7}
+    .stat.i1 .ico{background:var(--amber-soft);color:var(--amber-ink)}
+    .stat.i2 .ico{background:var(--blue-soft);color:var(--blue)}
+    .stat.i3 .ico{background:var(--green-soft);color:var(--green)}
+    .stat .k{font-size:12px;color:var(--muted2);font-weight:600}
+    .stat .vrow{display:flex;align-items:baseline;gap:8px}
+    .stat .v{font-size:27px;font-weight:700;font-family:"Hanken Grotesk";margin-top:1px;letter-spacing:-.01em}
+    .stat .delta{font-size:11px;font-weight:700;color:var(--green);display:flex;align-items:center;gap:2px}
+    .stat .delta svg{width:10px;height:10px;stroke-width:3}
+    .spark{display:flex;align-items:flex-end;gap:2px;height:16px;margin-left:auto}
+    .spark i{width:4px;border-radius:1.5px;display:block}
+
+    /* ---- two-column lower area ---- */
+    .cols{display:grid;grid-template-columns:1.05fr 1fr;gap:18px;align-items:start}
+    .panel{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+    .panel .phead{display:flex;align-items:center;justify-content:space-between;padding:16px 20px;border-bottom:1px solid var(--line-faint)}
+    .panel .phead h3{font-size:14px}
+    .panel .phead a{font-size:12px;font-weight:600}
+
+    .activity{display:flex;flex-direction:column}
+    .arow{display:flex;align-items:center;gap:13px;padding:13px 20px;border-bottom:1px solid var(--line-faint);transition:background .12s ease;cursor:default}
+    .arow:last-child{border-bottom:none}
+    .arow:hover{background:#fbf9f5}
+    .abadge{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex:none}
+    .abadge svg{width:16px;height:16px;stroke-width:1.8}
+    .abadge.sighting{background:var(--amber-soft);color:var(--amber-ink)}
+    .abadge.approval{background:var(--green-soft);color:var(--green)}
+    .abadge.training{background:var(--amber-soft);color:var(--amber-ink)}
+    .aline1{font-size:13px;font-weight:600;color:var(--ink)}
+    .aline2{font-size:11.5px;color:var(--muted2);margin-top:1px}
+    .aright{margin-left:auto;text-align:right;font-size:11.5px;color:var(--muted2)}
+    .aright b{color:var(--ink-soft);font-weight:600}
+    .apill{font-size:10.5px;font-weight:600;background:var(--chip);color:var(--muted3);border-radius:20px;padding:2px 9px;margin-left:8px}
+
+    /* ---- stylised map ---- */
+    .mapwrap{position:relative;height:378px;background:linear-gradient(160deg,#eef2e6,#e3ebe0);overflow:hidden}
+    .mapwrap svg{width:100%;height:100%;display:block}
+    .maphead .msub{font-size:11px;color:var(--muted2);font-weight:500}
+    .legend{position:absolute;left:14px;bottom:14px;background:#ffffffee;border:1px solid var(--line);border-radius:10px;padding:8px 12px;font-size:11px;color:var(--muted3);display:flex;gap:14px;backdrop-filter:blur(2px)}
+    .legend span{display:flex;align-items:center;gap:6px}
+    .legend i{width:9px;height:9px;border-radius:50%;display:block}
+    .legend i.star{background:var(--accent);clip-path:polygon(50% 0%,63% 35%,100% 38%,72% 60%,82% 96%,50% 76%,18% 96%,28% 60%,0% 38%,37% 35%)}
+    .legend i.dot{background:var(--blue)}
+    .legend i.new{background:var(--red)}
+    .pin{cursor:pointer}
+    .pin circle{transition:r .12s ease}
+    .pin:hover circle{r:7}
+    @keyframes ringpulse{0%{r:6;stroke-opacity:.75}100%{r:17;stroke-opacity:0}}
+    .pulsering{animation:ringpulse 2s ease-out infinite}
+    .peek{position:absolute;top:14px;right:14px;width:158px;background:#211d19;border-radius:12px;overflow:hidden;box-shadow:0 14px 32px -14px rgba(0,0,0,.5);border:1px solid #3a3227;cursor:pointer;transition:transform .15s ease}
+    .peek:hover{transform:translateY(-2px)}
+    .peek .pk{font-size:9px;text-transform:uppercase;letter-spacing:.05em;color:#f4c15c;font-weight:700;padding:8px 11px 0}
+    .peek .ph{height:56px;display:flex;align-items:center;justify-content:center;position:relative}
+    .peek .ph svg{width:34px;height:34px}
+    .peek .pb{padding:8px 11px 10px;font-size:10px;color:#cbc4b7;line-height:1.65}
+    .peek .pb b{color:#f4efe8;font-weight:600;display:block;font-size:12px;font-family:"IBM Plex Mono"}
+    .peek .pgo{display:flex;align-items:center;gap:4px;font-size:10px;font-weight:600;color:#f4c15c;margin-top:5px}
+    .peek .pgo svg{width:10px;height:10px;stroke-width:2.5}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></symbol>
+  <symbol id="ico-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M3 10h18M9 4v16"/></symbol>
+  <symbol id="ico-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><circle cx="19" cy="18" r="1.5"/><path d="M9.9 10.4 6.3 7.1M14.1 10.4l3.6-3.3M9.9 13.6l-3.6 3.3M14.1 13.6l3.6 3.3"/></symbol>
+  <symbol id="ico-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="18" r="2"/></symbol>
+  <symbol id="ico-users" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 20c1-3.4 3.2-5.2 6-5.2s5 1.8 6 5.2"/><circle cx="17.5" cy="8.8" r="2.4"/><path d="M16 14.8c2.3.3 3.7 1.9 4.4 4.4"/></symbol>
+  <symbol id="ico-images" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="15" rx="2.2"/><circle cx="8.5" cy="9.5" r="1.6"/><path d="m4 17 5-5 3.5 3.5L17 11l3 3"/></symbol>
+  <symbol id="ico-salamander" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></symbol>
+  <symbol id="ico-award" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="5.2"/><path d="m8.5 13.5-1.7 6.5L12 17l5.2 3-1.7-6.5"/></symbol>
+  <symbol id="ico-bell" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M18 16v-5a6 6 0 1 0-12 0v5l-2 3h16Z"/><path d="M10 20a2 2 0 0 0 4 0"/></symbol>
+  <symbol id="ico-alert" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3 2 20h20Z"/><path d="M12 9v5M12 17h.01"/></symbol>
+  <symbol id="ico-x" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 6l12 12M18 6 6 18"/></symbol>
+  <symbol id="ico-trend" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m4 16 6-6 4 4 6-8"/><path d="M14 6h6v6"/></symbol>
+  <symbol id="ico-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14"/><path d="m13 6 6 6-6 6"/></symbol>
+</svg>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><use href="#ico-salamander"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a class="on"><svg><use href="#ico-home"/></svg>Overview</a>
+      <a><svg><use href="#ico-upload"/></svg>Upload</a>
+      <a><svg><use href="#ico-review"/></svg>Review</a>
+      <a><svg><use href="#ico-table"/></svg>Names</a>
+      <a><svg><use href="#ico-atom"/></svg>Models<span class="navdot"></span></a>
+    </nav>
+    <div class="side-bottom">
+      <div class="foot"><b>M. Vardy</b>reviewer &middot; lead</div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <header class="top">
+      <h1>Overview</h1>
+      <span class="sub">Kibbutz Sasa &middot; fire salamander census</span>
+      <span class="bell"><svg><use href="#ico-bell"/></svg><span class="badge">1</span></span>
+    </header>
+
+    <div class="body">
+      <div class="alertband">
+        <span class="aico"><svg><use href="#ico-alert"/></svg></span>
+        <div class="atext"><b>Training complete</b> &mdash; candidate <span class="mono">set_transformer_v4</span> finished its full run in the background and beats production on Novelty AUROC (0.71 vs 0.67).</div>
+        <div class="aactions"><a href="#">Review in Models &rarr;</a><span class="dismiss"><svg><use href="#ico-x"/></svg></span></div>
+      </div>
+
+      <div class="stats">
+        <div class="stat i3">
+          <span class="ico"><svg><use href="#ico-salamander"/></svg></span>
+          <div><div class="k">Individuals</div><div class="vrow"><div class="v">68</div><span class="delta"><svg><use href="#ico-trend"/></svg>+3 this month</span></div></div>
+          <div class="spark"><i style="height:5px;background:var(--green-line)"></i><i style="height:8px;background:var(--green-line)"></i><i style="height:6px;background:var(--green-line)"></i><i style="height:11px;background:var(--green-line)"></i><i style="height:9px;background:var(--green)"></i><i style="height:14px;background:var(--green)"></i><i style="height:16px;background:var(--green)"></i></div>
+        </div>
+        <div class="stat i2">
+          <span class="ico"><svg><use href="#ico-images"/></svg></span>
+          <div><div class="k">Images</div><div class="vrow"><div class="v">1,421</div><span class="delta" style="color:var(--blue)"><svg><use href="#ico-trend"/></svg>+142 this month</span></div></div>
+        </div>
+        <div class="stat i1">
+          <span class="ico"><svg><use href="#ico-users"/></svg></span>
+          <div><div class="k">Contributors</div><div class="vrow"><div class="v">53</div><span class="delta" style="color:var(--amber-ink)"><svg><use href="#ico-trend"/></svg>+2 this month</span></div></div>
+        </div>
+      </div>
+
+      <div class="cols">
+        <section class="panel">
+          <div class="phead"><h3>Recent activity</h3><a href="#">View all &rarr;</a></div>
+          <div class="activity">
+            <div class="arow">
+              <span class="abadge training"><svg><use href="#ico-alert"/></svg></span>
+              <div><div class="aline1">Training complete<span class="apill">set_transformer_v4</span></div><div class="aline2">beats production on Novelty AUROC</div></div>
+              <div class="aright">5 min ago</div>
+            </div>
+            <div class="arow">
+              <span class="abadge sighting"><svg><use href="#ico-salamander"/></svg></span>
+              <div><div class="aline1">New sighting</div><div class="aline2">from Yaakov Mozer</div></div>
+              <div class="aright"><b>1 image</b><br>3 days ago</div>
+            </div>
+            <div class="arow">
+              <span class="abadge approval"><svg><use href="#ico-review"/></svg></span>
+              <div><div class="aline1">Batch reviewed<span class="apill">11 images</span></div><div class="aline2">by Gadi Esh-Am</div></div>
+              <div class="aright">8 days ago</div>
+            </div>
+            <div class="arow">
+              <span class="abadge approval"><svg><use href="#ico-review"/></svg></span>
+              <div><div class="aline1">Batch reviewed<span class="apill">6 images</span></div><div class="aline2">by M. Vardy</div></div>
+              <div class="aright">9 days ago</div>
+            </div>
+          </div>
+        </section>
+
+        <section class="panel">
+          <div class="phead maphead"><div><h3>Sightings map</h3><div class="msub">6 sightings this month &middot; 2 notable patterns</div></div><a href="#">Open full map &rarr;</a></div>
+          <div class="mapwrap">
+            <svg viewBox="0 0 560 378" preserveAspectRatio="xMidYMid slice">
+              <defs>
+                <radialGradient id="glowA" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#b9782a" stop-opacity="0.32"/>
+                  <stop offset="100%" stop-color="#b9782a" stop-opacity="0"/>
+                </radialGradient>
+                <radialGradient id="glowB" cx="50%" cy="50%" r="50%">
+                  <stop offset="0%" stop-color="#3f5f9c" stop-opacity="0.22"/>
+                  <stop offset="100%" stop-color="#3f5f9c" stop-opacity="0"/>
+                </radialGradient>
+                <linearGradient id="skyfade" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="#f4f1e6"/>
+                  <stop offset="100%" stop-color="#e3ebe0"/>
+                </linearGradient>
+              </defs>
+              <rect width="560" height="378" fill="url(#skyfade)"/>
+              <path d="M0 60 C 120 20 300 90 560 40 L560 0 0 0 Z" fill="#dfe8d6" opacity=".8"/>
+              <path d="M0 378 C 160 300 380 360 560 300 L560 378 Z" fill="#d8e3cd" opacity=".7"/>
+              <path d="M0 96 C 130 62 300 118 560 74" stroke="#cddbc4" stroke-width="1.2" fill="none" opacity=".7"/>
+              <path d="M0 330 C 150 300 360 350 560 316" stroke="#c9d8c0" stroke-width="1.2" fill="none" opacity=".6"/>
+              <ellipse cx="220" cy="168" rx="130" ry="95" fill="url(#glowA)"/>
+              <ellipse cx="150" cy="205" rx="100" ry="75" fill="url(#glowB)"/>
+              <path d="M120 90 C 220 60 320 70 360 130 C 400 190 340 250 260 260 C 180 270 100 230 90 170 C 84 135 95 105 120 90 Z" fill="#e7ded0" stroke="#c9a15b" stroke-width="1.6" stroke-dasharray="4 3" opacity=".9"/>
+              <path d="M40 250 C 90 240 120 260 160 250" stroke="#c7d6c0" stroke-width="10" fill="none" opacity=".6"/>
+              <path d="M420 60 C 460 120 470 220 430 300" stroke="#c7d6c0" stroke-width="10" fill="none" opacity=".6"/>
+              <g class="pin" transform="translate(178,150)"><ellipse cx="0" cy="3" rx="4.5" ry="1.6" fill="#00000022"/><circle r="6" fill="var(--accent)" stroke="#fff" stroke-width="1.2" clip-path="polygon(50% 0%,63% 35%,100% 38%,72% 60%,82% 96%,50% 76%,18% 96%,28% 60%,0% 38%,37% 35%)"/></g>
+              <g class="pin" transform="translate(232,128)"><ellipse cx="0" cy="3" rx="4" ry="1.4" fill="#00000022"/><circle r="5" fill="var(--blue)" stroke="#fff" stroke-width="1.2"/></g>
+              <g class="pin" transform="translate(205,190)"><ellipse cx="0" cy="3" rx="4" ry="1.4" fill="#00000022"/><circle r="5" fill="var(--blue)" stroke="#fff" stroke-width="1.2"/></g>
+              <g class="pin" transform="translate(268,205)"><ellipse cx="0" cy="3" rx="4.5" ry="1.6" fill="#00000022"/><circle r="6" fill="var(--accent)" stroke="#fff" stroke-width="1.2" clip-path="polygon(50% 0%,63% 35%,100% 38%,72% 60%,82% 96%,50% 76%,18% 96%,28% 60%,0% 38%,37% 35%)"/></g>
+              <g class="pin" transform="translate(150,205)"><ellipse cx="0" cy="3" rx="4" ry="1.4" fill="#00000022"/><circle r="5" fill="var(--blue)" stroke="#fff" stroke-width="1.2"/></g>
+              <g class="pin" transform="translate(115,168)">
+                <ellipse cx="0" cy="3" rx="4.5" ry="1.6" fill="#00000022"/>
+                <circle class="pulsering" r="6" fill="none" stroke="var(--red)" stroke-width="2"/>
+                <circle r="5.5" fill="var(--red)" stroke="#fff" stroke-width="1.2"/>
+              </g>
+              <text x="184" y="141" font-family="Hanken Grotesk" font-size="9" fill="#7a6a4a" font-weight="600">Sasa</text>
+            </svg>
+            <div class="legend"><span><i class="star"></i>notable pattern</span><span><i class="dot"></i>sighting</span><span><i class="new"></i>new &middot; 3d</span></div>
+            <div class="peek">
+              <div class="pk">Latest sighting</div>
+              <div class="ph"><svg viewBox="0 0 24 24" fill="none" stroke="#f4c15c" stroke-width="1.6"><use href="#ico-salamander"/></svg></div>
+              <div class="pb">
+                <b>SD&#8209;1 &middot; unconfirmed</b>
+                Yaakov Mozer &middot; 3 days ago<br>Sasa, north slope
+                <div class="pgo">Review now<svg><use href="#ico-arrow"/></svg></div>
+              </div>
+            </div>
+          </div>
+        </section>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

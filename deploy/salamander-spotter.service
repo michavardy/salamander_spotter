@@ -1,0 +1,28 @@
+# spec §2.1 — systemd unit for a bare (non-Docker) install.
+#   sudo cp deploy/salamander-spotter.service /etc/systemd/system/
+#   sudo systemctl enable --now salamander-spotter
+
+[Unit]
+Description=Salamander Spotter
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+User=spotter
+Group=spotter
+WorkingDirectory=/opt/salamander_spotter
+Environment=SPOTTER_DATA_DIR=/var/lib/salamander-spotter
+Environment=SPOTTER_HOST=127.0.0.1
+Environment=SPOTTER_PORT=8756
+EnvironmentFile=-/etc/salamander-spotter.env
+ExecStartPre=/opt/salamander_spotter/.venv/bin/python -m app migrate
+ExecStart=/opt/salamander_spotter/.venv/bin/python -m app serve
+Restart=on-failure
+RestartSec=3
+NoNewPrivileges=true
+ProtectSystem=strict
+ReadWritePaths=/var/lib/salamander-spotter
+
+[Install]
+WantedBy=multi-user.target

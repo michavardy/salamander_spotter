@@ -1,0 +1,295 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap">
+  <style>
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:#33302c;background:#faf8f5;-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:#4a72b8;text-decoration:none}a:hover{color:#365a99}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    .screen{width:1600px;height:1040px;display:flex;overflow:hidden;background:#faf8f5}
+
+    .side{width:216px;flex:none;background:#2b2825;color:#cfc9c1;display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 18px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:#f4efe8}
+    .brand .dot{width:22px;height:22px;border-radius:6px;background:#b9782a;display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:6px 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:8.5px 12px;border-radius:8px;color:#a79e93;font-size:13px;font-weight:500}
+    .nav a.on{background:#3a3632;color:#f4efe8}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .side .foot{margin-top:auto;padding:14px 20px 2px;border-top:1px solid #3a3632;font-size:11.5px;color:#8a827a;line-height:1.5}
+    .side .foot b{color:#cfc9c1;font-weight:600;display:block;font-size:12.5px}
+
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .top{height:58px;flex:none;border-bottom:1px solid #e6e1d9;display:flex;align-items:center;gap:14px;padding:0 24px;background:#fff}
+    .top a.back{display:flex;align-items:center;gap:6px;font-size:12.5px;color:#7a736a;font-weight:600}
+    .top a.back svg{width:15px;height:15px}
+    .top h1{font-size:15.5px;border-left:1px solid #e6e1d9;padding-left:14px}
+    .top h1 .mono{color:#8a827a;font-weight:500;font-size:13.5px}
+    .top .ses{margin-left:auto;font-size:12px;color:#8a827a}
+    .top .ses b{color:#4b453d}
+
+    .body{flex:1;display:flex;gap:20px;padding:22px 24px;min-height:0}
+    .colL{flex:1;display:flex;flex-direction:column;gap:18px;min-width:0}
+    .colR{width:520px;flex:none;display:flex;flex-direction:column;gap:18px}
+    .panel{background:#fff;border:1px solid #e9e3d9;border-radius:13px;padding:16px 18px}
+    .panel h2{font-size:13.5px;margin-bottom:3px}
+    .panel .cap{font-size:11.5px;color:#9a9186;margin-bottom:13px}
+
+    .consensus{background:linear-gradient(#eef2f8,#eaf1ec);border:1px solid #dbe3e6;border-radius:13px;padding:15px 18px;display:flex;align-items:center;gap:16px}
+    .consensus .ring{width:46px;height:46px;flex:none;border-radius:50%;background:conic-gradient(#2f7d4f 0 288deg,#dfe6d9 288deg 360deg);display:flex;align-items:center;justify-content:center}
+    .consensus .ring i{width:34px;height:34px;border-radius:50%;background:#fff;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;font-family:"Hanken Grotesk";color:#2f6b46}
+    .consensus h2{font-size:14.5px;color:#2f4a4a}
+    .consensus p{margin:2px 0 0;font-size:12px;color:#5f6f6a}
+    .consensus .pill{margin-left:auto;flex:none;font-size:11px;font-weight:600;color:#3f5f9c;background:#e2eaf6;border:1px solid #cbd8ec;border-radius:20px;padding:6px 12px}
+
+    table{width:100%;border-collapse:collapse}
+    thead th{font-size:10px;text-transform:uppercase;letter-spacing:.05em;color:#a29a8d;font-weight:600;text-align:left;padding:0 10px 8px}
+    thead th.num{text-align:right}
+    tbody td{padding:10px;border-top:1px solid #f0ebe2;font-size:12.5px}
+    tbody td.num{text-align:right;font-variant-numeric:tabular-nums}
+    tbody tr.sel{background:#f3f6fb}
+    tbody tr.sel td:first-child{box-shadow:inset 3px 0 0 #4a72b8}
+    .mname{font-weight:600}
+    .mname .t{display:block;font-size:10px;color:#9a9186;font-weight:500}
+    .vd{font-size:10.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;padding:3px 8px;border-radius:5px}
+    .vd.match{background:#e7f1ea;color:#2f7d4f}
+    .vd.abst{background:#e9eef6;color:#3f5f9c}
+    .vd.new{background:#f6ecdc;color:#8a5a1e}
+    .agrx{color:#c0392b;font-weight:700}
+    .track-mini{display:inline-flex;align-items:center;gap:4px}
+    .track-mini i{width:34px;height:5px;border-radius:3px;background:#ece7df;overflow:hidden;display:inline-block}
+    .track-mini i b{display:block;height:100%;background:#7d9ad0}
+
+    /* calibration */
+    .calib{flex:1;display:flex;flex-direction:column}
+    .calib .split{display:flex;gap:20px;flex:1;min-height:0}
+    .chart{flex:none;width:360px}
+    .chart svg{width:100%;height:auto;display:block}
+    .calib .read{flex:1;display:flex;flex-direction:column;gap:12px;font-size:12px;color:#6b6357;line-height:1.55}
+    .calib .read b{color:#3c3833}
+    .kpis{display:flex;gap:10px}
+    .kpi{flex:1;background:#f8f5ef;border:1px solid #eee7da;border-radius:9px;padding:9px 11px}
+    .kpi .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:#9a9186;font-weight:600}
+    .kpi .v{font-size:17px;font-weight:600;font-family:"Hanken Grotesk";margin-top:2px}
+    .kpi .s{font-size:9.5px;color:#a99f92}
+
+    /* track record cards */
+    .trk{display:flex;flex-direction:column;gap:8px}
+    .trow{border:1px solid #ece5d9;border-radius:10px;padding:10px 12px}
+    .trow.sel{border-color:#b7c8e4;background:#f5f8fc}
+    .trow .h{display:flex;align-items:center;justify-content:space-between}
+    .trow .h .n{font-size:12.5px;font-weight:600}
+    .trow .h .badge{font-size:9.5px;font-weight:700;text-transform:uppercase;letter-spacing:.03em;color:#3f5f9c;background:#e6edf8;border-radius:5px;padding:2px 6px}
+    .trow .mets{display:flex;gap:14px;margin-top:7px}
+    .trow .mets div{font-size:10.5px;color:#9a9186}
+    .trow .mets div b{display:block;font-size:14px;color:#4b453d;font-weight:600;font-family:"Hanken Grotesk";font-variant-numeric:tabular-nums}
+    .trow .mets div.hl b{color:#2f7d4f}
+
+    /* why match */
+    .why{flex:1;display:flex;flex-direction:column}
+    .why .viz{background:#211d19;border-radius:10px;overflow:hidden;margin-bottom:12px}
+    .why .viz svg{display:block;width:100%;height:auto}
+    .why .mrow{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+    .why .mrow .m{background:#f8f5ef;border:1px solid #eee7da;border-radius:9px;padding:9px 11px}
+    .why .mrow .m .k{font-size:9.5px;text-transform:uppercase;letter-spacing:.04em;color:#9a9186;font-weight:600}
+    .why .mrow .m .v{font-size:16px;font-weight:600;font-family:"Hanken Grotesk";margin-top:2px}
+    .why .foot{margin-top:11px;font-size:11.5px;color:#7a736a;line-height:1.5}
+
+    .usebar{margin-top:14px;display:flex;align-items:center;gap:12px;background:#f4f0e6;border:1px solid #e6dfcd;border-radius:10px;padding:11px 14px;font-size:12px;color:#6b6357}
+    .usebar b{color:#4b453d}
+    .usebar button{margin-left:auto;border:1px solid #4a72b8;background:#4a72b8;color:#fff;border-radius:8px;padding:8px 14px;font-size:12px;font-weight:600;cursor:pointer}
+  </style>
+</helmet>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></svg>Overview</a>
+      <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></svg>Upload</a>
+      <a class="on"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></svg>Review &amp; Approval</a>
+      <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><circle cx="12" cy="8" r="3.5"/><path d="M5 20c1-4 4-6 7-6s6 2 7 6"/></svg>Individuals</a>
+      <a><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="m9 4 6 2 6-2v14l-6 2-6-2-6 2V6z"/><path d="M9 4v14M15 6v14"/></svg>Sightings map</a>
+    </nav>
+    <div class="foot"><b>M. Vardy</b>reviewer · lead</div>
+  </aside>
+
+  <div class="work">
+    <header class="top">
+      <a class="back"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="m15 18-6-6 6-6"/></svg>Back to review</a>
+      <h1>Model trust <span class="mono">&middot; sighting sd_1_2</span></h1>
+      <span class="ses">evaluation split: 5-fold by individual &middot; dataset <b>all_sasa_norm</b></span>
+    </header>
+
+    <div class="body">
+      <div class="colL">
+        <div class="consensus">
+          <span class="ring"><i>4 / 5</i></span>
+          <div>
+            <h2>Four of five matchers pick <span class="mono">en_1</span></h2>
+            <p>Median calibrated confidence 0.58 &middot; three call it a match, one abstains, one disagrees (picks <span class="mono">rt_1</span>).</p>
+          </div>
+          <span class="pill">agreement is a trust signal, not a vote</span>
+        </div>
+
+        <div class="panel">
+          <h2>How each matcher scored this sighting</h2>
+          <div class="cap">Same query, same gallery. Each row is one model's own top pick and its calibrated confidence.</div>
+          <table>
+            <thead><tr><th>Matcher</th><th>Top pick</th><th class="num">Similarity</th><th class="num">Confidence</th><th>Verdict</th></tr></thead>
+            <tbody>
+              <tr class="sel">
+                <td class="mname">set_transformer <span class="t">selected &middot; learned aggregator</span></td>
+                <td class="mono">en_1</td>
+                <td class="num mono">0.71</td>
+                <td class="num"><span class="track-mini"><i><b style="width:68%"></b></i> <span class="mono">0.68</span></span></td>
+                <td><span class="vd match">match</span></td>
+              </tr>
+              <tr>
+                <td class="mname">cnn <span class="t">frozen ResNet18</span></td>
+                <td class="mono">en_1</td>
+                <td class="num mono">0.66</td>
+                <td class="num"><span class="track-mini"><i><b style="width:55%"></b></i> <span class="mono">0.55</span></span></td>
+                <td><span class="vd match">match</span></td>
+              </tr>
+              <tr>
+                <td class="mname">classical <span class="t">constellation + RANSAC</span></td>
+                <td class="mono">en_1</td>
+                <td class="num mono">0.63</td>
+                <td class="num"><span class="track-mini"><i><b style="width:58%"></b></i> <span class="mono">0.58</span></span></td>
+                <td><span class="vd match">match</span></td>
+              </tr>
+              <tr>
+                <td class="mname">spotdesc <span class="t">shape descriptors, orient A</span></td>
+                <td class="mono">en_1</td>
+                <td class="num mono">0.60</td>
+                <td class="num"><span class="track-mini"><i><b style="width:49%"></b></i> <span class="mono">0.49</span></span></td>
+                <td><span class="vd abst">abstain</span></td>
+              </tr>
+              <tr>
+                <td class="mname">hungarian <span class="t">per-spot + optimal assignment</span></td>
+                <td class="mono agrx">rt_1</td>
+                <td class="num mono">0.41</td>
+                <td class="num"><span class="track-mini"><i><b style="width:22%"></b></i> <span class="mono">0.22</span></span></td>
+                <td><span class="vd new">new</span></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+
+        <div class="panel calib">
+          <h2>Is this confidence earned?</h2>
+          <div class="cap">set_transformer, held-out sightings, 5-fold CV &middot; risk&ndash;coverage on the match / new decision.</div>
+          <div class="split">
+            <div class="chart">
+              <svg viewBox="0 0 320 220">
+                <line x1="44" y1="14" x2="44" y2="184" stroke="#d9d2c6"/>
+                <line x1="44" y1="184" x2="308" y2="184" stroke="#d9d2c6"/>
+                <g stroke="#efeae0"><line x1="44" y1="142" x2="308" y2="142"/><line x1="44" y1="100" x2="308" y2="100"/><line x1="44" y1="58" x2="308" y2="58"/></g>
+                <text x="8" y="188" font-size="9" fill="#9a9186">.5</text>
+                <text x="8" y="103" font-size="9" fill="#9a9186">.75</text>
+                <text x="8" y="18" font-size="9" fill="#9a9186">1.0</text>
+                <text x="150" y="206" font-size="9" fill="#9a9186">coverage &rarr;</text>
+                <text x="2" y="106" font-size="9" fill="#9a9186" transform="rotate(-90 12 100)">precision</text>
+                <path d="M56 46 C 110 54 150 66 190 84 C 228 102 262 128 296 172" fill="none" stroke="#4a72b8" stroke-width="2.2"/>
+                <circle cx="204" cy="90" r="4.5" fill="#fff" stroke="#4a72b8" stroke-width="2.5"/>
+                <line x1="204" y1="90" x2="204" y2="184" stroke="#4a72b8" stroke-dasharray="3 3" opacity="0.5"/>
+                <text x="150" y="80" font-size="9" fill="#4a72b8" font-weight="700">current threshold 0.55</text>
+                <text x="150" y="92" font-size="8.5" fill="#7d7264">71% coverage &middot; 88% precision</text>
+              </svg>
+            </div>
+            <div class="read">
+              <div>At confidence <b>0.68</b>, set_transformer has been right on <b>82%</b> of held&#8209;out sightings in this band (n&nbsp;=&nbsp;140). This one is <b>above</b> that band.</div>
+              <div class="kpis">
+                <div class="kpi"><div class="k">Open-set AUROC</div><div class="v">0.59</div><div class="s">novel vs known</div></div>
+                <div class="kpi"><div class="k">Verify AUC</div><div class="v">0.59</div><div class="s">same vs diff pair</div></div>
+                <div class="kpi"><div class="k">Rank-1</div><div class="v">0.13</div><div class="s">exact photo</div></div>
+              </div>
+              <div>Read this as <b>decision support, not proof</b>. The dataset is small (87 multi&#8209;photo individuals) and the curve is not yet steep &mdash; a confident score still misses roughly 1 in 8.</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="colR">
+        <div class="panel">
+          <h2>Matcher track record</h2>
+          <div class="cap">5-fold by-individual CV on <span class="mono">all_sasa_norm</span>. The product metric is <b>open-set AUROC</b> &mdash; can it tell a new animal from an enrolled one.</div>
+          <div class="trk">
+            <div class="trow sel">
+              <div class="h"><span class="n">set_transformer</span><span class="badge">in use</span></div>
+              <div class="mets"><div>rank-1<b>0.13</b></div><div>verify AUC<b>0.59</b></div><div class="hl">open-set<b>0.59</b></div></div>
+            </div>
+            <div class="trow">
+              <div class="h"><span class="n">cnn &middot; frozen ResNet18</span></div>
+              <div class="mets"><div>rank-1<b>0.25</b></div><div>verify AUC<b>0.58</b></div><div>open-set<b>0.52</b></div></div>
+            </div>
+            <div class="trow">
+              <div class="h"><span class="n">classical &middot; constellation</span></div>
+              <div class="mets"><div>rank-1<b>0.21</b></div><div>verify AUC<b>0.57</b></div><div>open-set<b>0.55</b></div></div>
+            </div>
+            <div class="trow">
+              <div class="h"><span class="n">hungarian</span></div>
+              <div class="mets"><div>rank-1<b>0.19</b></div><div>verify AUC<b>0.58</b></div><div>open-set<b>0.51</b></div></div>
+            </div>
+            <div class="trow">
+              <div class="h"><span class="n">spotdesc &middot; orient A</span></div>
+              <div class="mets"><div>rank-1<b>0.19</b></div><div>verify AUC<b>0.55</b></div><div>open-set<b>0.54</b></div></div>
+            </div>
+          </div>
+          <div class="usebar">
+            <div><b>set_transformer</b> leads open-set / verification; <b>cnn</b> is the retrieval bar to beat.</div>
+            <button>Use cnn this session</button>
+          </div>
+        </div>
+
+        <div class="panel why">
+          <h2>Why <span class="mono">en_1</span> &mdash; spot correspondence</h2>
+          <div class="cap">set_transformer per-spot embeddings, RANSAC-verified similarity transform.</div>
+          <div class="viz">
+            <svg viewBox="0 0 480 210" preserveAspectRatio="xMidYMid meet">
+              <rect width="480" height="210" fill="#211d19"/>
+              <text x="66" y="15" fill="#e9e2d3" font-size="9" opacity="0.6" font-family="'IBM Plex Mono',monospace">sd_1_2</text>
+              <text x="352" y="15" fill="#e9e2d3" font-size="9" opacity="0.6" font-family="'IBM Plex Mono',monospace">en_1_3</text>
+              <g transform="translate(40,22) scale(0.6)">
+                <path d="M60 6 C 44 26 40 66 46 100 C 51 132 34 168 40 200 C 44 220 55 232 64 234 C 76 232 84 216 81 198 C 76 168 90 134 85 100 C 80 68 79 28 64 8 Z" fill="#17140f" stroke="#ded7c9" stroke-width="1.5"/>
+                <g fill="#d99a3f" fill-opacity="0.7" stroke="#e8b866"><ellipse cx="57" cy="30" rx="6" ry="4"/><ellipse cx="70" cy="46" rx="4" ry="3"/><ellipse cx="54" cy="60" rx="5" ry="5"/><ellipse cx="68" cy="74" rx="6" ry="4"/><ellipse cx="57" cy="92" rx="4" ry="4"/><ellipse cx="70" cy="108" rx="5" ry="3"/><ellipse cx="55" cy="124" rx="6" ry="5"/><ellipse cx="66" cy="142" rx="4" ry="4"/><ellipse cx="62" cy="176" rx="5" ry="4"/><ellipse cx="64" cy="204" rx="3" ry="3"/></g>
+                <circle cx="62" cy="9" r="4" fill="#46b45f"/><circle cx="63" cy="232" r="4" fill="#cf4b3d"/>
+              </g>
+              <g transform="translate(330,22) scale(0.6)">
+                <path d="M60 6 C 44 26 40 66 46 100 C 51 132 34 168 40 200 C 44 220 55 232 64 234 C 76 232 84 216 81 198 C 76 168 90 134 85 100 C 80 68 79 28 64 8 Z" fill="#17140f" stroke="#ded7c9" stroke-width="1.5"/>
+                <g fill="#d99a3f" fill-opacity="0.7" stroke="#e8b866"><ellipse cx="57" cy="32" rx="6" ry="4"/><ellipse cx="71" cy="48" rx="4" ry="3"/><ellipse cx="53" cy="62" rx="5" ry="5"/><ellipse cx="69" cy="76" rx="6" ry="4"/><ellipse cx="58" cy="95" rx="4" ry="4"/><ellipse cx="55" cy="126" rx="6" ry="5"/><ellipse cx="63" cy="180" rx="5" ry="4"/><ellipse cx="65" cy="206" rx="3" ry="3"/></g>
+                <circle cx="62" cy="9" r="4" fill="#46b45f"/><circle cx="63" cy="232" r="4" fill="#cf4b3d"/>
+              </g>
+              <g stroke="#4a86d8" stroke-width="1.3" fill="none" opacity="0.9">
+                <path d="M78 40 C 180 36 250 40 335 42"/>
+                <path d="M70 58 C 180 62 250 62 350 68"/>
+                <path d="M84 76 C 180 84 255 84 335 84"/>
+                <path d="M76 100 C 180 110 250 110 337 100"/>
+                <path d="M75 130 C 180 138 250 138 333 134"/>
+                <path d="M78 168 C 180 176 250 176 340 180"/>
+              </g>
+              <circle cx="82" cy="140" r="6" fill="none" stroke="#c98a2e" stroke-width="1.4" stroke-dasharray="2 2"/>
+            </svg>
+          </div>
+          <div class="mrow">
+            <div class="m"><div class="k">Spots matched</div><div class="v">9 / 21</div></div>
+            <div class="m"><div class="k">RANSAC inliers</div><div class="v">7</div></div>
+            <div class="m"><div class="k">Geom. consistency</div><div class="v">0.74</div></div>
+          </div>
+          <div class="foot">The head&#8209;triplet and the mid&#8209;body fork spot corr­espond within 3&nbsp;px after alignment. Coverage of 43% is normal &mdash; about a fifth of a salamander's spots appear or vanish between sightings.</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>

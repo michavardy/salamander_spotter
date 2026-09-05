@@ -1,0 +1,214 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Hanken+Grotesk:wght@500;600;700&amp;family=IBM+Plex+Mono:wght@400;500&amp;display=swap">
+  <style>
+    *{box-sizing:border-box}
+    :root{
+      --bg:#faf8f5; --ink:#33302c; --ink-soft:#5b544c;
+      --muted:#9a9186; --muted2:#8a827a; --muted3:#7a736a;
+      --line:#e9e3d9; --line-soft:#e6e1d9; --line-faint:#f0ebe2;
+      --panel:#fff;
+      --side:#2b2825; --side-active:#3a3632; --side-text:#a79e93; --side-text-on:#f4efe8;
+      --accent:#b9782a; --accent-soft:#faf1e4; --accent-line:#e6d3ad;
+      --green:#2f7d4f; --green-soft:#eaf3ee;
+      --amber-ink:#8a5a1e; --amber-line:#cda86f; --amber-soft:#faf1e0;
+      --blue:#3f5f9c; --blue-line:#9db1d4; --blue-link:#4a72b8; --blue-link-h:#365a99; --blue-soft:#eef2f8;
+      --red:#a5443b; --red-line:#d9a8a3; --red-soft:#f8ece9;
+      --chip:#f1ece3;
+    }
+    body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;color:var(--ink);background:var(--bg);-webkit-font-smoothing:antialiased}
+    h1,h2,h3,h4{font-family:"Hanken Grotesk","Segoe UI",system-ui,sans-serif;margin:0;font-weight:600;letter-spacing:-.012em}
+    a{color:var(--blue-link);text-decoration:none}a:hover{color:var(--blue-link-h)}
+    .mono{font-family:"IBM Plex Mono",ui-monospace,"SF Mono",Menlo,monospace}
+    svg{display:block}
+
+    .screen{width:1440px;height:960px;display:flex;overflow:hidden;background:var(--bg)}
+    .side{width:220px;flex:none;background:var(--side);color:var(--side-text);display:flex;flex-direction:column;padding:20px 0}
+    .brand{display:flex;align-items:center;gap:9px;padding:2px 20px 20px;font-family:"Hanken Grotesk",system-ui;font-weight:700;font-size:14.5px;color:var(--side-text-on)}
+    .brand .dot{width:24px;height:24px;border-radius:7px;background:var(--accent);display:flex;align-items:center;justify-content:center;flex:none}
+    .nav{display:flex;flex-direction:column;gap:2px;padding:0 12px}
+    .nav a{display:flex;align-items:center;gap:11px;padding:9px 12px;border-radius:8px;color:var(--side-text);font-size:13px;font-weight:500;cursor:pointer;transition:background .12s ease,color .12s ease}
+    .nav a:hover{background:#332f2b;color:#e4ded4}
+    .nav a.on{background:var(--side-active);color:var(--side-text-on)}
+    .nav a.on svg{color:var(--accent)}
+    .nav a svg{width:17px;height:17px;flex:none;stroke-width:1.7}
+    .side-bottom{margin-top:auto;padding:0 12px}
+    .side .foot{padding:14px 20px 2px;border-top:1px solid var(--side-active);font-size:11.5px;color:var(--muted2);line-height:1.5;margin-top:10px}
+    .side .foot b{color:var(--side-text);font-weight:600;display:block;font-size:12.5px}
+
+    .work{flex:1;display:flex;flex-direction:column;min-width:0}
+    .urlbar{height:32px;flex:none;background:#efeae0;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:9px;padding:0 14px}
+    .urlbar .dots{display:flex;gap:5px}
+    .urlbar .dots i{width:7px;height:7px;border-radius:50%;background:#d8d1c2}
+    .urlbar .pill{flex:none;background:#fff;border:1px solid var(--line);border-radius:20px;padding:4px 12px;display:flex;align-items:center;gap:6px;font-size:10.5px;color:var(--muted2);font-family:"IBM Plex Mono"}
+    .urlbar .pill svg{width:10px;height:10px;stroke-width:2.2;color:var(--green);flex:none}
+    .urlbar .pill .cur{color:var(--ink);font-weight:600}
+    .top{height:60px;flex:none;border-bottom:1px solid var(--line-soft);display:flex;align-items:center;gap:16px;padding:0 28px;background:#fff}
+    .top h1{font-size:17px}
+    .top .sub{font-size:12.5px;color:var(--muted2)}
+    .body{flex:1;overflow:auto;padding:22px 28px 32px}
+
+    .toolbar{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+    .search{flex:1;max-width:340px;display:flex;align-items:center;gap:8px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:9px 12px;color:var(--muted2);transition:border-color .12s ease,box-shadow .12s ease}
+    .search:hover{border-color:var(--accent-line)}
+    .search svg{width:16px;height:16px;stroke-width:1.8;flex:none}
+    .search span{font-size:12.5px}
+    .toolbar .fchip{font-size:12px;padding:7px 13px;border-radius:20px;border:1px solid var(--line);color:var(--muted3);background:#fff;cursor:pointer;font-weight:500}
+    .toolbar .fchip.on{background:var(--ink);border-color:var(--ink);color:#fff}
+    .exports{margin-left:auto;display:flex;gap:8px}
+    .xbtn{display:flex;align-items:center;gap:7px;font-size:12.5px;font-weight:600;color:var(--ink-soft);background:#fff;border:1px solid var(--line);border-radius:9px;padding:8px 13px;cursor:pointer;transition:border-color .12s ease,box-shadow .12s ease}
+    .xbtn:hover{border-color:var(--accent-line);box-shadow:0 4px 14px -8px rgba(51,48,44,.3)}
+    .xbtn svg{width:15px;height:15px;stroke-width:1.8}
+
+    table{width:100%;border-collapse:collapse;background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden}
+    thead th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.05em;color:var(--muted);font-weight:600;padding:12px 16px;border-bottom:1px solid var(--line);background:#fbf9f5}
+    tbody td{padding:10px 16px;font-size:13px;border-bottom:1px solid var(--line-faint);color:var(--ink-soft);vertical-align:middle}
+    tbody tr{cursor:pointer;transition:background .12s ease}
+    tbody tr:hover{background:#fbf7ee}
+    tbody tr:hover .go{opacity:1;transform:translateX(0)}
+    tbody tr:last-child td{border-bottom:none}
+    .avatar{width:30px;height:42px;border-radius:6px;background:#211d19;overflow:hidden}
+    .avatar svg{width:100%;height:100%}
+    .idcell{display:flex;align-items:center;gap:11px}
+    .idcell b{font-weight:700;color:var(--ink);font-family:"IBM Plex Mono";font-size:12.5px}
+    .site{display:inline-flex;align-items:center;gap:5px;font-size:12px;color:var(--muted2)}
+    .site svg{width:12px;height:12px;stroke-width:2}
+    .count{font-family:"IBM Plex Mono";font-weight:600;color:var(--ink)}
+    .go{opacity:0;transform:translateX(-4px);transition:all .14s ease;color:var(--muted2)}
+    .go svg{width:16px;height:16px;stroke-width:2}
+    .pager{display:flex;align-items:center;justify-content:space-between;margin-top:14px;font-size:12px;color:var(--muted2)}
+  </style>
+</helmet>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="ico-home" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 10.5 12 3l9 7.5"/><path d="M5 9.5V21h14V9.5"/></symbol>
+  <symbol id="ico-upload" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 15V4"/><path d="m7 9 5-5 5 5"/><path d="M4 20h16"/></symbol>
+  <symbol id="ico-review" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 11 3 3 7-7"/><path d="M20 12v7H4V5h11"/></symbol>
+  <symbol id="ico-table" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="16" rx="2.2"/><path d="M3 10h18M9 4v16"/></symbol>
+  <symbol id="ico-atom" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="2.3"/><circle cx="5" cy="6" r="1.5"/><circle cx="19" cy="6" r="1.5"/><circle cx="5" cy="18" r="1.5"/><circle cx="19" cy="18" r="1.5"/><path d="M9.9 10.4 6.3 7.1M14.1 10.4l3.6-3.3M9.9 13.6l-3.6 3.3M14.1 13.6l3.6 3.3"/></symbol>
+  <symbol id="ico-sliders" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><line x1="4" y1="6" x2="20" y2="6"/><circle cx="9" cy="6" r="2"/><line x1="4" y1="12" x2="20" y2="12"/><circle cx="15" cy="12" r="2"/><line x1="4" y1="18" x2="20" y2="18"/><circle cx="8" cy="18" r="2"/></symbol>
+  <symbol id="ico-search" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><circle cx="11" cy="11" r="7"/><path d="m21 21-4.3-4.3"/></symbol>
+  <symbol id="ico-pin" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s7-7.6 7-12a7 7 0 0 0-14 0c0 4.4 7 12 7 12Z"/><circle cx="12" cy="10" r="2.3"/></symbol>
+  <symbol id="ico-arrow" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="m9 6 6 6-6 6"/></symbol>
+  <symbol id="ico-download" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12"/><path d="m7 10 5 5 5-5"/><path d="M4 21h16"/></symbol>
+  <symbol id="ico-lock" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M6 10V7a6 6 0 0 1 12 0v3"/><rect x="4" y="10" width="16" height="10" rx="2"/></symbol>
+  <symbol id="fig-sal" viewBox="0 0 90 140">
+    <rect width="90" height="140" fill="#211d19"/>
+    <path d="M45 8 C 36 22 34 46 38 64 C 41 84 30 106 34 124 C 36 133 42 139 46 140 C 53 138 58 128 56 118 C 53 100 61 84 58 64 C 55 46 55 22 46 9 Z" fill="#17140f"/>
+    <path d="M45 8 C 36 22 34 46 38 64 C 41 84 30 106 34 124 C 36 133 42 139 46 140 C 53 138 58 128 56 118 C 53 100 61 84 58 64 C 55 46 55 22 46 9 Z" fill="#b6a996" opacity=".15"/>
+    <g fill="#d99a3f" fill-opacity=".62" stroke="#e8b866" stroke-width=".6">
+      <ellipse cx="42" cy="20" rx="3.6" ry="2.6"/><ellipse cx="51" cy="27" rx="2.6" ry="2"/>
+      <ellipse cx="40" cy="34" rx="3" ry="3"/><ellipse cx="50" cy="42" rx="4" ry="2.6"/>
+      <ellipse cx="42" cy="51" rx="2.6" ry="2.6"/><ellipse cx="51" cy="59" rx="3" ry="2"/>
+      <ellipse cx="41" cy="67" rx="3.6" ry="3"/><ellipse cx="48" cy="76" rx="2.6" ry="2.6"/>
+      <ellipse cx="39" cy="85" rx="3" ry="2"/><ellipse cx="46" cy="94" rx="3.6" ry="2.6"/>
+    </g>
+  </symbol>
+</svg>
+
+<div class="screen">
+  <aside class="side">
+    <div class="brand"><span class="dot"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2"><path d="M4 14c2-1 3-3 3-5s2-4 5-4 5 2 5 4-1 4 1 6-3 3-6 3-3-2-5-2-2 1-3 0"/></svg></span>Salamander Spotter</div>
+    <nav class="nav">
+      <a><svg><use href="#ico-home"/></svg>Overview</a>
+      <a><svg><use href="#ico-upload"/></svg>Upload</a>
+      <a><svg><use href="#ico-review"/></svg>Review</a>
+      <a class="on"><svg><use href="#ico-table"/></svg>Names</a>
+      <a><svg><use href="#ico-atom"/></svg>Models</a>
+    </nav>
+    <div class="side-bottom">
+      <div class="foot"><b>M. Vardy</b>reviewer &middot; lead</div>
+    </div>
+  </aside>
+
+  <div class="work">
+    <div class="urlbar"><span class="dots"><i></i><i></i><i></i></span><span class="pill"><svg><use href="#ico-lock"/></svg>spottersapp.com/<span class="cur">names</span></span></div>
+    <header class="top">
+      <h1>Names</h1>
+      <span class="sub">68 individuals enrolled</span>
+    </header>
+
+    <div class="body">
+      <div class="toolbar">
+        <div class="search"><svg><use href="#ico-search"/></svg><span>Search by ID, name or site&hellip;</span></div>
+        <span class="fchip on">All sites</span>
+        <span class="fchip">Sasa</span>
+        <span class="fchip">Baram</span>
+        <div class="exports">
+          <button class="xbtn"><svg><use href="#ico-download"/></svg>CSV</button>
+          <button class="xbtn"><svg><use href="#ico-download"/></svg>Excel</button>
+        </div>
+      </div>
+
+      <table>
+        <thead><tr>
+          <th style="width:230px">Individual</th>
+          <th>Site</th>
+          <th>Sightings</th>
+          <th>First seen</th>
+          <th>Last seen</th>
+          <th>Contributors</th>
+          <th style="width:24px"></th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><div class="idcell"><span class="avatar"><svg><use href="#fig-sal"/></svg></span><div><b>AC-3</b><br><span style="font-size:11.5px;color:var(--muted2)">&ldquo;Notch&rdquo;</span></div></div></td>
+            <td><span class="site"><svg><use href="#ico-pin"/></svg>Sasa &middot; north slope</span></td>
+            <td><span class="count">4</span></td>
+            <td class="mono" style="font-size:12px">03 Apr 2024</td>
+            <td class="mono" style="font-size:12px">26 Aug 2026</td>
+            <td>G. Esh&#8209;Am, Y. Mozer</td>
+            <td class="go"><svg><use href="#ico-arrow"/></svg></td>
+          </tr>
+          <tr>
+            <td><div class="idcell"><span class="avatar"><svg><use href="#fig-sal"/></svg></span><div><b>EN-1</b><br><span style="font-size:11.5px;color:var(--muted2)">&mdash;</span></div></div></td>
+            <td><span class="site"><svg><use href="#ico-pin"/></svg>Sasa &middot; Uri garden</span></td>
+            <td><span class="count">7</span></td>
+            <td class="mono" style="font-size:12px">14 Jan 2024</td>
+            <td class="mono" style="font-size:12px">21 Aug 2026</td>
+            <td>G. Esh&#8209;Am</td>
+            <td class="go"><svg><use href="#ico-arrow"/></svg></td>
+          </tr>
+          <tr>
+            <td><div class="idcell"><span class="avatar"><svg><use href="#fig-sal"/></svg></span><div><b>RT-1</b><br><span style="font-size:11.5px;color:var(--muted2)">&mdash;</span></div></div></td>
+            <td><span class="site"><svg><use href="#ico-pin"/></svg>Sasa &middot; Nof Harim school</span></td>
+            <td><span class="count">2</span></td>
+            <td class="mono" style="font-size:12px">02 Jun 2025</td>
+            <td class="mono" style="font-size:12px">09 Jul 2026</td>
+            <td>Y. Mozer</td>
+            <td class="go"><svg><use href="#ico-arrow"/></svg></td>
+          </tr>
+          <tr>
+            <td><div class="idcell"><span class="avatar"><svg><use href="#fig-sal"/></svg></span><div><b>CA-47</b><br><span style="font-size:11.5px;color:var(--muted2)">&mdash;</span></div></div></td>
+            <td><span class="site"><svg><use href="#ico-pin"/></svg>Sasa &middot; Buza spring</span></td>
+            <td><span class="count">3</span></td>
+            <td class="mono" style="font-size:12px">28 Sep 2023</td>
+            <td class="mono" style="font-size:12px">02 May 2026</td>
+            <td>G. Esh&#8209;Am</td>
+            <td class="go"><svg><use href="#ico-arrow"/></svg></td>
+          </tr>
+          <tr>
+            <td><div class="idcell"><span class="avatar"><svg><use href="#fig-sal"/></svg></span><div><b>SD-1</b><br><span style="font-size:11.5px;color:var(--muted2)">new</span></div></div></td>
+            <td><span class="site"><svg><use href="#ico-pin"/></svg>Sasa &middot; north slope</span></td>
+            <td><span class="count">1</span></td>
+            <td class="mono" style="font-size:12px">26 Aug 2026</td>
+            <td class="mono" style="font-size:12px">26 Aug 2026</td>
+            <td>G. Esh&#8209;Am</td>
+            <td class="go"><svg><use href="#ico-arrow"/></svg></td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="pager"><span>Showing 5 of 68</span><span>Click a row to open its individual&#8209;image&#8209;set &rarr;</span></div>
+    </div>
+  </div>
+</div>
+</x-dc>
+</body>
+</html>
