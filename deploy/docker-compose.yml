@@ -7,7 +7,7 @@ services:
     build:
       context: ..
       dockerfile: deploy/Dockerfile
-    image: ghcr.io/OWNER/salamander-spotter:latest
+    image: ghcr.io/michavardy/salamander-spotter:latest
     restart: unless-stopped
     env_file: .env
     volumes:
@@ -33,7 +33,7 @@ services:
       - caddy-config:/config
 
   backup:
-    image: ghcr.io/OWNER/salamander-spotter:latest
+    image: ghcr.io/michavardy/salamander-spotter:latest
     restart: unless-stopped
     env_file: .env
     entrypoint: ["/bin/sh", "-c"]
