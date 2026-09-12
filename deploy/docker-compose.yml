@@ -1,6 +1,11 @@
 # Spec §2.1 — app + Caddy (auto-HTTPS) + nightly backup sidecar.
 # `docker compose up -d`.  Behind a Cloudflare/Tailscale tunnel, drop the caddy
 # service and point the tunnel at app:8756.
+#
+# /data is bind-mounted from a separate block-storage volume (mounted on the
+# host at /mnt/spotter-data), not the boot disk — the dataset (photos, model
+# checkpoints, embeddings) grows well past what a typical droplet's boot disk
+# has room for.
 
 services:
   app:
@@ -11,7 +16,7 @@ services:
     restart: unless-stopped
     env_file: .env
     volumes:
-      - spotter-data:/data
+      - /mnt/spotter-data:/data
     expose:
       - "8756"
     healthcheck:
@@ -43,10 +48,9 @@ services:
          sleep 86400;
        done"
     volumes:
-      - spotter-data:/data:ro
+      - /mnt/spotter-data:/data:ro
       - ${SPOTTER_BACKUP_DIR:-./backups}:/backups
 
 volumes:
-  spotter-data:
   caddy-data:
   caddy-config:
