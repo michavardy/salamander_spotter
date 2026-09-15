@@ -39,13 +39,33 @@ from runpod_runner.batch import run_batch                            # noqa: E40
 from runpod_runner.volumes import delete_volume, find_volume         # noqa: E402
 from runpod_runner.web_server import WebServer                       # noqa: E402
 
-DATASET = "all_sasa_norm_2026_23_07"
+DATASET = "all_sasa_norm_2026_23_07"          # default; override with --dataset after re-packaging
+                                               # (e.g. after `pixi run emb-gen-augment` + fold + package)
 IMAGE = "runpod/pytorch:2.4.0-py3.11-cuda12.4.1-devel-ubuntu22.04"
-# small, cheap cards first — the sweep model is tiny; create_pod cycles this list on capacity.
-GPU = "NVIDIA RTX 2000 Ada Generation"
+# cheap cards first, all <= ~$0.22/hr on COMMUNITY cloud (checked via runpod.get_gpu) — the sweep
+# model is tiny, so a small card is plenty. create_pod cycles this list on capacity per pod.
+# NOTE: the runner defaults to SECURE cloud (pricier — e.g. RTX 4090 is $0.34/hr community but
+# $0.74/hr secure); pass --cloud-type COMMUNITY (the default here) to actually get these prices.
+GPU = "NVIDIA RTX A2000"
 GPU_FALLBACKS = [
-    "NVIDIA RTX A4000", "NVIDIA RTX 4000 Ada Generation", "NVIDIA RTX A5000",
-    "NVIDIA A40", "NVIDIA L40S", "NVIDIA GeForce RTX 4090",
+    "NVIDIA GeForce RTX 3070", "NVIDIA RTX A5000", "NVIDIA GeForce RTX 3080",
+    "NVIDIA RTX A4000", "NVIDIA GeForce RTX 3080 Ti", "NVIDIA RTX 4000 SFF Ada Generation",
+    "NVIDIA RTX A4500", "NVIDIA GeForce RTX 4070 Ti", "Tesla V100-PCIE-16GB",
+    "NVIDIA RTX 4000 Ada Generation", "NVIDIA GeForce RTX 3090",
+    # last resort — pricier ($0.34/hr community) but the only type with confirmed EU-RO-1 capacity
+    # when the cheap tiers are all exhausted.
+    "NVIDIA GeForce RTX 4090",
+]
+# SECURE-cloud cascade, ~$0.75/hr ceiling — COMMUNITY was confirmed 13/13 empty in EU-RO-1;
+# SECURE had confirmed (if flaky) capacity for RTX 4090. Ordered by secure price, ascending.
+GPU_075 = "NVIDIA RTX 4000 Ada Generation"           # $0.28/hr secure — untested under SECURE
+GPU_075_FALLBACKS = [
+    "NVIDIA A40",                    # $0.49/hr secure
+    "NVIDIA L4",                     # $0.49/hr secure
+    "NVIDIA RTX A6000",              # $0.53/hr secure
+    "NVIDIA GeForce RTX 4090",       # $0.74/hr secure — confirmed capacity twice already
+    "NVIDIA L40",                    # $0.82/hr secure
+    "NVIDIA RTX 6000 Ada Generation",  # $0.84/hr secure
 ]
 
 # one pod per entry. Each re-runs `baseline` (5 fold-trains, cheap) as a self-check and to
@@ -57,6 +77,7 @@ STUDY_PODS: list[tuple[str, dict[str, str]]] = [
     ("gate",     {"STUDY": "baseline,gate"}),
     ("hardneg",  {"STUDY": "baseline,hardneg"}),
     ("general",  {"STUDY": "baseline,general"}),
+    ("boost",    {"STUDY": "baseline,boost"}),
 ]
 
 REMOTE_OUT = "/workspace/job/bundle/artifacts/spot_transformer/sweeps/e2e_explore"
@@ -64,9 +85,10 @@ LOCAL_OUT = REPO / "artifacts" / "spot_transformer" / "sweeps" / "e2e_explore"
 
 
 def build_specs(args, experiment: str) -> list[RunSpec]:
+    dataset = args.dataset
     uploads = [
-        (REPO / "datasets" / DATASET / "corrections.json",
-         f"/workspace/job/bundle/datasets/{DATASET}/corrections.json"),
+        (REPO / "datasets" / dataset / "corrections.json",
+         f"/workspace/job/bundle/datasets/{dataset}/corrections.json"),
         (REPO / "images" / "all_sasa_norm" / "label_map.csv",
          "/workspace/job/bundle/images/all_sasa_norm/label_map.csv"),
     ]
@@ -85,10 +107,16 @@ def build_specs(args, experiment: str) -> list[RunSpec]:
     )
     base_env = {
         "MIN_QUALITY": "0.4", "SOURCE": "sasa", "DEVICE": "cuda",
-        "K_FOLDS": str(args.k_folds),
+        "K_FOLDS": str(args.k_folds), "DATASET_NAME": dataset,
     }
     if args.epoch_scale != 1.0:
         base_env["EPOCH_SCALE"] = str(args.epoch_scale)
+    # forward a re-launch's skip-list to the pod — set locally (SKIP_CONFIGS="name1,name2") to
+    # resume after an interrupted run without re-training already-confirmed configs. Not a
+    # RunSpec/CLI arg because it's meant to be thrown away per-relaunch, not remembered.
+    import os as _os
+    if _os.environ.get("SKIP_CONFIGS"):
+        base_env["SKIP_CONFIGS"] = _os.environ["SKIP_CONFIGS"]
 
     want = set(args.studies.split(",")) if args.studies else None
     specs = []
@@ -108,6 +136,12 @@ def build_specs(args, experiment: str) -> list[RunSpec]:
 def main() -> None:
     ap = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     ap.add_argument("--volume", default="salamander-spotter", help="network volume id or name")
+    ap.add_argument("--dataset", default=DATASET,
+                    help="packaged dataset snapshot to train on (default: %(default)s). After "
+                         "`pixi run package-dataset --input all_sasa_norm --name <new>`, pass "
+                         "--dataset <new> here AND `volume put` the new contours.db onto --volume "
+                         "first — this only tells the pod which corrections.json/DATASET_NAME to "
+                         "use, it does not upload the DB itself")
     ap.add_argument("--max-concurrency", type=int, default=3)
     ap.add_argument("--studies", default="", help="comma list of study-pod tags (default: all)")
     ap.add_argument("--k-folds", type=int, default=5)
@@ -120,8 +154,21 @@ def main() -> None:
     ap.add_argument("--no-web-ui", dest="web_ui", action="store_false",
                     help="disable the live dashboard (default: on)")
     ap.add_argument("--web-ui-port", type=int, default=None)
+    ap.add_argument("--cloud-type", default="COMMUNITY", choices=["COMMUNITY", "SECURE"],
+                    help="COMMUNITY is cheaper (e.g. RTX 4090 $0.34/hr vs $0.74/hr SECURE) "
+                         "but less reliable; the runner's own default is SECURE")
+    ap.add_argument("--gpu-tier", default="cheap", choices=["cheap", "0.75"],
+                    help="'cheap' <=$0.22/hr community cascade (default); '0.75' <=$0.85/hr "
+                         "secure cascade (RTX 4000 Ada / A40 / L4 / A6000 / 4090 / L40 / 6000 Ada)")
     ap.add_argument("--dry-run", action="store_true")
     args = ap.parse_args()
+
+    import os
+    os.environ["RUNPOD_CLOUD_TYPE"] = args.cloud_type          # load_config() reads this env var
+
+    global GPU, GPU_FALLBACKS
+    if args.gpu_tier == "0.75":
+        GPU, GPU_FALLBACKS = GPU_075, GPU_075_FALLBACKS
 
     runpod_env = _RUNPOD_SRC.parent / ".env"
     cfg = load_config(
@@ -138,8 +185,12 @@ def main() -> None:
     specs = build_specs(args, args.experiment)
 
     print(f"experiment  {args.experiment}")
+    print(f"dataset     {args.dataset}"
+          + ("  (default — pass --dataset to use a re-packaged snapshot)"
+             if args.dataset == DATASET else ""))
     print(f"volume      {vol['id']} ({vol['name']}, {vol['size']}GB in {vol['dataCenterId']})")
     print(f"image       {IMAGE}")
+    print(f"cloud       {args.cloud_type}")
     print(f"gpu         {GPU}  (fallbacks: {', '.join(GPU_FALLBACKS)})")
     print(f"pods        {len(specs)}  ·  max-concurrency {args.max_concurrency}")
     for s in specs:

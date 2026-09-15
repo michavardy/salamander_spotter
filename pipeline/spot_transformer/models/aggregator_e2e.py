@@ -149,11 +149,11 @@ class E2EVoter(nn.Module):
     """Encoder + differentiable voting, trained jointly on the pairwise same/different label."""
 
     def __init__(self, in_dim=62, out_dim=64, arch="mlp", depth=3, dropout=0.1,
-                 n_heads=4, tau=0.05, hidden=32, residual=True):
+                 n_heads=4, tau=0.05, sharp=20.0, hidden=32, residual=True):
         super().__init__()
         self.encoder = SpotEncoder(in_dim, out_dim, arch, depth, dropout, n_heads,
                                    residual=residual)
-        self.vote = SoftVote(tau=tau, hidden=hidden, dropout=dropout)
+        self.vote = SoftVote(tau=tau, sharp=sharp, hidden=hidden, dropout=dropout)
 
     def forward(self, Q, qm, C, cm):
         return self.vote(self.encoder(Q, qm), qm, self.encoder(C, cm), cm)

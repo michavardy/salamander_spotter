@@ -207,6 +207,104 @@ class PipelineMatchingBridge:
             con.close()
 
 
+class PipelineE2EMatchingBridge:
+    """Real matcher using a trained ``e2e_transformer`` checkpoint (spec M3, successor to the
+    soft-chamfer baseline). Loads once at construction; scores every gallery individual in a
+    single batched forward pass per query.
+
+    Mirrors how the model was actually trained (``pipeline/spot_transformer/models/aggregator_e2e
+    .build_e2e_pairs``): a gallery individual's photos are POOLED into one candidate token-set,
+    not scored per-photo — there is no natural "best photo" the way soft-chamfer has one, so
+    ``best_photo_id`` here is just one of the individual's real photos (first by id), useful for
+    UI display, not a claim that photo specifically drove the score.
+    """
+
+    model_name = "e2e_transformer"
+
+    def __init__(self, weights_path: Path, *, embedding_table: str = "spot_embeddings",
+                max_spots: int = 120):
+        import sys
+
+        import torch
+
+        # aggregator_e2e.py uses bare `import data as d` etc — it's part of the sweep scripts'
+        # flat-sys.path package (pipeline/spot_transformer/{core,models,eval,sweeps} all on
+        # sys.path directly), not importable as a normal `pipeline.spot_transformer...` package.
+        _st = Path(__file__).resolve().parents[2] / "pipeline" / "spot_transformer"
+        for _sub in (".", "core", "models", "eval"):
+            _p = str((_st / _sub).resolve())
+            if _p not in sys.path:
+                sys.path.insert(0, _p)
+
+        from aggregator_e2e import E2EVoter
+
+        self._torch = torch
+        self.embedding_table = embedding_table
+        self.max_spots = max_spots
+        ckpt = torch.load(str(weights_path), map_location="cpu", weights_only=False)
+        self.model = E2EVoter(**ckpt["model_config"])
+        self.model.load_state_dict(ckpt["state_dict"])
+        self.model.eval()
+
+    def score(self, query_image_id, gallery, contours_db_path):  # noqa: D102
+        import duckdb
+        import numpy as np
+
+        torch = self._torch
+        con = duckdb.connect(str(contours_db_path), read_only=True)
+        try:
+            if not _table_exists(con, self.embedding_table):
+                raise RuntimeError(
+                    f"contours.db has no '{self.embedding_table}' table — run "
+                    f"`pixi run build-embeddings --combine both` on the dataset first."
+                )
+            _, eq = _spot_embeddings(con, self.embedding_table, query_image_id)
+            if eq.shape[0] == 0:
+                return []
+            eq = eq[: self.max_spots].astype(np.float32)
+
+            cand_ids: list[str] = []
+            cand_arrs: list[np.ndarray] = []
+            best_photo: dict[str, str] = {}
+            for individual_id in gallery:
+                photos = [p for p in _real_photos_of(con, individual_id) if p != query_image_id]
+                if not photos:
+                    continue
+                arrs = [_spot_embeddings(con, self.embedding_table, p)[1] for p in photos]
+                arrs = [a for a in arrs if a.shape[0] > 0]
+                if not arrs:
+                    continue
+                cand_ids.append(individual_id)
+                cand_arrs.append(np.concatenate(arrs, axis=0)[: self.max_spots].astype(np.float32))
+                best_photo[individual_id] = photos[0]
+            if not cand_ids:
+                return []
+
+            B = len(cand_ids)
+            Nq, Nc = eq.shape[0], max(a.shape[0] for a in cand_arrs)
+            F = eq.shape[1]
+            Q = np.zeros((B, Nq, F), np.float32)
+            qm = np.ones((B, Nq), bool)
+            Q[:] = eq
+            C = np.zeros((B, Nc, F), np.float32)
+            cm = np.zeros((B, Nc), bool)
+            for i, a in enumerate(cand_arrs):
+                C[i, :len(a)] = a
+                cm[i, :len(a)] = True
+
+            with torch.no_grad():
+                logits = self.model(torch.tensor(Q), torch.tensor(qm),
+                                    torch.tensor(C), torch.tensor(cm))
+                sims = torch.sigmoid(logits).numpy()
+
+            return [
+                PairScore(individual_id=cid, best_photo_id=best_photo[cid], similarity=float(s))
+                for cid, s in zip(cand_ids, sims)
+            ]
+        finally:
+            con.close()
+
+
 class PipelineCorrespondenceBridge:
     """Geometric spot-to-spot correspondence for Match-lines (spec §7.3) — always
     available, independent of whichever matcher is active. Mutual-nearest-neighbour

@@ -57,9 +57,16 @@ def create_app(
     app.state.owns_db = db is None
     app.state.settings_store = SettingsStore(app.state.db)
     app.state.secret_store = SecretStore(settings.data_dir / "secrets.json")
-    app.state.bridges = bridges or Bridges.production(
-        active_model=app.state.settings_store.get("active_model")
-    )
+    if bridges is None:
+        from ..services.models import active_model as _active_model_row
+
+        _active = _active_model_row(app.state.db)
+        app.state.bridges = Bridges.production(
+            active_model=_active["name"] if _active else None,
+            weights_path=_active.get("weights_path") if _active else None,
+        )
+    else:
+        app.state.bridges = bridges
     app.state.worker = Worker(app.state.db)
     register_all(
         app.state.worker,

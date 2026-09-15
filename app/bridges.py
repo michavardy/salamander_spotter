@@ -15,6 +15,7 @@ from .pipeline_bridge.matching import (
     CorrespondenceBridge,
     MatchingBridge,
     PipelineCorrespondenceBridge,
+    PipelineE2EMatchingBridge,
     PipelineMatchingBridge,
     StubCorrespondenceBridge,
     StubMatchingBridge,
@@ -32,20 +33,24 @@ class Bridges:
 
     @classmethod
     def production(cls, *, active_model: str | None = None, weights_path: Path | None = None) -> "Bridges":
-        # NOTE: PipelineMatchingBridge/PipelineCorrespondenceBridge now have a real,
-        # tested implementation (soft-chamfer over contours.db's precomputed
-        # `spot_embeddings`) — but validation against the live dataset showed its
-        # rank-1 is at population chance (median rank ~= gallery_size/2 across
-        # gallery sizes 5/20/60), i.e. no real discriminating signal, consistent
-        # with the pipeline's own docs calling soft-chamfer a weak baseline "to
-        # improve upon". Shipping it as the default here would produce confident-
-        # looking but essentially random match suggestions, which is worse than
-        # not matching at all. Left wired for `Bridges.experimental_matcher()`
-        # (opt-in) and further work — see docs/salamander_spotter_spec.md M3.
+        # NOTE: PipelineMatchingBridge (soft-chamfer over contours.db's precomputed
+        # `spot_embeddings`) validated at population-chance rank-1 on the live dataset — no real
+        # discriminating signal, so it stays opt-in only via `Bridges.experimental_matcher()`.
+        #
+        # PipelineE2EMatchingBridge (a trained e2e_transformer checkpoint) is the real matcher:
+        # activated when the caller resolves an active model's weights_path and passes it in (see
+        # app/api/__init__.py, which looks up `models.active_model()`). No active model yet, or
+        # its weights file missing -> falls back to the safe stub rather than guessing.
+        if weights_path is not None and Path(weights_path).is_file():
+            matching: MatchingBridge = PipelineE2EMatchingBridge(Path(weights_path))
+            correspondence: CorrespondenceBridge = PipelineCorrespondenceBridge()
+        else:
+            matching = StubMatchingBridge()
+            correspondence = StubCorrespondenceBridge()
         return cls(
             extraction=PipelineExtractionBridge(),
-            matching=StubMatchingBridge(),
-            correspondence=StubCorrespondenceBridge(),
+            matching=matching,
+            correspondence=correspondence,
             editor=PipelineEditorBridge(),
             training=PipelineTrainingBridge(),
         )
